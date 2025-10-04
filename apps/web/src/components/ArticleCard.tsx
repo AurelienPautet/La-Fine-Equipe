@@ -146,7 +146,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ slug }) => {
         {/* Fixed position button at bottom */}
         <div className="card-actions justify-end mt-4">
           <Link
-            to={`/blog/${slug}`}
+            to={`/article/${slug}`}
             className="btn btn-primary btn-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
           >
             Lire l'article

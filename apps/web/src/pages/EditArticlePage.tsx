@@ -36,7 +36,7 @@ const EditArticlePage: React.FC = () => {
       } catch (error) {
         console.error("Error loading article for editing:", error);
         alert("Erreur lors du chargement de l'article.");
-        navigate("/blog");
+        navigate("/article");
       } finally {
         setLoading(false);
       }
@@ -89,7 +89,7 @@ tags: ${formData.tags}
 
       // Show success message and redirect
       alert("Article modifié avec succès !");
-      navigate(`/blog/${id}`);
+      navigate(`/article/${id}`);
     } catch (error) {
       console.error("Error updating article:", error);
       alert("Erreur lors de la modification de l'article. Veuillez réessayer.");
@@ -126,14 +126,14 @@ tags: ${formData.tags}
           {/* Navigation */}
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <Link
-              to={`/blog/${id}`}
+              to={`/article/${id}`}
               className="btn btn-outline btn-primary hover:btn-primary transition-all duration-300 flex items-center gap-2 w-fit"
             >
               <FaArrowLeft className="w-4 h-4" />
               Retour à l'article
             </Link>
             <Link
-              to="/blog"
+              to="/article"
               className="btn btn-outline btn-secondary hover:btn-secondary transition-all duration-300 flex items-center gap-2 w-fit"
             >
               Voir tous les articles

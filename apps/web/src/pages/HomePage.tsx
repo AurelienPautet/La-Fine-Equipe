@@ -74,7 +74,7 @@ const HomePage: React.FC = () => {
                 Découvrir l'équipe
               </Link>
               <Link
-                to="/blog"
+                to="/article"
                 className="btn btn-outline btn-lg border-2 border-accent text-accent hover:bg-accent hover:text-accent-content shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
               >
                 <FaBook className="w-5 h-5" />
@@ -109,7 +109,7 @@ const HomePage: React.FC = () => {
             </div>
             <div className="text-center mt-8">
               <Link
-                to="/blog"
+                to="/article"
                 className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
               >
                 <FaBook className="w-5 h-5" />

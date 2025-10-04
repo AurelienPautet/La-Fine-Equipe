@@ -26,10 +26,10 @@ function App() {
           <main className="min-h-screen">
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/blog" element={<ArticlesPage />} />
-              <Route path="/blog/create" element={<CreateArticlePage />} />
-              <Route path="/blog/edit/:id" element={<EditArticlePage />} />
-              <Route path="/blog/:id" element={<ArticlePage />} />
+              <Route path="/article" element={<ArticlesPage />} />
+              <Route path="/article/create" element={<CreateArticlePage />} />
+              <Route path="/article/edit/:id" element={<EditArticlePage />} />
+              <Route path="/article/:id" element={<ArticlePage />} />
               <Route path="/about" element={<AboutPage />} />
             </Routes>
           </main>

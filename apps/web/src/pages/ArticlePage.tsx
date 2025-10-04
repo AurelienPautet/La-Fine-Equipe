@@ -68,7 +68,7 @@ const ArticlePage: React.FC = () => {
           <p className="text-lg text-base-content mb-8">
             Désolé, nous n'avons pas pu trouver cet article.
           </p>
-          <Link to="/blog" className="btn btn-primary btn-lg">
+          <Link to="/article" className="btn btn-primary btn-lg">
             ← Retour aux articles
           </Link>
         </div>
@@ -99,7 +99,7 @@ const ArticlePage: React.FC = () => {
           {/* Navigation */}
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <Link
-              to="/blog"
+              to="/article"
               className="btn btn-outline btn-primary hover:btn-primary transition-all duration-300"
             >
               ← Retour aux articles
@@ -108,7 +108,7 @@ const ArticlePage: React.FC = () => {
             {/* Edit Button */}
             {id && (
               <Link
-                to={`/blog/edit/${id}`}
+                to={`/article/edit/${id}`}
                 className="btn btn-secondary shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
               >
                 <FaPen className="w-4 h-4" />
@@ -138,7 +138,7 @@ const ArticlePage: React.FC = () => {
           {/* Navigation Footer */}
           <div className="text-center mt-12">
             <Link
-              to="/blog"
+              to="/article"
               className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
             >
               Voir plus d'articles

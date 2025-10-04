@@ -17,4 +17,4 @@ Nous avons hâte de vous retrouver pour de nouvelles aventures !
 | Atelier Créatif      | 5 octobre 2025    | Local Associatif  |
 | Tournoi de Jeux      | 18 octobre 2025   | Cafétéria         |
 
-Pour plus d'informations, visitez notre [page d'événements](/blog) ou contactez-nous via notre [formulaire de contact](/about).
+Pour plus d'informations, visitez notre [page d'événements](/article) ou contactez-nous via notre [formulaire de contact](/about).

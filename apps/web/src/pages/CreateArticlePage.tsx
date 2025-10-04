@@ -31,7 +31,7 @@ const CreateArticlePage: React.FC = () => {
       },
       {
         onSuccess: () => {
-          navigate("/blog");
+          navigate("/article");
         },
         onError: (error) => {
           console.error("Error creating article:", error);
@@ -55,7 +55,7 @@ const CreateArticlePage: React.FC = () => {
           {/* Navigation */}
           <div className="mb-8">
             <Link
-              to="/blog"
+              to="/article"
               className="btn btn-outline btn-primary hover:btn-primary transition-all duration-300 flex items-center gap-2 w-fit"
             >
               <FaArrowLeft className="w-4 h-4" />

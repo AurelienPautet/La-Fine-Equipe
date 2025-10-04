@@ -43,7 +43,7 @@ const ArticlesPage: React.FC = () => {
           {/* Create New Article Button */}
           <div className="mt-8">
             <Link
-              to="/blog/create"
+              to="/article/create"
               className="btn btn-secondary btn-lg gap-2 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <FaPlus className="w-5 h-5" />
@@ -71,7 +71,7 @@ const ArticlesPage: React.FC = () => {
                   Soyez le premier à créer un article !
                 </p>
                 <Link
-                  to="/blog/create"
+                  to="/article/create"
                   className="btn btn-primary btn-lg gap-2"
                 >
                   <FaPlus className="w-5 h-5" />

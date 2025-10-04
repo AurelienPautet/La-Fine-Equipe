@@ -34,7 +34,7 @@ const Header: React.FC = () => {
           </li>
           <li>
             <Link
-              to="/blog"
+              to="/article"
               className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaBlog className="w-4 h-4" />

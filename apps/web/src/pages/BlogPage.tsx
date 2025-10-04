@@ -44,7 +44,7 @@ const BlogPage: React.FC = () => {
           {/* Create Article Button */}
           <div className="mt-8">
             <Link
-              to="/blog/create"
+              to="/article/create"
               className="btn btn-accent btn-lg text-accent-content shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
             >
               <FaPlus className="w-5 h-5" />
