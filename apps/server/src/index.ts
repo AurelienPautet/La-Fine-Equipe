@@ -5,11 +5,7 @@ import express from "express";
 import cors from "cors";
 import { db } from "@lafineequipe/db";
 import { articles, tags, articleTags } from "@lafineequipe/db/src/schema";
-import { InferSelectModel } from "drizzle-orm";
-
-interface ArticleWithTags extends InferSelectModel<typeof articles> {
-  tags: (number | null)[];
-};
+import { ArticleWithTags, createArticleRequestSchema, createTagRequestSchema } from "@lafineequipe/types";
 import { eq } from 'drizzle-orm';
 
 const app = express();
@@ -37,19 +33,38 @@ app.get("/api/articles", async (_, res) => {
 });
 
 app.post("/api/articles", async (req, res) => {
-  const { title, content, author, tagsId } = req.body;
-  const [article] = await db.insert(articles).values({ title, content, author }).returning().execute();
-  console.log(article);
-  for(const tagId of tagsId){
-    await db.insert(articleTags).values({ articleId: article.id, tagId }).execute();
+  try {
+    const validatedData = createArticleRequestSchema.parse(req.body);    
+    const { title, slug, content, author, tagsId } = validatedData;
+    const [article] = await db.insert(articles).values({ title, content, author, slug }).returning().execute();
+    console.log(article);
+    
+    for(const tagId of tagsId){
+      await db.insert(articleTags).values({ articleId: article.id, tagId }).execute();
+    }
+    res.status(201).json({ success: true, data: article });
+  } catch (error: any) {
+    if (error.name === 'ZodError') {
+      return res.status(400).json({ success: false, errors: error.errors });
+    }
+    res.status(500).json({ success: false, error: 'Failed to create article' });
   }
-  res.status(201).send("Article created!");
 });
 
 app.post("/api/tags", async (req, res) => {
-  const { name } = req.body;
-  await db.insert(tags).values({ name }).execute();
-  res.status(201).send("Tag created!");
+  try {
+    const validatedData = createTagRequestSchema.parse(req.body);
+    
+    const { name } = validatedData;
+    const [tag] = await db.insert(tags).values({ name }).returning().execute();
+    
+    res.status(201).json({ success: true, data: tag });
+  } catch (error: any) {
+    if (error.name === 'ZodError') {
+      return res.status(400).json({ success: false, errors: error.errors });
+    }
+    res.status(500).json({ success: false, error: 'Failed to create tag' });
+  }
 });
 
 const PORT = process.env.PORT || 4000;
