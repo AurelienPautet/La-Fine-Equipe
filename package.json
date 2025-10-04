@@ -1,0 +1,16 @@
+{
+  "name": "lafineequipe",
+    "private": true,
+  "version": "1.0.0",
+  "devDependencies": {
+    "turbo": "^2.5.8"
+  },
+  "scripts": {
+    "dev": "turbo run dev"
+  },
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.18.0"
+}
