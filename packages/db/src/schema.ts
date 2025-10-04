@@ -9,6 +9,7 @@ export const tags = pgTable("tags", {
 export const articles = pgTable("articles", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
+  slug: text("slug").notNull().unique(),
   content: text("content").notNull(),
   author: text("author").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
