@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+const queryClient = new QueryClient();
+
 import HomePage from "./pages/HomePage";
 import ArticlesPage from "./pages/ArticlesPage";
 import AboutPage from "./pages/AboutPage";
@@ -11,28 +14,30 @@ import Footer from "./components/Footer";
 function App() {
   return (
     <BrowserRouter>
-      <div
-        data-theme="lafine"
-        className="min-h-screen bg-gradient-to-br from-accent to-base-100"
-      >
-        {/* Header/Navigation */}
-        <Header />
+      <QueryClientProvider client={queryClient}>
+        <div
+          data-theme="lafine"
+          className="min-h-screen bg-gradient-to-br from-accent to-base-100"
+        >
+          {/* Header/Navigation */}
+          <Header />
 
-        {/* Main Content */}
-        <main className="min-h-screen">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/blog" element={<ArticlesPage />} />
-            <Route path="/blog/create" element={<CreateArticlePage />} />
-            <Route path="/blog/edit/:id" element={<EditArticlePage />} />
-            <Route path="/blog/:id" element={<ArticlePage />} />
-            <Route path="/about" element={<AboutPage />} />
-          </Routes>
-        </main>
+          {/* Main Content */}
+          <main className="min-h-screen">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/blog" element={<ArticlesPage />} />
+              <Route path="/blog/create" element={<CreateArticlePage />} />
+              <Route path="/blog/edit/:id" element={<EditArticlePage />} />
+              <Route path="/blog/:id" element={<ArticlePage />} />
+              <Route path="/about" element={<AboutPage />} />
+            </Routes>
+          </main>
 
-        {/* Footer */}
-        <Footer />
-      </div>
+          {/* Footer */}
+          <Footer />
+        </div>
+      </QueryClientProvider>
     </BrowserRouter>
   );
 }
