@@ -4,69 +4,29 @@ import { FaArrowLeft } from "react-icons/fa";
 import ArticleForm, { type ArticleFormData } from "../components/ArticleForm";
 import ArticleFormHeader from "../components/ArticleFormHeader";
 import MarkdownGuide from "../components/MarkdownGuide";
+import { usePostArticle } from "../hooks/ArticleHooks";
 
 const CreateArticlePage: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const postArticle = usePostArticle();
 
   const initialFormData: ArticleFormData = {
     title: "",
     author: "",
-    date: new Date().toISOString().split("T")[0], // Today's date
+    date: new Date().toISOString().split("T")[0],
     tags: "",
     content: "",
   };
 
-  const generateSlug = (title: string): string => {
-    return title
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Remove accents
-      .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
-      .replace(/\s+/g, "-") // Replace spaces with hyphens
-      .replace(/-+/g, "-") // Replace multiple hyphens with single
-      .trim();
-  };
-
   const handleSubmit = async (formData: ArticleFormData) => {
-    setIsSubmitting(true);
-
-    try {
-      // Generate slug from title
-      const slug = generateSlug(formData.title);
-
-      // Create frontmatter
-      const frontmatter = `---
-title: ${formData.title}
-author: ${formData.author}
-date: ${formData.date}
-tags: ${formData.tags}
----
-
-`;
-
-      // Combine frontmatter with content
-      const fullContent = frontmatter + formData.content;
-
-      // In a real application, you would send this to your backend
-      // For now, we'll simulate saving and show a success message
-      console.log("Article to save:", {
-        slug,
-        content: fullContent,
-      });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Show success message and redirect
-      alert("Article créé avec succès !");
-      navigate("/blog");
-    } catch (error) {
-      console.error("Error creating article:", error);
-      alert("Erreur lors de la création de l'article. Veuillez réessayer.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    postArticle.mutate({
+      title: formData.title,
+      content: formData.content,
+      author: formData.author,
+      date: new Date(formData.date),
+      tagsId: [],
+    });
   };
 
   return (
