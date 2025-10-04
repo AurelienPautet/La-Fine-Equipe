@@ -1,10 +1,16 @@
 import dotenv from "dotenv";
-dotenv.config(); // Load env vars FIRST, before other imports
+dotenv.config(); 
 
 import express from "express";
 import cors from "cors";
 import { db } from "@lafineequipe/db";
 import { articles, tags, articleTags } from "@lafineequipe/db/src/schema";
+import { InferSelectModel } from "drizzle-orm";
+
+interface ArticleWithTags extends InferSelectModel<typeof articles> {
+  tags: (number | null)[];
+};
+import { eq } from 'drizzle-orm';
 
 const app = express();
 app.use(cors());
@@ -16,7 +22,18 @@ app.get("/", (_, res) => {
 
 app.get("/api/articles", async (_, res) => {
   const allArticles = await db.select().from(articles).execute();
-  res.json(allArticles);
+  let allArticlesWithTags: ArticleWithTags[] = [];
+  for (const article of allArticles) {
+    const articleTagRelations = await db
+      .select()
+      .from(articleTags)
+      .where(eq(articleTags.articleId, article.id))
+      .execute();
+    const tagIds = articleTagRelations.map((relation) => relation.tagId);
+    allArticlesWithTags.push({ ...article, tags: tagIds });
+  }
+
+  res.json(allArticlesWithTags);
 });
 
 app.post("/api/articles", async (req, res) => {
@@ -37,5 +54,5 @@ app.post("/api/tags", async (req, res) => {
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
