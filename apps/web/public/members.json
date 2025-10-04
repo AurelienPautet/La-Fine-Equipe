@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Lézard en Chef",
+    "role": "Président",
+    "photo": "/logo.png",
+    "instagram": "https://www.instagram.com/aurelien.ptt"
+  },
+  {
+    "id": 2,
+    "name": "Salamandre Souriante",
+    "role": "Vice-Présidente",
+    "photo": "/logo.png",
+    "instagram": "https://www.instagram.com/lafineequipesite"
+  },
+  {
+    "id": 3,
+    "name": "Triton Timide",
+    "role": "Trésorier",
+    "photo": "/logo.png",
+    "instagram": "https://www.instagram.com/lafineequipesite"
+  },
+  {
+    "id": 4,
+    "name": "Gecko Gentil",
+    "role": "Secrétaire",
+    "photo": "/logo.png",
+    "instagram": "https://www.instagram.com/lafineequipesite"
+  }
+]

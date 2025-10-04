@@ -1,0 +1,59 @@
+import { Link } from "react-router-dom";
+import { FaHome, FaBlog, FaUsers } from "react-icons/fa";
+
+const Header: React.FC = () => {
+  return (
+    <div className="navbar bg-base-100 shadow-xl border-b-4 border-primary">
+      <div className="flex-1">
+        <Link
+          to="/"
+          className="flex items-center normal-case text-2xl font-bold text-secondary hover:text-primary transition-colors"
+        >
+          <div className="avatar">
+            <div className="w-12 h-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+              <img
+                src="/logo.png"
+                alt="La Fine Équipe Logo"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+          <span className="ml-3 hidden md:block">La Fine Équipe</span>
+        </Link>
+      </div>
+      <div className="flex-none">
+        <ul className="menu menu-horizontal px-1 text-lg font-semibold">
+          <li>
+            <Link
+              to="/"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+            >
+              <FaHome className="w-4 h-4" />
+              <span className="hidden md:block">Accueil</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/blog"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+            >
+              <FaBlog className="w-4 h-4" />
+              <span className="hidden md:block">Articles</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/about"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+            >
+              <FaUsers className="w-4 h-4" />
+              <span className="hidden md:block">À Propos</span>
+            </Link>
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+export default Header;

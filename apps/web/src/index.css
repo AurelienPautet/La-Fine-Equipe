@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+@plugin "@tailwindcss/typography";
+
+/* Custom La Fine Équipe Theme */
+@plugin "daisyui/theme" {
+  name: "lafine";
+  default: false;
+  prefersdark: false;
+  color-scheme: light;
+
+  /* Brand Colors based on the orange lizard theme */
+  --color-primary: oklch(65% 0.25 30); /* Orange #FF6B35 */
+  --color-primary-content: oklch(98% 0.01 30);
+  --color-secondary: oklch(25% 0.05 30); /* Dark brown #2C1810 */
+  --color-secondary-content: oklch(98% 0.01 30);
+  --color-accent: oklch(95% 0.05 60); /* Cream #FFF8E7 */
+  --color-accent-content: oklch(25% 0.05 30);
+
+  /* Base colors */
+  --color-base-100: oklch(100% 0 0); /* White */
+  --color-base-200: oklch(97% 0.02 60); /* Light cream */
+  --color-base-300: oklch(92% 0.03 60); /* Slightly darker cream */
+  --color-base-content: oklch(25% 0.05 30); /* Dark text */
+
+  /* Neutral colors */
+  --color-neutral: oklch(45% 0.05 240);
+  --color-neutral-content: oklch(98% 0.01 240);
+
+  /* Status colors */
+  --color-info: oklch(70% 0.2 220);
+  --color-info-content: oklch(98% 0.01 220);
+  --color-success: oklch(65% 0.25 140);
+  --color-success-content: oklch(98% 0.01 140);
+  --color-warning: oklch(80% 0.25 80);
+  --color-warning-content: oklch(20% 0.05 80);
+  --color-error: oklch(65% 0.3 20);
+  --color-error-content: oklch(98% 0.01 20);
+
+  /* Border radius - rounded for friendly feel */
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+
+  /* Base sizes */
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  /* Border size */
+  --border: 2px;
+
+  /* Effects - subtle depth */
+  --depth: 2;
+  --noise: 1;
+}
