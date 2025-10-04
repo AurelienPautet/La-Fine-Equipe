@@ -5,12 +5,12 @@ import { z } from 'zod';
 export type Article = InferSelectModel<typeof articles>;
 
 export interface ArticleWithTags extends Article {
-  tags: (number | null)[];
+  tagsId: (number | null)[];
 }
 
 export const createArticleRequestSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  slug: z.string().min(1, 'Slug is required'),
+  date: z.coerce.date({ required_error: 'Date is required', invalid_type_error: 'Invalid date format' }),
   content: z.string().min(1, 'Content is required'),
   author: z.string().min(1, 'Author is required'),
   tagsId: z.array(z.number()).optional().default([])

@@ -12,6 +12,7 @@ export const articles = pgTable("articles", {
   slug: text("slug").notNull().unique(),
   content: text("content").notNull(),
   author: text("author").notNull(),
+  date: timestamp("date").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow().$onUpdateFn(()=>new Date()),
 });
