@@ -20,13 +20,25 @@ const CreateArticlePage: React.FC = () => {
   };
 
   const handleSubmit = async (formData: ArticleFormData) => {
-    postArticle.mutate({
-      title: formData.title,
-      content: formData.content,
-      author: formData.author,
-      date: new Date(formData.date),
-      tagsId: [],
-    });
+    setIsSubmitting(true);
+    postArticle.mutate(
+      {
+        title: formData.title,
+        content: formData.content,
+        author: formData.author,
+        date: new Date(formData.date),
+        tagsId: [],
+      },
+      {
+        onSuccess: () => {
+          navigate("/blog");
+        },
+        onError: (error) => {
+          console.error("Error creating article:", error);
+          setIsSubmitting(false);
+        },
+      }
+    );
   };
 
   return (
