@@ -1,8 +1,13 @@
-import type { CreateArticleRequest, ArticleWithTags } from "@lafineequipe/types";
+import type {
+  CreateArticleRequest,
+  ArticleWithTags,
+} from "@lafineequipe/types";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
-export async function postArticleMutation(articleData: CreateArticleRequest): Promise<ArticleWithTags> {
+export async function postArticleMutation(
+  articleData: CreateArticleRequest
+): Promise<ArticleWithTags> {
   const response = await fetch(`${API_URL}/api/articles`, {
     method: "POST",
     headers: {
@@ -19,6 +24,17 @@ export async function postArticleMutation(articleData: CreateArticleRequest): Pr
   return article;
 }
 
+export async function getArticles(): Promise<ArticleWithTags[]> {
+  const response = await fetch(`${API_URL}/api/articles`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch articles");
+  }
+
+  const articles = await response.json();
+  return articles;
+}
+
 export async function getArticle(slug: string): Promise<ArticleWithTags> {
   const response = await fetch(`${API_URL}/api/articles/${slug}`);
 
@@ -28,5 +44,15 @@ export async function getArticle(slug: string): Promise<ArticleWithTags> {
 
   const article = await response.json();
   return article.data;
+}
 
+export async function getLatestArticle(): Promise<ArticleWithTags> {
+  const response = await fetch(`${API_URL}/api/articles/latest`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch latest article");
+  }
+
+  const article = await response.json();
+  return article.data;
 }

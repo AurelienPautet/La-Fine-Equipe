@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FaUsers, FaBook, FaGem } from "react-icons/fa";
 import ArticleCard from "../components/ArticleCard";
 import MemberCard from "../components/MemberCard";
-
+import { useLatestArticle } from "../hooks/ArticleHooks";
 interface Member {
   id: number;
   name: string;
@@ -14,26 +14,14 @@ interface Member {
 
 const HomePage: React.FC = () => {
   const [students, setMembers] = useState<Member[]>([]);
-  const [latestPostSlug, setLatestPostSlug] = useState<string | null>(null);
 
+  const { data: latestArticle, error, isLoading } = useLatestArticle();
+  console.log("Latest article data:", latestArticle, error);
   useEffect(() => {
     fetch("/members.json")
       .then((response) => response.json())
       .then((data) => setMembers(data))
       .catch((error) => console.error("Error fetching students:", error));
-    const fetchMarkdownPosts = async () => {
-      const modules = import.meta.glob("../posts/*.md", { as: "raw" });
-      const slugs: string[] = [];
-      for (const path in modules) {
-        const slug = path.split("/").pop()?.replace(".md", "") || "";
-        if (slug) {
-          slugs.push(slug);
-        }
-      }
-      setLatestPostSlug(slugs[0] || null);
-    };
-
-    fetchMarkdownPosts();
   }, []);
 
   return (
@@ -92,7 +80,7 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Latest Article Section */}
-      {latestPostSlug && (
+      {latestArticle && (
         <section className="py-20 bg-base-100">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
@@ -104,7 +92,7 @@ const HomePage: React.FC = () => {
             </div>
             <div className="flex justify-center">
               <div className="max-w-lg">
-                <ArticleCard slug={latestPostSlug} />
+                <ArticleCard article={latestArticle} />
               </div>
             </div>
             <div className="text-center mt-8">

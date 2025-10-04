@@ -2,30 +2,14 @@ import React, { useEffect, useState } from "react";
 import { FaBook, FaPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import ArticleCard from "../components/ArticleCard";
-
+import type { ArticleWithTags } from "../../../../packages/types/src/article";
+import { useArticles } from "../hooks/ArticleHooks";
 const ArticlesPage: React.FC = () => {
-  const [postSlugs, setPostSlugs] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchMarkdownPosts = async () => {
-      const modules = import.meta.glob("../posts/*.md", { as: "raw" });
-      console.log("ArticlesPage: import.meta.glob modules:", modules);
-      const slugs: string[] = [];
-
-      for (const path in modules) {
-        const slug = path.split("/").pop()?.replace(".md", "") || "";
-        if (slug) {
-          slugs.push(slug);
-        }
-      }
-
-      console.log("ArticlesPage: All post slugs:", slugs);
-      setPostSlugs(slugs);
-    };
-
-    fetchMarkdownPosts();
-  }, []);
-
+  let { data: articles, error, isLoading } = useArticles();
+  console.log("Fetched articles data:", articles, error);
+  if (articles === undefined) {
+    articles = [];
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent to-base-200">
       {/* Header Section */}
@@ -60,7 +44,7 @@ const ArticlesPage: React.FC = () => {
             Tous nos articles
           </h2>
 
-          {postSlugs.length === 0 ? (
+          {articles.length === 0 ? (
             <div className="text-center">
               <div className="bg-base-100 rounded-xl p-12 shadow-lg">
                 <FaBook className="w-16 h-16 mx-auto mb-6 text-primary/50" />
@@ -81,12 +65,12 @@ const ArticlesPage: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {postSlugs.map((slug) => (
+              {articles.map((article: ArticleWithTags) => (
                 <div
-                  key={slug}
+                  key={article.slug}
                   className="transform transition-all duration-300 hover:scale-105"
                 >
-                  <ArticleCard slug={slug} />
+                  <ArticleCard article={article} />
                 </div>
               ))}
             </div>

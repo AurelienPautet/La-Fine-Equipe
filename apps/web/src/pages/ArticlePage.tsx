@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FaEdit, FaPen } from "react-icons/fa";
 import ArticleDisplay from "../components/ArticleDisplay";
-import { useArticles } from "../hooks/ArticleHooks";
+import { useArticle } from "../hooks/ArticleHooks";
 import type { ArticleWithTags } from "@lafineequipe/types";
 import { TbError404 } from "react-icons/tb";
 
@@ -10,7 +10,7 @@ const ArticlePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [Article, setArticle] = useState<ArticleWithTags | null>(null);
 
-  const { data, error, isLoading } = useArticles(slug || "");
+  const { data, error, isLoading } = useArticle(slug || "");
 
   useEffect(() => {
     console.log("Fetched article data:", data, error);
