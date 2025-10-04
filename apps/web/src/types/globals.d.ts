@@ -1,5 +1,15 @@
 
 
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_API_URL: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 //from https://wicky.nillia.ms/cally/guides/frameworks/
 
 import type {

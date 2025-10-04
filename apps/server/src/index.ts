@@ -26,7 +26,7 @@ app.get("/api/articles", async (_, res) => {
       .where(eq(articleTags.articleId, article.id))
       .execute();
     const tagIds = articleTagRelations.map((relation) => relation.tagId);
-    allArticlesWithTags.push({ ...article, tags: tagIds });
+    allArticlesWithTags.push({ ...article, tagsId: tagIds });
   }
 
   res.json(allArticlesWithTags);
@@ -35,9 +35,22 @@ app.get("/api/articles", async (_, res) => {
 app.post("/api/articles", async (req, res) => {
   try {
     const validatedData = createArticleRequestSchema.parse(req.body);    
-    const { title, slug, content, author, tagsId } = validatedData;
-    const [article] = await db.insert(articles).values({ title, content, author, slug }).returning().execute();
-    console.log(article);
+    const { title, content, author, date, tagsId } = validatedData;
+
+    const slug = title
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") 
+      .replace(/[^a-z0-9\s-]/g, "") 
+      .replace(/\s+/g, "-") 
+      .replace(/-+/g, "-") 
+      .trim();
+      
+    const existingArticle = await db.select().from(articles).where(eq(articles.slug, slug)).execute();
+    if (existingArticle.length > 0) {
+      return res.status(400).json({ success: false, error: 'Slug already exists. Please choose a different title.' });
+    }
+    const [article] = await db.insert(articles).values({ title, content, author, slug, date }).returning().execute();
     
     for(const tagId of tagsId){
       await db.insert(articleTags).values({ articleId: article.id, tagId }).execute();
