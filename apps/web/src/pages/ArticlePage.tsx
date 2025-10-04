@@ -4,6 +4,7 @@ import { FaEdit, FaPen } from "react-icons/fa";
 import ArticleDisplay from "../components/ArticleDisplay";
 import { useArticles } from "../hooks/ArticleHooks";
 import type { ArticleWithTags } from "@lafineequipe/types";
+import { TbError404 } from "react-icons/tb";
 
 const ArticlePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -38,8 +39,8 @@ const ArticlePage: React.FC = () => {
   if (!Article) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-accent to-base-200 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">😕</div>
+        <div className="text-center w-full flex items-center flex-col">
+          <TbError404 className="w-20 h-20" />
           <h1 className="text-4xl font-bold text-secondary mb-4">
             Article non trouvé
           </h1>
