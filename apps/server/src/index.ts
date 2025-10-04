@@ -26,7 +26,12 @@ app.get("/api/articles", async (_, res) => {
       .where(eq(articleTags.articleId, article.id))
       .execute();
     const tagIds = articleTagRelations.map((relation) => relation.tagId);
-    allArticlesWithTags.push({ ...article, tagsId: tagIds });
+    let tagsList = [];
+    for(const tagId of tagIds){
+      const tag = await db.select().from(tags).where(eq(tags.id, tagId)).execute();
+      tagsList.push(tag[0].name);
+    }
+    allArticlesWithTags.push({ ...article, tags: tagsList });
   }
 
   res.json(allArticlesWithTags);
@@ -45,7 +50,7 @@ app.post("/api/articles", async (req, res) => {
       .replace(/\s+/g, "-") 
       .replace(/-+/g, "-") 
       .trim();
-      
+
     const existingArticle = await db.select().from(articles).where(eq(articles.slug, slug)).execute();
     if (existingArticle.length > 0) {
       return res.status(400).json({ success: false, error: 'Slug already exists. Please choose a different title.' });
@@ -62,6 +67,21 @@ app.post("/api/articles", async (req, res) => {
     }
     res.status(500).json({ success: false, error: 'Failed to create article' });
   }
+});
+
+app.get("/api/articles/:slug", async (req, res) => {
+  const { slug } = req.params;
+  const article = await db.select().from(articles).where(eq(articles.slug, slug)).execute();
+  if (article.length === 0) {
+    return res.status(404).json({ success: false, error: 'Article not found' });
+  }
+  const articleTagRelations = await db
+    .select()
+    .from(articleTags)
+    .where(eq(articleTags.articleId, article[0].id))
+    .execute();
+  const tagIds = articleTagRelations.map((relation) => relation.tagId);
+  res.json({ success: true, data: { ...article[0], tagsId: tagIds } });
 });
 
 app.post("/api/tags", async (req, res) => {

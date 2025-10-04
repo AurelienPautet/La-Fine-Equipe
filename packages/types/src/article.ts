@@ -5,7 +5,7 @@ import { z } from 'zod';
 export type Article = InferSelectModel<typeof articles>;
 
 export interface ArticleWithTags extends Article {
-  tagsId: (number | null)[];
+  tags: (string)[];
 }
 
 export const createArticleRequestSchema = z.object({

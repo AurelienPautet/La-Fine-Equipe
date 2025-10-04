@@ -18,3 +18,15 @@ export async function postArticleMutation(articleData: CreateArticleRequest): Pr
   const article = await response.json();
   return article;
 }
+
+export async function getArticle(slug: string): Promise<ArticleWithTags> {
+  const response = await fetch(`${API_URL}/api/articles/${slug}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch article");
+  }
+
+  const article = await response.json();
+  return article.data;
+
+}

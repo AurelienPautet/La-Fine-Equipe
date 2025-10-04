@@ -7,7 +7,7 @@ interface ArticleMetadata {
   title: string;
   author: string;
   date: string;
-  tags: string;
+  tags: string[];
 }
 
 interface ArticleDisplayProps {
@@ -21,39 +21,6 @@ const ArticleDisplay: React.FC<ArticleDisplayProps> = ({
   content,
   isPreview = false,
 }) => {
-  // Parse tags if they're in array format [tag1, tag2] or comma-separated
-  const parseTags = (tagsString: string): string[] => {
-    if (!tagsString) return [];
-
-    // Remove brackets and split by comma
-    const cleanTags = tagsString
-      .replace(/[\[\]]/g, "")
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0);
-
-    return cleanTags;
-  };
-
-  const tags = parseTags(metadata.tags);
-
-  // Format date for display
-  const formatDate = (dateString: string): string => {
-    if (!dateString) return "";
-
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("fr-FR", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return dateString; // Return original if parsing fails
-    }
-  };
-
   return (
     <article className="w-full">
       {/* Article Header */}
@@ -81,16 +48,16 @@ const ArticleDisplay: React.FC<ArticleDisplayProps> = ({
           {metadata.date && (
             <div className="flex items-center gap-2">
               <FaCalendarAlt className="w-4 h-4 text-primary" />
-              <span>{formatDate(metadata.date)}</span>
+              <span>{metadata.date}</span>
             </div>
           )}
 
           {/* Tags */}
-          {tags.length > 0 && (
+          {metadata.tags.length > 0 && (
             <div className="flex items-center gap-2">
               <FaTag className="w-4 h-4 text-primary" />
               <div className="flex flex-wrap gap-1">
-                {tags.map((tag, index) => (
+                {metadata.tags.map((tag, index) => (
                   <span key={index} className="badge badge-primary badge-sm">
                     {tag}
                   </span>

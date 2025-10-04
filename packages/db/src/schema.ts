@@ -19,8 +19,8 @@ export const articles = pgTable("articles", {
 
 export const articleTags = pgTable("article_tags", {
   articleId: integer('article_id')
-            .references(() => articles.id),
+            .references(() => articles.id).notNull(),
   tagId: integer("tag_id")
-            .references(() => tags.id),
+            .references(() => tags.id).notNull(),
 });
 

@@ -2,49 +2,27 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FaEdit, FaPen } from "react-icons/fa";
 import ArticleDisplay from "../components/ArticleDisplay";
-import { fetchArticle } from "../utils/articleUtils";
-
-interface PostMetadata {
-  title: string;
-  date: string;
-  author?: string;
-  tags?: string;
-}
+import { useArticles } from "../hooks/ArticleHooks";
+import type { ArticleWithTags } from "@lafineequipe/types";
 
 const ArticlePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [markdownContent, setMarkdownContent] = useState("");
-  const [postMetadata, setPostMetadata] = useState<PostMetadata | null>(null);
-  const [contentWithoutFrontmatter, setContentWithoutFrontmatter] =
-    useState("");
-  const [loading, setLoading] = useState(true);
+  const [Article, setArticle] = useState<ArticleWithTags | null>(null);
+
+  const { data, error, isLoading } = useArticles(slug || "");
 
   useEffect(() => {
-    const loadArticle = async () => {
-      if (!slug) return;
+    console.log("Fetched article data:", data, error);
+    if (data && data.content) {
+      const content = data.content;
+      setArticle(data);
+    }
+    if (error) {
+      console.error("Error fetching article:", error);
+    }
+  }, [data, error]);
 
-      try {
-        const article = await fetchArticle(slug);
-        setPostMetadata({
-          title: article.metadata.title,
-          date: article.metadata.date,
-          author: article.metadata.author,
-          tags: article.metadata.tags,
-        });
-        setContentWithoutFrontmatter(article.content);
-        setMarkdownContent(article.fullContent);
-      } catch (error) {
-        console.error("Error loading article:", error);
-        setMarkdownContent(""); // This will trigger the "not found" UI
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadArticle();
-  }, [slug]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-accent to-base-200 flex items-center justify-center">
         <div className="text-center">
@@ -57,7 +35,7 @@ const ArticlePage: React.FC = () => {
     );
   }
 
-  if (!markdownContent) {
+  if (!Article) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-accent to-base-200 flex items-center justify-center">
         <div className="text-center">
@@ -120,15 +98,15 @@ const ArticlePage: React.FC = () => {
           {/* Article Content */}
           <article className="card bg-base-100 shadow-2xl border-2 border-primary/20">
             <div className="card-body p-8 lg:p-12">
-              {postMetadata && (
+              {Article && (
                 <ArticleDisplay
                   metadata={{
-                    title: postMetadata.title,
-                    author: postMetadata.author || "",
-                    date: postMetadata.date,
-                    tags: postMetadata.tags || "",
+                    title: Article.title,
+                    author: Article.author || "",
+                    date: new Date(Article.date).toLocaleDateString(),
+                    tags: Article.tags || [],
                   }}
-                  content={contentWithoutFrontmatter}
+                  content={Article.content}
                   isPreview={false}
                 />
               )}
