@@ -3,11 +3,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaEdit } from "react-icons/fa";
 import ArticleForm, { type ArticleFormData } from "../components/ArticleForm";
 import ArticleFormHeader from "../components/ArticleFormHeader";
-import MarkdownGuide from "../components/MarkdownGuide";
 import { fetchArticle } from "../utils/articleUtils";
+import MarkdownGuide from "../components/MarkdownGuide";
 
 const EditArticlePage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -22,10 +22,10 @@ const EditArticlePage: React.FC = () => {
   // Load existing article data
   useEffect(() => {
     const loadArticle = async () => {
-      if (!id) return;
+      if (!slug) return;
 
       try {
-        const article = await fetchArticle(id);
+        const article = await fetchArticle(slug);
         setInitialFormData({
           title: article.metadata.title,
           author: article.metadata.author,
@@ -43,7 +43,7 @@ const EditArticlePage: React.FC = () => {
     };
 
     loadArticle();
-  }, [id, navigate]);
+  }, [slug, navigate]);
 
   const generateSlug = (title: string): string => {
     return title
@@ -79,7 +79,7 @@ tags: ${formData.tags}
       // In a real application, you would send this to your backend
       // For now, we'll simulate saving and show a success message
       console.log("Article to update:", {
-        originalId: id,
+        originalslug: slug,
         newSlug: slug,
         content: fullContent,
       });
@@ -89,7 +89,7 @@ tags: ${formData.tags}
 
       // Show success message and redirect
       alert("Article modifié avec succès !");
-      navigate(`/article/${id}`);
+      navigate(`/article/${slug}`);
     } catch (error) {
       console.error("Error updating article:", error);
       alert("Erreur lors de la modification de l'article. Veuillez réessayer.");
@@ -116,7 +116,7 @@ tags: ${formData.tags}
       {/* Header */}
       <ArticleFormHeader
         title="Modifier l'Article"
-        subtitle="Modifiez votre article et partagez vos idées avec La Fine Équipe"
+        subtitle="Modifiez votre article et partagez vos slugées avec La Fine Équipe"
         icon={<FaEdit className="w-10 h-10" />}
       />
 
@@ -126,7 +126,7 @@ tags: ${formData.tags}
           {/* Navigation */}
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <Link
-              to={`/article/${id}`}
+              to={`/article/${slug}`}
               className="btn btn-outline btn-primary hover:btn-primary transition-all duration-300 flex items-center gap-2 w-fit"
             >
               <FaArrowLeft className="w-4 h-4" />

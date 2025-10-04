@@ -28,8 +28,8 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/article" element={<ArticlesPage />} />
               <Route path="/article/create" element={<CreateArticlePage />} />
-              <Route path="/article/edit/:id" element={<EditArticlePage />} />
-              <Route path="/article/:id" element={<ArticlePage />} />
+              <Route path="/article/edit/:slug" element={<EditArticlePage />} />
+              <Route path="/article/:slug" element={<ArticlePage />} />
               <Route path="/about" element={<AboutPage />} />
             </Routes>
           </main>

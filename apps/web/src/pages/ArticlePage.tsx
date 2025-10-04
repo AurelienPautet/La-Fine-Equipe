@@ -12,7 +12,7 @@ interface PostMetadata {
 }
 
 const ArticlePage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const [markdownContent, setMarkdownContent] = useState("");
   const [postMetadata, setPostMetadata] = useState<PostMetadata | null>(null);
   const [contentWithoutFrontmatter, setContentWithoutFrontmatter] =
@@ -21,10 +21,10 @@ const ArticlePage: React.FC = () => {
 
   useEffect(() => {
     const loadArticle = async () => {
-      if (!id) return;
+      if (!slug) return;
 
       try {
-        const article = await fetchArticle(id);
+        const article = await fetchArticle(slug);
         setPostMetadata({
           title: article.metadata.title,
           date: article.metadata.date,
@@ -42,7 +42,7 @@ const ArticlePage: React.FC = () => {
     };
 
     loadArticle();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -106,9 +106,9 @@ const ArticlePage: React.FC = () => {
             </Link>
 
             {/* Edit Button */}
-            {id && (
+            {slug && (
               <Link
-                to={`/article/edit/${id}`}
+                to={`/article/edit/${slug}`}
                 className="btn btn-secondary shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
               >
                 <FaPen className="w-4 h-4" />
