@@ -5,7 +5,7 @@ import {
   ArticleWithTags,
   createArticleRequestSchema,
 } from "@lafineequipe/types";
-import { eq, desc, SQL } from "drizzle-orm";
+import { eq, desc, SQL, and, not } from "drizzle-orm";
 
 const getArticlesWithTags = async (
   whereCondition?: SQL,
@@ -54,6 +54,7 @@ const getArticlesWithTags = async (
       });
     } else if (row.tagName) {
       articlesMap.get(row.id)!.tags.push(row.tagName);
+      articlesMap.get(row.id)!.tagsId?.push(row.id);
     }
   }
 
@@ -66,6 +67,44 @@ export const getAllArticles = async (_req: Request, res: Response) => {
     res.json(allArticlesWithTags);
   } catch (error) {
     res.status(500).json({ success: false, error: "Failed to fetch articles" });
+  }
+};
+
+export const getArticleBySlug = async (req: Request, res: Response) => {
+  try {
+    const { slug } = req.params;
+    const articlesWithTags = await getArticlesWithTags(eq(articles.slug, slug));
+
+    if (articlesWithTags.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Article not found" });
+    }
+
+    res.json({ success: true, data: articlesWithTags[0] });
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Failed to fetch article" });
+  }
+};
+
+export const getLatestArticle = async (req: Request, res: Response) => {
+  try {
+    const allArticles = await getArticlesWithTags(
+      undefined,
+      desc(articles.date)
+    );
+
+    if (allArticles.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, error: "No articles found" });
+    }
+
+    res.json({ success: true, data: allArticles[0] });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to fetch latest article" });
   }
 };
 
@@ -117,40 +156,55 @@ export const createArticle = async (req: Request, res: Response) => {
   }
 };
 
-export const getArticleBySlug = async (req: Request, res: Response) => {
+export const editArticle = async (req: Request, res: Response) => {
   try {
-    const { slug } = req.params;
-    const articlesWithTags = await getArticlesWithTags(eq(articles.slug, slug));
-
-    if (articlesWithTags.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Article not found" });
+    const { id } = req.params;
+    const validatedData = createArticleRequestSchema.parse(req.body);
+    const { title, content, author, date, tagsId } = validatedData;
+    const slug = title
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
+    const existingArticle = await db
+      .select()
+      .from(articles)
+      .where(and(eq(articles.slug, slug), not(eq(articles.id, Number(id)))))
+      .execute();
+    if (existingArticle.length > 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Slug already exists. Please choose a different title.",
+      });
     }
 
-    res.json({ success: true, data: articlesWithTags[0] });
-  } catch (error) {
-    res.status(500).json({ success: false, error: "Failed to fetch article" });
-  }
-};
+    const [article] = await db
+      .update(articles)
+      .set({ title, content, author, slug, date })
+      .where(eq(articles.id, Number(id)))
+      .returning()
+      .execute();
 
-export const getLatestArticle = async (req: Request, res: Response) => {
-  try {
-    const allArticles = await getArticlesWithTags(
-      undefined,
-      desc(articles.date)
-    );
+    await db
+      .delete(articleTags)
+      .where(eq(articleTags.articleId, article.id))
+      .execute();
 
-    if (allArticles.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, error: "No articles found" });
+    for (const tagId of tagsId) {
+      await db
+        .insert(articleTags)
+        .values({ articleId: article.id, tagId })
+        .execute();
     }
 
-    res.json({ success: true, data: allArticles[0] });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, error: "Failed to fetch latest article" });
+    res.json({ success: true, data: article });
+  } catch (error: any) {
+    if (error.name === "ZodError") {
+      return res.status(400).json({ success: false, errors: error.errors });
+    }
+    res.status(500).json({ success: false, error: "Failed to edit article" });
   }
 };

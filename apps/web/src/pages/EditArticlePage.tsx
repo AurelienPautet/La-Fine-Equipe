@@ -5,94 +5,34 @@ import ArticleForm, { type ArticleFormData } from "../components/ArticleForm";
 import ArticleFormHeader from "../components/ArticleFormHeader";
 import { fetchArticle } from "../utils/articleUtils";
 import MarkdownGuide from "../components/MarkdownGuide";
+import type { CreateArticleRequest } from "@lafineequipe/types";
+import { useArticle, useEditArticle } from "../hooks/ArticleHooks";
 
 const EditArticlePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [initialFormData, setInitialFormData] = useState<ArticleFormData>({
-    title: "",
-    author: "",
-    date: new Date().toISOString().split("T")[0],
-    tags: "",
-    content: "",
-  });
 
-  // Load existing article data
-  useEffect(() => {
-    const loadArticle = async () => {
-      if (!slug) return;
+  const { data: article, error, isLoading: loading } = useArticle(slug || "");
 
-      try {
-        const article = await fetchArticle(slug);
-        setInitialFormData({
-          title: article.metadata.title,
-          author: article.metadata.author,
-          date: article.metadata.date,
-          tags: article.metadata.tags,
-          content: article.content,
-        });
-      } catch (error) {
-        console.error("Error loading article for editing:", error);
-        alert("Erreur lors du chargement de l'article.");
-        navigate("/article");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const editArticle = useEditArticle();
 
-    loadArticle();
-  }, [slug, navigate]);
-
-  const generateSlug = (title: string): string => {
-    return title
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Remove accents
-      .replace(/[^a-z0-9\s-]/g, "") // Remove special characters
-      .replace(/\s+/g, "-") // Replace spaces with hyphens
-      .replace(/-+/g, "-") // Replace multiple hyphens with single
-      .trim();
-  };
-
-  const handleSubmit = async (formData: ArticleFormData) => {
+  const handleSubmit = async (formData: CreateArticleRequest) => {
     setIsSubmitting(true);
-
     try {
-      // Generate slug from title
-      const slug = generateSlug(formData.title);
-
-      // Create frontmatter
-      const frontmatter = `---
-title: ${formData.title}
-author: ${formData.author}
-date: ${formData.date}
-tags: ${formData.tags}
----
-
-`;
-
-      // Combine frontmatter with content
-      const fullContent = frontmatter + formData.content;
-
-      // In a real application, you would send this to your backend
-      // For now, we'll simulate saving and show a success message
-      console.log("Article to update:", {
-        originalslug: slug,
-        newSlug: slug,
-        content: fullContent,
+      await editArticle.mutateAsync({
+        id: article.id,
+        articleData: {
+          title: formData.title,
+          date: formData.date,
+          content: formData.content,
+          author: formData.author,
+          tagsId: formData.tagsId,
+        },
       });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Show success message and redirect
-      alert("Article modifié avec succès !");
       navigate(`/article/${slug}`);
     } catch (error) {
-      console.error("Error updating article:", error);
-      alert("Erreur lors de la modification de l'article. Veuillez réessayer.");
+      console.error("Failed to edit article:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -142,7 +82,7 @@ tags: ${formData.tags}
 
           {/* Article Form */}
           <ArticleForm
-            initialData={initialFormData}
+            initialData={article}
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}
             submitButtonText="Sauvegarder les modifications"

@@ -4,8 +4,30 @@ import {
   getArticle,
   getLatestArticle,
   getArticles,
+  editArticleMutation,
 } from "../endpoints/ArticlesEnpoints";
 import type { ArticleWithTags } from "@lafineequipe/types";
+
+export const useArticles = () => {
+  return useQuery<ArticleWithTags[], Error>({
+    queryKey: ["articles"],
+    queryFn: () => getArticles(),
+  });
+};
+
+export const useArticle = (slug: string) => {
+  return useQuery<ArticleWithTags, Error>({
+    queryKey: ["article", slug],
+    queryFn: () => getArticle(slug),
+  });
+};
+
+export const useLatestArticle = () => {
+  return useQuery<ArticleWithTags, Error>({
+    queryKey: ["latest-article"],
+    queryFn: () => getLatestArticle(),
+  });
+};
 
 export const usePostArticle = () => {
   const queryClient = useQueryClient();
@@ -19,23 +41,14 @@ export const usePostArticle = () => {
   });
 };
 
-export const useArticles = () => {
-  return useQuery<ArticleWithTags[], Error>({
-    queryKey: ["articles"],
-    queryFn: () => getArticles(),
-  });
-};
-
-export const useArticle = (slug: string) => {
-  return useQuery<ArticleWithTags, Error>({
-    queryKey: [slug],
-    queryFn: () => getArticle(slug),
-  });
-};
-
-export const useLatestArticle = () => {
-  return useQuery<ArticleWithTags, Error>({
-    queryKey: ["latest-article"],
-    queryFn: () => getLatestArticle(),
+export const useEditArticle = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: editArticleMutation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["articles"],
+      });
+    },
   });
 };

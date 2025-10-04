@@ -9,18 +9,23 @@ import {
 } from "react-icons/fa";
 import ArticleDisplay from "./ArticleDisplay";
 import "cally";
+import type {
+  ArticleWithTags,
+  CreateArticleRequest,
+} from "@lafineequipe/types";
 
 export interface ArticleFormData {
   title: string;
   author: string;
   date: string;
-  tags: string;
+  tags: string[];
   content: string;
+  tagsId?: number[];
 }
 
 interface ArticleFormProps {
-  initialData: ArticleFormData;
-  onSubmit: (data: ArticleFormData) => Promise<void>;
+  initialData: CreateArticleRequest;
+  onSubmit: (data: CreateArticleRequest) => Promise<void>;
   isSubmitting: boolean;
   submitButtonText: string;
   submitButtonLoadingText: string;
@@ -34,7 +39,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
   submitButtonLoadingText,
 }) => {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [formData, setFormData] = useState<ArticleFormData>(initialData);
+  const [formData, setFormData] = useState<CreateArticleRequest>(initialData);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -168,7 +173,9 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
                             date: e.target.value,
                           }));
                         }}
-                        value={formData.date}
+                        value={
+                          new Date(formData.date).toISOString().split("T")[0]
+                        }
                       >
                         <svg
                           aria-label="Previous"
@@ -207,7 +214,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
                   <input
                     type="text"
                     name="tags"
-                    value={formData.tags}
+                    value={formData.tagsId?.join(", ") || ""}
                     onChange={handleInputChange}
                     className="input input-bordered input-primary"
                     placeholder="événement, tournoi, équipe..."
@@ -280,8 +287,8 @@ Vous pouvez utiliser du Markdown :
                   metadata={{
                     title: formData.title,
                     author: formData.author,
-                    date: formData.date,
-                    tags: formData.tags,
+                    date: new Date(formData.date).toISOString().split("T")[0],
+                    tags: formData.tags || [],
                   }}
                   content={formData.content}
                   isPreview={true}
