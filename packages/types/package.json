@@ -1,0 +1,16 @@
+{
+  "name": "@lafineequipe/types",
+  "version": "0.0.1",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lafineequipe/db": "workspace:*",
+    "drizzle-orm": "^0.36.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
