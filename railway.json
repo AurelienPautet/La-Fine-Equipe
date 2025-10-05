@@ -3,7 +3,8 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "cd apps/server && pnpm start",
-    "restartPolicyType": "ON_FAILURE"
+    "startCommand": "cd apps/server && pnpm build && pnpm start",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
   }
 }
