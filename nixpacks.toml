@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs-18_x"]
+
+[phases.install]
+cmds = ["corepack enable", "pnpm install --frozen-lockfile"]
+
+[phases.build]
+cmds = ["cd apps/server && pnpm run build"]
+
+[start]
+cmd = "cd apps/server && node dist/index.js"
