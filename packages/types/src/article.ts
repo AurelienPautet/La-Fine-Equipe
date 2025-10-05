@@ -18,7 +18,12 @@ export const createArticleRequestSchema = z.object({
   content: z.string().min(1, "Content is required"),
   author: z.string().min(1, "Author is required"),
   tagsId: z.array(z.number()).optional().default([]),
-  tags: z.array(z.string()).optional().default([]),
+  tags: z.array(z.string()).optional(),
+});
+
+export const editArticleRequestSchema = createArticleRequestSchema.extend({
+  id: z.number().min(1, "ID is required"),
 });
 
 export type CreateArticleRequest = z.infer<typeof createArticleRequestSchema>;
+export type EditArticleRequest = z.infer<typeof editArticleRequestSchema>;

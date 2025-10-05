@@ -1,13 +1,13 @@
 export type {
   Article,
   ArticleWithTags,
-  CreateArticleRequest
-} from './article';
-export { createArticleRequestSchema } from './article';
+  CreateArticleRequest,
+  EditArticleRequest,
+} from "./article";
+export {
+  createArticleRequestSchema,
+  editArticleRequestSchema,
+} from "./article";
 
-export type {
-  Tag,
-  CreateTagRequest
-} from './tag';
-export { createTagRequestSchema } from './tag';
-
+export type { Tag, CreateTagRequest } from "./tag";
+export { createTagRequestSchema } from "./tag";

@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaEdit } from "react-icons/fa";
-import ArticleForm, { type ArticleFormData } from "../components/ArticleForm";
+import ArticleForm from "../components/ArticleForm";
 import ArticleFormHeader from "../components/ArticleFormHeader";
-import { fetchArticle } from "../utils/articleUtils";
 import MarkdownGuide from "../components/MarkdownGuide";
-import type { CreateArticleRequest } from "@lafineequipe/types";
+import type {
+  CreateArticleRequest,
+  EditArticleRequest,
+} from "@lafineequipe/types";
 import { useArticle, useEditArticle } from "../hooks/ArticleHooks";
 
 const EditArticlePage: React.FC = () => {
@@ -21,8 +23,8 @@ const EditArticlePage: React.FC = () => {
     setIsSubmitting(true);
     try {
       await editArticle.mutateAsync({
-        id: article.id,
         articleData: {
+          id: article?.id || 0,
           title: formData.title,
           date: formData.date,
           content: formData.content,
@@ -38,7 +40,7 @@ const EditArticlePage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || !article) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-accent to-base-200 flex items-center justify-center">
         <div className="text-center">

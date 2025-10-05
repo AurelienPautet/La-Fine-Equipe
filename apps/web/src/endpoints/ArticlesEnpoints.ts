@@ -1,6 +1,12 @@
 import type {
   CreateArticleRequest,
   ArticleWithTags,
+  EditArticleRequest,
+} from "@lafineequipe/types";
+
+import {
+  createArticleRequestSchema,
+  editArticleRequestSchema,
 } from "@lafineequipe/types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
@@ -41,12 +47,13 @@ export async function getLatestArticle(): Promise<ArticleWithTags> {
 export async function postArticleMutation(
   articleData: CreateArticleRequest
 ): Promise<ArticleWithTags> {
+  const validateData = createArticleRequestSchema.parse(articleData);
   const response = await fetch(`${API_URL}/api/articles`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(articleData),
+    body: JSON.stringify(validateData),
   });
 
   if (!response.ok) {
@@ -58,18 +65,17 @@ export async function postArticleMutation(
 }
 
 export async function editArticleMutation({
-  id,
   articleData,
 }: {
-  id: number;
-  articleData: CreateArticleRequest;
+  articleData: EditArticleRequest;
 }): Promise<ArticleWithTags> {
-  const response = await fetch(`${API_URL}/api/articles/${id}`, {
+  const validateData = editArticleRequestSchema.parse(articleData);
+  const response = await fetch(`${API_URL}/api/articles/${articleData.id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(articleData),
+    body: JSON.stringify(validateData),
   });
 
   if (!response.ok) {

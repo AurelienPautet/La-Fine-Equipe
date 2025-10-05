@@ -12,20 +12,12 @@ import "cally";
 import type {
   ArticleWithTags,
   CreateArticleRequest,
+  EditArticleRequest,
 } from "@lafineequipe/types";
 
-export interface ArticleFormData {
-  title: string;
-  author: string;
-  date: string;
-  tags: string[];
-  content: string;
-  tagsId?: number[];
-}
-
 interface ArticleFormProps {
-  initialData: CreateArticleRequest;
-  onSubmit: (data: CreateArticleRequest) => Promise<void>;
+  initialData: CreateArticleRequest | EditArticleRequest | ArticleWithTags;
+  onSubmit: (data: CreateArticleRequest | EditArticleRequest) => Promise<void>;
   isSubmitting: boolean;
   submitButtonText: string;
   submitButtonLoadingText: string;
@@ -39,7 +31,12 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
   submitButtonLoadingText,
 }) => {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [formData, setFormData] = useState<CreateArticleRequest>(initialData);
+  const [formData, setFormData] = useState<
+    CreateArticleRequest | EditArticleRequest
+  >({
+    ...initialData,
+    tagsId: initialData.tagsId || [],
+  });
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
