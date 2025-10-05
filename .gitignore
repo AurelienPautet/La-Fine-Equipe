@@ -9,3 +9,5 @@ coverage/
 .turbo/
 
 commands.md
+
+migrations/
