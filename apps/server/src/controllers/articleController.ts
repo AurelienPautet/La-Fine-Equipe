@@ -66,7 +66,8 @@ export const getAllArticles = async (_req: Request, res: Response) => {
     const allArticlesWithTags = await getArticlesWithTags();
     res.json(allArticlesWithTags);
   } catch (error) {
-    res.status(500).json({ success: false, error: "Failed to fetch articles" });
+    console.error("Error fetching articles:", error);
+    res.status(500).json({ success: false, error: error });
   }
 };
 
