@@ -1,0 +1,6 @@
+{
+  "version": 2,
+    "buildCommand": "cd ../.. && pnpm install && pnpm --filter server build",
+    "outputDirectory": "/dist"
+
+}
