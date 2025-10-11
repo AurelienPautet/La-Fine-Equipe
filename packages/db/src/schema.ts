@@ -1,5 +1,4 @@
-import { pgTable, text, serial, timestamp,integer } from "drizzle-orm/pg-core";
-
+import { pgTable, text, serial, timestamp, integer } from "drizzle-orm/pg-core";
 
 export const tags = pgTable("tags", {
   id: serial("id").primaryKey(),
@@ -14,13 +13,16 @@ export const articles = pgTable("articles", {
   author: text("author").notNull(),
   date: timestamp("date").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow().$onUpdateFn(()=>new Date()),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdateFn(() => new Date()),
 });
 
 export const articleTags = pgTable("article_tags", {
-  articleId: integer('article_id')
-            .references(() => articles.id).notNull(),
+  articleId: integer("article_id")
+    .references(() => articles.id)
+    .notNull(),
   tagId: integer("tag_id")
-            .references(() => tags.id).notNull(),
+    .references(() => tags.id)
+    .notNull(),
 });
-
