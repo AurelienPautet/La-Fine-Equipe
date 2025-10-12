@@ -3,14 +3,14 @@ import { FaHome, FaBlog, FaUsers } from "react-icons/fa";
 
 const Header: React.FC = () => {
   return (
-    <div className="navbar bg-base-100 shadow-xl border-b-4 border-primary">
+    <div className="navbar bg-primary shadow-xl border-b-4 border-primary sticky top-0 z-50">
       <div className="flex-1">
         <Link
           to="/"
-          className="flex items-center normal-case text-2xl font-bold text-secondary hover:text-primary transition-colors"
+          className="flex items-center normal-case text-2xl font-bold text-secondary hover:text-primary-content transition-colors"
         >
           <div className="avatar">
-            <div className="w-12 h-12 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+            <div className="w-12 h-12 rounded-full ">
               <img
                 src="/logo.png"
                 alt="La Fine Équipe Logo"

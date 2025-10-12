@@ -1,5 +1,5 @@
 import React from "react";
-import { FaInstagram } from "react-icons/fa";
+import { FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer: React.FC = () => {
   return (
@@ -15,14 +15,24 @@ const Footer: React.FC = () => {
           Une équipe passionnée et déterminée
         </p>
         <p className="opacity-75">Copyright © 2025 - Tous droits réservés</p>
-        <a
-          href="https://www.instagram.com/lafineequipe_lyon3/"
-          target="_blank"
-          className="flex items-center gap-1 "
-        >
-          <FaInstagram className="w-6 h-6 hover:text-primary transition-colors" />
-          Instagram
-        </a>
+        <div className="flex flex-row gap-3">
+          <a
+            href="https://www.instagram.com/lafineequipe_lyon3/"
+            target="_blank"
+            className="flex items-center gap-1 "
+          >
+            <FaInstagram className="w-6 h-6 hover:text-primary transition-colors" />
+            Instagram
+          </a>
+          <a
+            href="https://www.linkedin.com/company/la-fine-%C3%A9quipe-lyon3/posts/?feedView=all"
+            target="_blank"
+            className="flex items-center gap-1 "
+          >
+            <FaLinkedin className="w-6 h-6 hover:text-primary transition-colors" />
+            LinkedIn
+          </a>
+        </div>
       </aside>
     </footer>
   );

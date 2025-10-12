@@ -32,7 +32,7 @@ const HomePage: React.FC = () => {
           <div className="max-w-4xl">
             <div className="flex justify-center mb-8">
               <div className="avatar">
-                <div className="w-32 h-32 rounded-full ring ring-accent ring-offset-base-800 ring-offset-1 shadow-2xl">
+                <div className="w-32 h-32 rounded-full shadow-2xl">
                   <img
                     src="/logo.png"
                     alt="La Fine Équipe"
