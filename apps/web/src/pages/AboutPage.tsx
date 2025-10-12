@@ -10,8 +10,24 @@ import {
   FaTrophy,
   FaBookOpen,
 } from "react-icons/fa";
+import MemberCard from "../components/MemberCard";
+import { useEffect, useState } from "react";
+interface Member {
+  id: number;
+  name: string;
+  role: string;
+  photo: string;
+  instagram?: string;
+}
 
 const AboutPage: React.FC = () => {
+  const [students, setMembers] = useState<Member[]>([]);
+  useEffect(() => {
+    fetch("/members.json")
+      .then((response) => response.json())
+      .then((data) => setMembers(data))
+      .catch((error) => console.error("Error fetching students:", error));
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent to-base-200">
       {/* Hero Section */}
@@ -79,53 +95,31 @@ const AboutPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Values Section */}
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="card bg-primary text-primary-content shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
-              <div className="card-body text-center">
-                <div className="text-4xl mb-4">
-                  <FaHandshake />
-                </div>
-                <h3 className="card-title justify-center text-2xl mb-3">
-                  Collaboration
-                </h3>
-                <p>
-                  Nous croyons en la force du travail d'équipe et de l'entraide
-                  mutuelle.
+          {/* Team Members Section */}
+          <section className="py-20 bg-gradient-to-br from-accent to-base-200">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-12">
+                <h2 className="text-5xl font-bold text-secondary mb-4 flex items-center justify-center gap-4">
+                  <FaUsers className="w-10 h-10" />
+                  Nos Membres
+                </h2>
+                <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-6"></div>
+                <p className="text-xl text-base-content max-w-2xl mx-auto">
+                  Rencontrez les membres passionnés qui composent La Fine Équipe
                 </p>
               </div>
-            </div>
-
-            <div className="card bg-secondary text-secondary-content shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
-              <div className="card-body text-center">
-                <div className="text-4xl mb-4">
-                  <FaLightbulb />
-                </div>
-                <h3 className="card-title justify-center text-2xl mb-3">
-                  Innovation
-                </h3>
-                <p>
-                  Nous innovons constamment pour créer des expériences uniques
-                  et mémorables.
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+                {students.map((student) => (
+                  <MemberCard
+                    key={student.id}
+                    student={student}
+                    size="medium"
+                    showSocial={true}
+                  />
+                ))}
               </div>
             </div>
-
-            <div className="card bg-accent text-accent-content shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
-              <div className="card-body text-center">
-                <div className="text-4xl mb-4">
-                  <FaHeart />
-                </div>
-                <h3 className="card-title justify-center text-2xl mb-3">
-                  Convivialité
-                </h3>
-                <p>
-                  L'ambiance chaleureuse et l'esprit festif sont au cœur de
-                  notre identité.
-                </p>
-              </div>
-            </div>
-          </div>
+          </section>
 
           {/* Activities Section */}
           <div className="card bg-base-100 shadow-2xl border-2 border-primary/20">

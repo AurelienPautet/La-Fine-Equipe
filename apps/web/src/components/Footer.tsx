@@ -3,7 +3,12 @@ import { FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="footer footer-center p-5 bg-secondary text-secondary-content">
+    <footer className="footer footer-center p-5 bg-secondary text-secondary-content relative">
+      <img
+        src="/LFE_lézard_nu_2.png"
+        alt=""
+        className="absolute -top-11 left-10 w-15 object-cover transition-all duration-100 hover:animate-bounce"
+      />
       <aside>
         <div className="avatar">
           <div className="w-16 h-16 rounded-full ring ring-primary ring-offset-base-100 ring-offset-1">
