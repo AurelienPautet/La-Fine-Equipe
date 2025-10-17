@@ -88,7 +88,7 @@ export const getArticleBySlug = async (req: Request, res: Response) => {
   }
 };
 
-export const getLatestArticle = async (req: Request, res: Response) => {
+export const getLatestsArticle = async (req: Request, res: Response) => {
   try {
     const allArticles = await getArticlesWithTags(
       undefined,
@@ -101,11 +101,11 @@ export const getLatestArticle = async (req: Request, res: Response) => {
         .json({ success: false, error: "No articles found" });
     }
 
-    res.json({ success: true, data: allArticles[0] });
+    res.json({ success: true, data: [allArticles[0], allArticles[1]] });
   } catch (error) {
     res
       .status(500)
-      .json({ success: false, error: "Failed to fetch latest article" });
+      .json({ success: false, error: "Failed to fetch latests article" });
   }
 };
 
@@ -153,7 +153,13 @@ export const createArticle = async (req: Request, res: Response) => {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, errors: error.errors });
     }
-    res.status(500).json({ success: false, error: "Failed to create article" });
+    res
+      .status(500)
+      .json({
+        success: false,
+        error: "Failed to create article",
+        stack: error.stack,
+      });
   }
 };
 
