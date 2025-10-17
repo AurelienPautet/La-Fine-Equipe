@@ -3,7 +3,7 @@ import { FaHome, FaBlog, FaUsers } from "react-icons/fa";
 
 const Header: React.FC = () => {
   return (
-    <div className="navbar bg-primary shadow-xl border-b-4 border-primary sticky top-0 z-50">
+    <div className="navbar h-10 bg-primary shadow-xl border-b-4 border-primary sticky top-0 z-50">
       <div className="flex-1">
         <Link
           to="/"

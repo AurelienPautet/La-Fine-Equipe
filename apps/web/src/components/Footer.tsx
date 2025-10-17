@@ -1,5 +1,6 @@
 import React from "react";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
+import { IoIosMail } from "react-icons/io";
 
 const Footer: React.FC = () => {
   return (
@@ -36,6 +37,13 @@ const Footer: React.FC = () => {
           >
             <FaLinkedin className="w-6 h-6 hover:text-primary transition-colors" />
             LinkedIn
+          </a>
+          <a
+            href="mailto:lafineequipe.lyon3@gmail.com"
+            className="flex items-center gap-1 "
+          >
+            <IoIosMail className="w-6 h-6 hover:text-primary transition-colors" />
+            lafineequipe.lyon3@gmail.com
           </a>
         </div>
       </aside>
