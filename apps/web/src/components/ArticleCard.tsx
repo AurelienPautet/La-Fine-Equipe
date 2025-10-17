@@ -10,23 +10,39 @@ import {
 import type { ArticleWithTags } from "@lafineequipe/types";
 
 const ArticleCard: React.FC<{
-  article: ArticleWithTags;
+  article: ArticleWithTags | undefined;
   loading?: boolean;
 }> = ({ article, loading = false }) => {
   if (loading) {
     return (
-      <div className="card bg-base-100 shadow-xl border-2 border-primary/20 animate-pulse">
-        <div className="card-body">
-          <div className="h-6 bg-base-300 rounded w-3/4 mb-4"></div>
-          <div className="h-4 bg-base-300 rounded w-1/2 mb-4"></div>
-          <div className="h-10 bg-base-300 rounded w-1/3"></div>
+      <div className="card md:w-1/3 bg-base-100 shadow-xl border-2 border-primary/20 h-64">
+        <div className="card-body flex flex-col justify-between h-full p-6">
+          <div className="flex items-start gap-3">
+            <div className="skeleton h-8 w-8 rounded-lg flex-shrink-0"></div>
+            <div className="flex-1 min-w-0 space-y-4">
+              <div className="skeleton h-6 w-3/4"></div>
+              <div className="skeleton h-6 w-1/2"></div>
+              <div className="space-y-2">
+                <div className="skeleton h-4 w-2/3"></div>
+                <div className="skeleton h-4 w-1/2"></div>
+                <div className="skeleton h-4 w-3/4"></div>
+              </div>
+            </div>
+          </div>
+          <div className="card-actions justify-end mt-4">
+            <div className="skeleton h-8 w-32"></div>
+          </div>
         </div>
       </div>
     );
   }
 
+  if (!article) {
+    return null;
+  }
+
   return (
-    <div className="card bg-base-100 shadow-xl border-2 border-primary/20 hover:shadow-2xl hover:border-primary/40 transition-all duration-300 transform hover:scale-105 h-64">
+    <div className="card md:w-1/3 bg-base-100 shadow-xl border-2 border-primary/20 hover:shadow-2xl hover:border-primary/40 transition-all duration-300 transform hover:scale-105 h-64">
       <div className="card-body flex flex-col justify-between h-full p-6">
         <div className="flex items-start gap-3">
           <div className="badge badge-primary badge-lg flex-shrink-0">

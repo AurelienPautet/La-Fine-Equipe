@@ -9,36 +9,30 @@ import {
   FaHandshake,
 } from "react-icons/fa";
 import ArticleCard from "../components/ArticleCard";
-import { useLatestArticle } from "../hooks/ArticleHooks";
+import { useLatestsArticle } from "../hooks/ArticleHooks";
 import FigureCard from "../components/FigureCard";
 
 const HomePage: React.FC = () => {
-  const { data: latestArticle, error, isLoading } = useLatestArticle();
-  console.log("Latest article data:", latestArticle, error);
+  const { data: latestsArticles, error, isLoading } = useLatestsArticle();
+  console.log("Latests article data:", latestsArticles, error);
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="hero min-h-[calc(100vh-2.5rem)] bg-gradient-to-br from-primary to-primary-focus relative overflow-hidden">
+      <div className="hero min-h-[calc(100vh-2.5rem)] bg-gradient-to-b from-primary to-primary-focus relative overflow-hidden">
         <div className="hero-content text-center text-primary-content relative z-10">
           <div className="max-w-4xl">
             <div className="flex justify-center mb-8">
-              <div className="avatar">
-                <div className="w-32 h-32 rounded-full shadow-2xl">
-                  <img
-                    src="/logo.png"
-                    alt="La Fine Équipe"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+              <div className="w-32 h-32 rounded-full shadow-2xl">
+                <img
+                  src="/logo.png"
+                  alt="La Fine Équipe"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
             <h1 className="text-6xl font-bold mb-6 drop-shadow-lg flex items-center justify-center gap-4">
               <FaGem className="w-12 h-12 text-accent" />
-
-              <span className="hidden lg:visible bold bg-red-900">
-                La Fine Équipe
-              </span>
             </h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
               Bienvenue sur le site de La Fine Équipe ! Nous sommes un groupe
@@ -48,62 +42,57 @@ const HomePage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/about"
-                className="btn btn-accent btn-lg text-accent-content shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
+                className="btn btn-primary btn-lg text-primary-content shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
               >
                 <FaUsers className="w-5 h-5" />
                 Découvrir l'équipe
               </Link>
-              <Link
-                to="/article"
-                className="btn btn-outline btn-lg border-2 border-accent text-accent hover:bg-accent hover:text-accent-content shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
-              >
-                <FaBook className="w-5 h-5" />
-                Lire nos articles
-              </Link>
             </div>
           </div>
-        </div>
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-accent rounded-full"></div>
-          <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-secondary rounded-full"></div>
-          <div className="absolute top-3/4 left-1/3 w-32 h-32 bg-accent rounded-full"></div>
         </div>
       </div>
 
-      {/* Latest Article Section */}
-      {latestArticle && (
-        <section className="py-20 bg-base-100">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-5xl font-bold text-secondary mb-4 flex items-center justify-center gap-4">
-                <FaBook className="w-10 h-10" />
-                Dernier Article
-              </h2>
-              <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
-            </div>
-            <div className="flex justify-center">
-              <div className="max-w-lg">
-                <ArticleCard article={latestArticle} />
-              </div>
-            </div>
-            <div className="text-center mt-8">
-              <Link
-                to="/article"
-                className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-              >
-                <FaBook className="w-5 h-5" />
-                Voir tous nos articles
-              </Link>
-            </div>
+      {/* Latests Article Section */}
+      <section className="py-20 bg-primary-focus">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-5xl font-bold text-secondary mb-4 flex items-center justify-center gap-4">
+              <FaBook className="w-10 h-10" />
+              Derniers Articles
+            </h2>
+            <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
           </div>
-        </section>
-      )}
+          <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-10">
+            {isLoading && (
+              <>
+                <ArticleCard loading={true} article={undefined} />
+                <ArticleCard loading={true} article={undefined} />
+              </>
+            )}
+            {error && (
+              <p className="text-red-500">Erreur de chargement des articles.</p>
+            )}
+
+            {latestsArticles?.map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link
+              to="/article"
+              className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+            >
+              <FaBook className="w-5 h-5" />
+              Voir tous nos articles
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Presentation Section */}
       <div className="min-h-[calc(100vh-2.5rem)] h-full flex flex-col  items-center">
         <div className="h-full bg-white w-full">
-          <div className="flex flex-row w-full h-full">
+          <div className="flex flex-col md:flex-row w-full h-full">
             <div className="flex-1 h-full w-full">
               <div className=" flex flex-col justify-center items-center h-full p-10">
                 <h2 className="text-5xl font-bold text-secondary mb-6 text-center">
@@ -125,16 +114,16 @@ const HomePage: React.FC = () => {
                 </p>
               </div>
             </div>
-            <div className=" h-full  w-1/3 flex items-center justify-center">
+            <div className=" h-full  w-full md:w-1/3 flex items-center justify-center">
               <img
                 src="/PresIlustr.png"
                 alt="Présentation La Fine Équipe"
-                className="w-2/3"
+                className="h-1/3 w-1/3 md:h-full md:w-full"
               />
             </div>
           </div>
         </div>
-        <div className="h-full bg-accent w-full flex flex-row justify-center items-center">
+        <div className="h-full bg-accent w-full flex flex-col md:flex-row justify-center items-center">
           <div className=" h-full  w-1/3 flex items-center justify-center">
             <img
               src="/PresIlustr2.png"

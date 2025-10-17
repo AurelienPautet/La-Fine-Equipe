@@ -2,7 +2,7 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import {
   postArticleMutation,
   getArticle,
-  getLatestArticle,
+  getLatestsArticle,
   getArticles,
   editArticleMutation,
 } from "../endpoints/ArticlesEnpoints";
@@ -22,10 +22,10 @@ export const useArticle = (slug: string) => {
   });
 };
 
-export const useLatestArticle = () => {
-  return useQuery<ArticleWithTags, Error>({
-    queryKey: ["latest-article"],
-    queryFn: () => getLatestArticle(),
+export const useLatestsArticle = () => {
+  return useQuery<ArticleWithTags[], Error>({
+    queryKey: ["latests-article"],
+    queryFn: () => getLatestsArticle(),
   });
 };
 

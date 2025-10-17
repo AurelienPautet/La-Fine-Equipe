@@ -1,6 +1,8 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+
 import { FaUser, FaCalendarAlt, FaTag } from "react-icons/fa";
 
 interface ArticleMetadata {
@@ -74,7 +76,7 @@ const ArticleDisplay: React.FC<ArticleDisplayProps> = ({
           isPreview ? "prose-sm lg:prose-base" : "prose-lg"
         }`}
       >
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
           {content || "*Votre contenu apparaîtra ici...*"}
         </ReactMarkdown>
       </div>

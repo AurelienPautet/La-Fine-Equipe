@@ -8,7 +8,10 @@ export function getDb() {
   if (!_db) {
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
+      ssl:
+        process.env.NODE_ENV === "production"
+          ? { rejectUnauthorized: false }
+          : false,
       max: 1,
       idleTimeoutMillis: 10000,
       connectionTimeoutMillis: 10000,

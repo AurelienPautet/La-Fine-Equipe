@@ -33,15 +33,15 @@ export async function getArticle(slug: string): Promise<ArticleWithTags> {
   return article.data;
 }
 
-export async function getLatestArticle(): Promise<ArticleWithTags> {
-  const response = await fetch(`${API_URL}/api/articles/latest`);
+export async function getLatestsArticle(): Promise<ArticleWithTags[]> {
+  const response = await fetch(`${API_URL}/api/articles/latests`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch latest article");
+    throw new Error("Failed to fetch latests article");
   }
 
-  const article = await response.json();
-  return article.data;
+  const articles = await response.json();
+  return articles.data;
 }
 
 export async function postArticleMutation(
