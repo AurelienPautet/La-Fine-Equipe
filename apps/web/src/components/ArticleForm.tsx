@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDropzone, type FileWithPath } from "react-dropzone";
+import { useUploadFile } from "../hooks/FileHooks";
 import {
   FaEdit,
   FaSave,
@@ -37,6 +39,39 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
     ...initialData,
     tagsId: initialData.tagsId || [],
   });
+
+  const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
+    noClick: true,
+    onDrop: (acceptedFiles) => handleDrop(acceptedFiles),
+  });
+
+  const files = acceptedFiles.map((file) => (
+    <li key={file.name} className="text-sm">
+      {file.name} - {file.size} bytes
+    </li>
+  ));
+
+  const uploadMutation = useUploadFile("articles");
+
+  const handleDrop = async (acceptedFiles: readonly FileWithPath[]) => {
+    const result = await Promise.all(
+      acceptedFiles.map((file) => uploadMutation.mutateAsync(file))
+    );
+    console.log("Uploaded files:", result);
+    for (const res of result) {
+      let stringToInsert = "";
+      if (res.type.startsWith("image/")) {
+        stringToInsert = `\n<img src="${res.url}" alt="${res.name}" />\n`;
+      } else if (res.type === "application/pdf") {
+        stringToInsert = `\n<embed src="${res.url}" type="application/pdf" width="100%" height="600px" />\n`;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        content: prev.content + stringToInsert,
+      }));
+    }
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -220,12 +255,18 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
 
                 <div className="flex-1 flex flex-col min-h-0">
                   {/* Content */}
-                  <div className="form-control flex-1 flex flex-col">
+                  <div
+                    {...getRootProps({
+                      className: "form-control flex-1 flex flex-col dropzone",
+                    })}
+                  >
                     <label className="label">
                       <span className="label-text font-semibold">
                         Contenu (écrit en Markdown)
                       </span>
                     </label>
+                    <input {...getInputProps()} />
+
                     <textarea
                       name="content"
                       value={formData.content}
@@ -243,6 +284,7 @@ Vous pouvez utiliser du Markdown :
                     />
                   </div>
                 </div>
+                <ul>{files}</ul>
 
                 {/* Submit Button */}
                 <div className="card-actions justify-end pt-6 flex-shrink-0">
