@@ -11,9 +11,9 @@ const ArticlesPage: React.FC = () => {
     articles = [];
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-accent to-base-200">
+    <div className="min-h-screen">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-primary to-primary-focus py-20">
+      <div className="bg-gradient-to-b from-primary to-primary-focus py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-6xl font-bold text-primary-content mb-6 drop-shadow-lg flex items-center justify-center gap-4">
             <FaBook className="w-12 h-12" />
@@ -66,12 +66,7 @@ const ArticlesPage: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {articles.map((article: ArticleWithTags) => (
-                <div
-                  key={article.slug}
-                  className="transform transition-all duration-300 hover:scale-105"
-                >
-                  <ArticleCard article={article} />
-                </div>
+                <ArticleCard key={article.id} article={article} />
               ))}
             </div>
           )}

@@ -65,8 +65,16 @@ const HomePage: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-10">
             {isLoading && (
               <>
-                <ArticleCard loading={true} article={undefined} />
-                <ArticleCard loading={true} article={undefined} />
+                <ArticleCard
+                  className="w-1/3"
+                  loading={true}
+                  article={undefined}
+                />
+                <ArticleCard
+                  className="w-1/3"
+                  loading={true}
+                  article={undefined}
+                />
               </>
             )}
             {error && (
@@ -74,7 +82,11 @@ const HomePage: React.FC = () => {
             )}
 
             {latestsArticles?.map((article) => (
-              <ArticleCard key={article.id} article={article} />
+              <ArticleCard
+                className="w-1/3"
+                key={article.id}
+                article={article}
+              />
             ))}
           </div>
           <div className="text-center mt-8">

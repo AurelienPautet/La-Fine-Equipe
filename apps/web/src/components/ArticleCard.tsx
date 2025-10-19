@@ -11,11 +11,14 @@ import type { ArticleWithTags } from "@lafineequipe/types";
 
 const ArticleCard: React.FC<{
   article: ArticleWithTags | undefined;
+  className?: string;
   loading?: boolean;
-}> = ({ article, loading = false }) => {
+}> = ({ article, loading = false, className }) => {
   if (loading) {
     return (
-      <div className="card md:w-1/3 bg-base-100 shadow-xl border-2 border-primary/20 h-64">
+      <div
+        className={`card  bg-base-100 shadow-xl border-2 border-primary/20 h-64 ${className}`}
+      >
         <div className="card-body flex flex-col justify-between h-full p-6">
           <div className="flex items-start gap-3">
             <div className="skeleton h-8 w-8 rounded-lg flex-shrink-0"></div>
@@ -42,7 +45,9 @@ const ArticleCard: React.FC<{
   }
 
   return (
-    <div className="card md:w-1/3 bg-base-100 shadow-xl border-2 border-primary/20 hover:shadow-2xl hover:border-primary/40 transition-all duration-300 transform hover:scale-105 h-64">
+    <div
+      className={`card  bg-base-100 shadow-xl border-2 border-primary/20 hover:shadow-2xl hover:border-primary/40 transition-all duration-300 transform hover:scale-105 h-64 ${className}`}
+    >
       <div className="card-body flex flex-col justify-between h-full p-6">
         <div className="flex items-start gap-3">
           <div className="badge badge-primary badge-lg flex-shrink-0">

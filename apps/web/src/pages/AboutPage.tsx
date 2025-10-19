@@ -29,9 +29,9 @@ const AboutPage: React.FC = () => {
       .catch((error) => console.error("Error fetching students:", error));
   }, []);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-accent to-base-200">
+    <div className="min-h-screen ">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary to-primary-focus py-20">
+      <div className="bg-gradient-to-b from-primary to-primary-focus py-20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-6xl font-bold text-primary-content mb-6 drop-shadow-lg flex items-center justify-center gap-4">
             <FaUsers className="w-12 h-12" />À Propos de La Fine Équipe
