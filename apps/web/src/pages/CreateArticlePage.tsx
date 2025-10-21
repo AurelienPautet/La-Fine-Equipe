@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaEdit } from "react-icons/fa";
 import ArticleForm, { type ArticleFormData } from "../components/ArticleForm";
-import ArticleFormHeader from "../components/ArticleFormHeader";
+import PageHeader from "../components/PageHeader";
 import MarkdownGuide from "../components/MarkdownGuide";
 import { usePostArticle } from "../hooks/ArticleHooks";
 
@@ -44,9 +44,10 @@ const CreateArticlePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent to-base-200">
       {/* Header */}
-      <ArticleFormHeader
+      <PageHeader
         title="Créer un Article"
         subtitle="Partagez vos idées et expériences avec La Fine Équipe"
+        icon={<FaEdit className="w-10 h-10" />}
       />
 
       {/* Content */}

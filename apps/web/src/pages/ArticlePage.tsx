@@ -5,6 +5,7 @@ import ArticleDisplay from "../components/ArticleDisplay";
 import { useArticle } from "../hooks/ArticleHooks";
 import type { ArticleWithTags } from "@lafineequipe/types";
 import { TbError404 } from "react-icons/tb";
+import PageHeader from "../components/PageHeader";
 
 const ArticlePage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -14,8 +15,7 @@ const ArticlePage: React.FC = () => {
 
   useEffect(() => {
     console.log("Fetched article data:", data, error);
-    if (data && data.content) {
-      const content = data.content;
+    if (data) {
       setArticle(data);
     }
     if (error) {
@@ -25,7 +25,7 @@ const ArticlePage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-accent to-base-200 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-accent to-base-200 flex items-center justify-center">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg text-primary mb-4"></div>
           <p className="text-xl text-base-content">
@@ -38,7 +38,7 @@ const ArticlePage: React.FC = () => {
 
   if (!Article) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-accent to-base-200 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-accent to-base-200 flex items-center justify-center">
         <div className="text-center w-full flex items-center flex-col">
           <TbError404 className="w-20 h-20" />
           <h1 className="text-4xl font-bold text-secondary mb-4">
@@ -56,21 +56,13 @@ const ArticlePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-accent to-base-200">
+    <div className="min-h-screen bg-gradient-to-b from-accent to-base-200">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-primary-focus py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center text-primary-content">
-            <h1 className="text-5xl font-bold mb-6 drop-shadow-lg flex items-center justify-center gap-4">
-              <FaEdit className="w-10 h-10" />
-              Article
-            </h1>
-            <p className="text-xl opacity-90">
-              Découvrez les dernières nouvelles de La Fine Équipe
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Article"
+        subtitle="Découvrez les dernières nouvelles de La Fine Équipe"
+        icon={<FaEdit className="w-10 h-10" />}
+      />
 
       {/* Content */}
       <div className="container mx-auto px-4 py-16">

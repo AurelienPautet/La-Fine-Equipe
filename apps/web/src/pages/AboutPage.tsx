@@ -11,6 +11,7 @@ import {
   FaBookOpen,
 } from "react-icons/fa";
 import MemberCard from "../components/MemberCard";
+import PageHeader from "../components/PageHeader";
 import { useEffect, useState } from "react";
 interface Member {
   id: number;
@@ -31,18 +32,14 @@ const AboutPage: React.FC = () => {
   return (
     <div className="min-h-screen ">
       {/* Hero Section */}
-      <div className="bg-gradient-to-b from-primary to-primary-focus py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-6xl font-bold text-primary-content mb-6 drop-shadow-lg flex items-center justify-center gap-4">
-            <FaUsers className="w-12 h-12" />À Propos de La Fine Équipe
-          </h1>
-          <p className="text-xl text-primary-content/90 max-w-3xl mx-auto drop-shadow-md">
-            Découvrez notre histoire, nos valeurs et notre passion pour
-            l'aventure collective
-          </p>
-          <div className="w-24 h-1 bg-accent mx-auto mt-6 rounded-full"></div>
-        </div>
-      </div>
+      <PageHeader
+        title="À Propos de La Fine Équipe"
+        subtitle="Découvrez notre histoire, nos valeurs et notre passion pour l'aventure collective"
+        icon={<FaUsers className="w-12 h-12" />}
+        className="py-20"
+      >
+        <div className="w-24 h-1 bg-accent mx-auto mt-6 rounded-full"></div>
+      </PageHeader>
 
       {/* Content Section */}
       <div className="container mx-auto px-4 py-16">

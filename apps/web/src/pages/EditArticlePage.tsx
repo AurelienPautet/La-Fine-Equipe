@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaEdit } from "react-icons/fa";
 import ArticleForm from "../components/ArticleForm";
-import ArticleFormHeader from "../components/ArticleFormHeader";
+import PageHeader from "../components/PageHeader";
 import MarkdownGuide from "../components/MarkdownGuide";
 import type {
   CreateArticleRequest,
@@ -42,7 +42,7 @@ const EditArticlePage: React.FC = () => {
 
   if (loading || !article) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-accent to-base-200 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-accent to-base-200 flex items-center justify-center">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg text-primary mb-4"></div>
           <p className="text-xl text-base-content">
@@ -54,11 +54,11 @@ const EditArticlePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-accent to-base-200">
+    <div className="min-h-screen bg-gradient-to-b from-accent to-base-200">
       {/* Header */}
-      <ArticleFormHeader
+      <PageHeader
         title="Modifier l'Article"
-        subtitle="Modifiez votre article et partagez vos slugées avec La Fine Équipe"
+        subtitle="Modifiez votre article et partagez vos idées avec La Fine Équipe"
         icon={<FaEdit className="w-10 h-10" />}
       />
 
