@@ -1,5 +1,11 @@
 import { Link } from "react-router-dom";
-import { FaHome, FaBlog, FaUsers } from "react-icons/fa";
+import {
+  FaHandsHelping,
+  FaHome,
+  FaNewspaper,
+  FaScroll,
+  FaUsers,
+} from "react-icons/fa";
 
 const Header: React.FC = () => {
   return (
@@ -34,11 +40,29 @@ const Header: React.FC = () => {
           </li>
           <li>
             <Link
+              to="/join"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+            >
+              <FaHandsHelping className="w-4 h-4" />
+              <span className="hidden md:block">Nous rejoindre</span>
+            </Link>
+          </li>
+          <li>
+            <Link
               to="/article"
               className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
-              <FaBlog className="w-4 h-4" />
+              <FaNewspaper className="w-4 h-4" />
               <span className="hidden md:block">Articles</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/act"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+            >
+              <FaScroll className="w-4 h-4" />
+              <span className="hidden md:block">Règlementations</span>
             </Link>
           </li>
           <li>
@@ -47,7 +71,7 @@ const Header: React.FC = () => {
               className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaUsers className="w-4 h-4" />
-              <span className="hidden md:block">À Propos</span>
+              <span className="hidden md:block">Notre Équipe</span>
             </Link>
           </li>
         </ul>

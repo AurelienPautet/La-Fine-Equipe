@@ -7,6 +7,7 @@ import {
   FaHeart,
   FaLightbulb,
   FaHandshake,
+  FaHandsHelping,
 } from "react-icons/fa";
 import ArticleCard from "../components/ArticleCard";
 import { useLatestsArticle } from "../hooks/ArticleHooks";
@@ -31,9 +32,6 @@ const HomePage: React.FC = () => {
                 />
               </div>
             </div>
-            <h1 className="text-6xl font-bold mb-6 drop-shadow-lg flex items-center justify-center gap-4">
-              <FaGem className="w-12 h-12 text-accent" />
-            </h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
               Bienvenue sur le site de La Fine Équipe ! Nous sommes un groupe
               passionné et dévoué, travaillant ensemble pour atteindre nos
@@ -46,6 +44,13 @@ const HomePage: React.FC = () => {
               >
                 <FaUsers className="w-5 h-5" />
                 Découvrir l'équipe
+              </Link>
+              <Link
+                to="/join"
+                className="btn btn-secondary btn-lg text-secondary-content shadow-lg hover:shadow-xl transform hover:scale-110 transition-all flex items-center gap-3"
+              >
+                <FaHandsHelping className="w-6 h-6" />
+                Rejoignez-nous
               </Link>
             </div>
           </div>

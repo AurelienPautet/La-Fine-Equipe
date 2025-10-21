@@ -21,7 +21,7 @@ interface Member {
   instagram?: string;
 }
 
-const AboutPage: React.FC = () => {
+const OurTeamPage: React.FC = () => {
   const [students, setMembers] = useState<Member[]>([]);
   useEffect(() => {
     fetch("/members.json")
@@ -181,4 +181,4 @@ const AboutPage: React.FC = () => {
   );
 };
 
-export default AboutPage;
+export default OurTeamPage;

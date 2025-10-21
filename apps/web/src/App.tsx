@@ -4,12 +4,14 @@ const queryClient = new QueryClient();
 
 import HomePage from "./pages/HomePage";
 import ArticlesPage from "./pages/ArticlesPage";
-import AboutPage from "./pages/AboutPage";
+import OurTeamPage from "./pages/OurTeamPage";
 import ArticlePage from "./pages/ArticlePage";
 import CreateArticlePage from "./pages/CreateArticlePage";
 import EditArticlePage from "./pages/EditArticlePage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ActPage from "./pages/ActPage";
+import JoinUsPage from "./pages/JoinUsPage";
 
 function App() {
   return (
@@ -30,7 +32,9 @@ function App() {
               <Route path="/article/create" element={<CreateArticlePage />} />
               <Route path="/article/edit/:slug" element={<EditArticlePage />} />
               <Route path="/article/:slug" element={<ArticlePage />} />
-              <Route path="/about" element={<AboutPage />} />
+              <Route path="/act" element={<ActPage />} />
+              <Route path="/join" element={<JoinUsPage />} />
+              <Route path="/about" element={<OurTeamPage />} />
             </Routes>
           </main>
 
