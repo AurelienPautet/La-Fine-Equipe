@@ -50,7 +50,7 @@ const HomePage: React.FC = () => {
                 className="btn btn-secondary btn-lg text-secondary-content shadow-lg hover:shadow-xl transform hover:scale-110 transition-all flex items-center gap-3"
               >
                 <FaHandsHelping className="w-6 h-6" />
-                Rejoignez-nous
+                Nous rejoindre
               </Link>
             </div>
           </div>
