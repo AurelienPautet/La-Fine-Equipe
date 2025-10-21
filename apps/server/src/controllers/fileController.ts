@@ -2,17 +2,6 @@ import { request, Request, Response } from "express";
 import fileUpload from "express-fileupload";
 import { put, del } from "@vercel/blob";
 
-async function test() {
-  const { url } = await put("articles/blob.txt", "Hello World!", {
-    access: "public",
-    allowOverwrite: true,
-  });
-  console.log("Blob URL:", url);
-}
-test().then(() => {
-  console.log("Test file uploaded");
-});
-
 export const uploadFile = async (req: Request, res: Response) => {
   if (!req.files?.file) {
     return res

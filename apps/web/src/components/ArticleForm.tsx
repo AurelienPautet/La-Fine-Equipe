@@ -16,6 +16,7 @@ import type {
   CreateArticleRequest,
   EditArticleRequest,
 } from "@lafineequipe/types";
+import TagSelector from "./TagSelector";
 
 interface ArticleFormProps {
   initialData: CreateArticleRequest | EditArticleRequest | ArticleWithTags;
@@ -236,22 +237,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
                 </div>
 
                 {/* Tags */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-semibold flex items-center gap-2">
-                      <FaTag className="w-4 h-4" />
-                      Tags (séparés par des virgules)
-                    </span>
-                  </label>
-                  <input
-                    type="text"
-                    name="tags"
-                    value={formData.tagsId?.join(", ") || ""}
-                    onChange={handleInputChange}
-                    className="input input-bordered input-primary"
-                    placeholder="événement, tournoi, équipe..."
-                  />
-                </div>
+                <TagSelector />
 
                 <div className="flex-1 flex flex-col min-h-0">
                   {/* Content */}

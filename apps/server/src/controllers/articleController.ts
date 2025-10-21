@@ -64,7 +64,7 @@ const getArticlesWithTags = async (
 export const getAllArticles = async (_req: Request, res: Response) => {
   try {
     const allArticlesWithTags = await getArticlesWithTags();
-    res.json(allArticlesWithTags);
+    res.status(200).json({ success: true, data: allArticlesWithTags });
   } catch (error) {
     console.error("Error fetching articles:", error);
     res.status(500).json({ success: false, error: error });
@@ -153,13 +153,11 @@ export const createArticle = async (req: Request, res: Response) => {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, errors: error.errors });
     }
-    res
-      .status(500)
-      .json({
-        success: false,
-        error: "Failed to create article",
-        stack: error.stack,
-      });
+    res.status(500).json({
+      success: false,
+      error: "Failed to create article",
+      stack: error.stack,
+    });
   }
 };
 

@@ -19,7 +19,7 @@ export async function getArticles(): Promise<ArticleWithTags[]> {
   }
 
   const articles = await response.json();
-  return articles;
+  return articles.data;
 }
 
 export async function getArticle(slug: string): Promise<ArticleWithTags> {
