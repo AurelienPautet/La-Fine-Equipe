@@ -24,9 +24,9 @@ const HomePage: React.FC = () => {
         <div className="hero-content text-center text-primary-content relative z-10">
           <div className="max-w-4xl">
             <div className="flex justify-center mb-8">
-              <div className="w-32 h-32 rounded-full shadow-2xl">
+              <div className="w-64 h-64 rounded-full shadow-2xl">
                 <img
-                  src="/logo.png"
+                  src="/logo_texte.png"
                   alt="La Fine Équipe"
                   className="w-full h-full object-cover"
                 />

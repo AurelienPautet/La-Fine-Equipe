@@ -49,6 +49,15 @@ const Header: React.FC = () => {
           </li>
           <li>
             <Link
+              to="/about"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+            >
+              <FaUsers className="w-4 h-4" />
+              <span className="hidden md:block">Notre Équipe</span>
+            </Link>
+          </li>
+          <li>
+            <Link
               to="/article"
               className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
@@ -63,15 +72,6 @@ const Header: React.FC = () => {
             >
               <FaScroll className="w-4 h-4" />
               <span className="hidden md:block">Règlementations</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/about"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
-            >
-              <FaUsers className="w-4 h-4" />
-              <span className="hidden md:block">Notre Équipe</span>
             </Link>
           </li>
         </ul>
