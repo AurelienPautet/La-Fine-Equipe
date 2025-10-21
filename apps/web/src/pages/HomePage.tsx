@@ -148,7 +148,7 @@ const HomePage: React.FC = () => {
               <p className="text-xl text-justify max-w-2xl">
                 Les membres et les élus de La Fine Équipe se donnent pour
                 mission{" "}
-                <b>d’incarner et de porter les revendications des étudiants</b>
+                <b>d’incarner et de porter les revendications des étudiants</b>{" "}
                 de Lyon III auprès des instances décisionnelles.
                 <br />
                 <br />
