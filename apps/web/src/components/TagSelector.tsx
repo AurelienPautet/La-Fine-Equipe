@@ -1,12 +1,12 @@
-import React, { use } from "react";
-import { useState, useEffect, useRef } from "react";
+import React from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import type { Tag } from "@lafineequipe/types";
 import TagDisplay from "./TagDisplay";
 import { useTags, usePostTag } from "../hooks/TagsHooks";
 import { FaPlus } from "react-icons/fa";
 
 interface TagSelectorProps {
-  setTags: (tags: Tag[]) => void;
+  setTags: (_tags: Tag[]) => void;
   initialTags: Tag[];
 }
 
@@ -92,6 +92,20 @@ const TagSelector: React.FC<TagSelectorProps> = ({ setTags, initialTags }) => {
     };
   }, [tagsWithState]);
 
+  const selectedTags = useMemo(() => {
+    if (!isLoading) {
+      return tagsWithState.filter((tag) => tag.isSelected);
+    }
+    return [];
+  }, [tagsWithState, isLoading]);
+
+  const notSelectedTags = useMemo(() => {
+    if (!isLoading) {
+      return tagsWithState.filter((tag) => !tag.isSelected);
+    }
+    return [];
+  }, [tagsWithState, isLoading]);
+
   const postTagMutation = usePostTag();
 
   function handleCreateTag(name: string) {
@@ -117,17 +131,15 @@ const TagSelector: React.FC<TagSelectorProps> = ({ setTags, initialTags }) => {
           ref={containerRef}
         >
           {" "}
-          {tagsWithState
-            .filter((tag) => tag.isSelected)
-            .map((tag) => (
-              <TagDisplay
-                key={tag.id}
-                text={tag.name}
-                onDelete={() => {
-                  deselectTag(tag.id);
-                }}
-              />
-            ))}
+          {selectedTags.map((tag) => (
+            <TagDisplay
+              key={tag.id}
+              text={tag.name}
+              onDelete={() => {
+                deselectTag(tag.id);
+              }}
+            />
+          ))}
           <details
             className={`dropdown dropdown-bottom ${dropdownPosition}`}
             tabIndex={0}
@@ -139,19 +151,17 @@ const TagSelector: React.FC<TagSelectorProps> = ({ setTags, initialTags }) => {
             <ul className="menu  dropdown-content t  bg-white rounded-box  w-40 p-2 shadow-sm">
               <li>
                 {tagsWithState && tagsWithState.length > 0 ? (
-                  tagsWithState
-                    .filter((tag) => !tag.isSelected)
-                    .map((tag: TagWithState) => (
-                      <button
-                        key={tag.id}
-                        className={`w-full text-left px-4 py-2 hover:bg-gray-200 rounded `}
-                        onClick={() => {
-                          selectTag(tag.id);
-                        }}
-                      >
-                        {tag.name}
-                      </button>
-                    ))
+                  notSelectedTags.map((tag: TagWithState) => (
+                    <button
+                      key={tag.id}
+                      className={`w-full text-left px-4 py-2 hover:bg-gray-200 rounded `}
+                      onClick={() => {
+                        selectTag(tag.id);
+                      }}
+                    >
+                      {tag.name}
+                    </button>
+                  ))
                 ) : (
                   <div>Aucun tag disponible</div>
                 )}
