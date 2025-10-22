@@ -90,7 +90,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto h-full">
       {/* Mode Toggle - Mobile Only */}
       <div className="flex justify-center mb-8 lg:hidden">
         <div className="btn-group">
@@ -116,7 +116,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
       </div>
 
       {/* Desktop: Side by side, Mobile: Toggle */}
-      <div className="grid lg:grid-cols-2 gap-8 lg:h-[800px]">
+      <div className="grid lg:grid-cols-2 gap-8 h-fit lg:h-min-[1000px]">
         {/* Edit Form - Always visible on desktop, conditional on mobile */}
         <div
           className={`h-full ${isPreviewMode ? "hidden lg:block" : "block"}`}
@@ -265,7 +265,10 @@ Vous pouvez utiliser du Markdown :
 - *texte en italique*
 - [liens](https://example.com)
 - `code`
-- etc."
+- etc.
+
+Deposé des fichiers (pdf et images) pour les insérer directement dans le contenu !
+"
                       required
                     />
                   </div>
