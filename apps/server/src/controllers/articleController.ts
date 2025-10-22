@@ -114,7 +114,6 @@ export const createArticle = async (req: Request, res: Response) => {
   try {
     const validatedData = createArticleRequestSchema.parse(req.body);
     const { title, content, author, date, tags } = validatedData;
-    console.log("tagsId", tags);
     const slug = title
       .toLowerCase()
       .normalize("NFD")
@@ -123,6 +122,13 @@ export const createArticle = async (req: Request, res: Response) => {
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
       .trim();
+
+    if (slug.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Titre invalide. Un titre doit contenir des caractères valides.",
+      });
+    }
 
     const existingArticle = await db
       .select()
