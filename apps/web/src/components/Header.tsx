@@ -29,49 +29,59 @@ const Header: React.FC = () => {
       </div>
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1 text-lg font-semibold">
-          <li>
+          <li className="group relative">
             <Link
               to="/"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-600 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaHome className="w-4 h-4" />
-              <span className="hidden md:block">Accueil</span>
+              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-600 ease-in-out whitespace-nowrap md:max-w-none">
+                Accueil
+              </span>
             </Link>
           </li>
-          <li>
+          <li className="group relative">
             <Link
               to="/join"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-600 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaHandsHelping className="w-4 h-4" />
-              <span className="hidden md:block">Nous rejoindre</span>
+              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-600 ease-in-out whitespace-nowrap md:max-w-none">
+                Nous rejoindre
+              </span>
             </Link>
           </li>
-          <li>
+          <li className="group relative">
             <Link
               to="/about"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-600 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaUsers className="w-4 h-4" />
-              <span className="hidden md:block">Notre Équipe</span>
+              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-600 ease-in-out whitespace-nowrap md:max-w-none">
+                Notre Équipe
+              </span>
             </Link>
           </li>
-          <li>
+          <li className="group relative">
             <Link
               to="/article"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-600 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaNewspaper className="w-4 h-4" />
-              <span className="hidden md:block">Articles</span>
+              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-600 ease-in-out whitespace-nowrap md:max-w-none">
+                Articles
+              </span>
             </Link>
           </li>
-          <li>
+          <li className="group relative">
             <Link
               to="/act"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-600 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaScroll className="w-4 h-4" />
-              <span className="hidden md:block">Règlementations</span>
+              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-600 ease-in-out whitespace-nowrap md:max-w-none">
+                Règlementations
+              </span>
             </Link>
           </li>
         </ul>
