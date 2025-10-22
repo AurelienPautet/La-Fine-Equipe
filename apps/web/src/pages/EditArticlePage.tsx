@@ -16,13 +16,12 @@ const EditArticlePage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: article, error, isLoading: loading } = useArticle(slug || "");
-  console.log("article", article);
   const editArticle = useEditArticle();
 
   const handleSubmit = async (formData: CreateArticleRequest) => {
     setIsSubmitting(true);
     try {
-      await editArticle.mutateAsync({
+      let res = await editArticle.mutateAsync({
         articleData: {
           id: article?.id || 0,
           title: formData.title,
@@ -32,7 +31,7 @@ const EditArticlePage: React.FC = () => {
           tags: formData.tags,
         },
       });
-      navigate(`/article/${slug}`);
+      navigate(`/article/${res.slug}`);
     } catch (error) {
       console.error("Failed to edit article:", error);
     } finally {

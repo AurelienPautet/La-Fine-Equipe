@@ -83,5 +83,5 @@ export async function editArticleMutation({
   }
 
   const article = await response.json();
-  return article;
+  return article.data;
 }
