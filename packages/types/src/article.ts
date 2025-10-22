@@ -1,12 +1,12 @@
 import { InferSelectModel } from "drizzle-orm";
-import { articles, tags } from "@lafineequipe/db/src/schema";
+import { articles } from "@lafineequipe/db/src/schema";
 import { z } from "zod";
+import { Tag, tagSchema } from "./tag";
 
 export type Article = InferSelectModel<typeof articles>;
 
 export interface ArticleWithTags extends Article {
-  tags: string[];
-  tagsId?: number[];
+  tags: Tag[];
 }
 
 export const createArticleRequestSchema = z.object({
@@ -17,8 +17,7 @@ export const createArticleRequestSchema = z.object({
   }),
   content: z.string().min(1, "Content is required"),
   author: z.string().min(1, "Author is required"),
-  tagsId: z.array(z.number()).optional().default([]),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(tagSchema).optional().default([]),
 });
 
 export const editArticleRequestSchema = createArticleRequestSchema.extend({

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaEdit } from "react-icons/fa";
-import ArticleForm, { type ArticleFormData } from "../components/ArticleForm";
+import ArticleForm from "../components/ArticleForm";
 import PageHeader from "../components/PageHeader";
 import MarkdownGuide from "../components/MarkdownGuide";
 import { usePostArticle } from "../hooks/ArticleHooks";
@@ -11,7 +11,7 @@ const CreateArticlePage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const postArticle = usePostArticle();
 
-  const initialFormData: ArticleFormData = {
+  const initialFormData: any = {
     title: "",
     author: "",
     date: new Date().toISOString().split("T")[0],
@@ -19,7 +19,7 @@ const CreateArticlePage: React.FC = () => {
     content: "",
   };
 
-  const handleSubmit = async (formData: ArticleFormData) => {
+  const handleSubmit = async (formData: any) => {
     setIsSubmitting(true);
     postArticle.mutate(
       {
@@ -27,7 +27,7 @@ const CreateArticlePage: React.FC = () => {
         content: formData.content,
         author: formData.author,
         date: new Date(formData.date),
-        tagsId: [],
+        tags: formData.tags,
       },
       {
         onSuccess: () => {

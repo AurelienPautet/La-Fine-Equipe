@@ -4,12 +4,13 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 
 import { FaUser, FaCalendarAlt, FaTag } from "react-icons/fa";
+import type { Tag } from "@lafineequipe/types";
 
 interface ArticleMetadata {
   title: string;
   author: string;
   date: string;
-  tags: string[];
+  tags: Tag[];
 }
 
 interface ArticleDisplayProps {
@@ -61,7 +62,7 @@ const ArticleDisplay: React.FC<ArticleDisplayProps> = ({
               <div className="flex flex-wrap gap-1">
                 {metadata.tags.map((tag, index) => (
                   <span key={index} className="badge badge-primary badge-sm">
-                    {tag}
+                    {tag.name}
                   </span>
                 ))}
               </div>

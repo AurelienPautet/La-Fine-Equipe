@@ -16,7 +16,7 @@ const EditArticlePage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: article, error, isLoading: loading } = useArticle(slug || "");
-
+  console.log("article", article);
   const editArticle = useEditArticle();
 
   const handleSubmit = async (formData: CreateArticleRequest) => {
@@ -29,7 +29,7 @@ const EditArticlePage: React.FC = () => {
           date: formData.date,
           content: formData.content,
           author: formData.author,
-          tagsId: formData.tagsId,
+          tags: formData.tags,
         },
       });
       navigate(`/article/${slug}`);

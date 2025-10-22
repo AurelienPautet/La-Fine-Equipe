@@ -1,45 +1,58 @@
-import React from "react";
+import React, { use } from "react";
 import { useState, useEffect, useRef } from "react";
 import type { Tag } from "@lafineequipe/types";
 import TagDisplay from "./TagDisplay";
 import { useTags, usePostTag } from "../hooks/TagsHooks";
 import { FaPlus } from "react-icons/fa";
 
-interface TagSelectorProps {}
+interface TagSelectorProps {
+  setTags: (tags: Tag[]) => void;
+  initialTags: Tag[];
+}
 
 interface TagWithState extends Tag {
   isSelected: boolean;
 }
 
-const TagSelector: React.FC<TagSelectorProps> = () => {
+const TagSelector: React.FC<TagSelectorProps> = ({ setTags, initialTags }) => {
   const { data: tags, error, isLoading } = useTags();
-  const [tagsWithState, setTagsWithState] = useState<TagWithState[]>(
-    tags
-      ? tags.map((tag) => ({
-          ...tag,
-          isSelected: false,
-        }))
-      : []
-  );
+
+  const [tagsWithState, setTagsWithState] = useState<TagWithState[]>([]);
+
+  useEffect(() => {
+    if (!isLoading && tags) {
+      const updatedTagsWithState = tags.map((tag) => {
+        const isSelected = initialTags.some((t) => t.id === tag.id);
+        return { ...tag, isSelected };
+      });
+      setTagsWithState(updatedTagsWithState);
+    }
+  }, [isLoading]);
+
+  function selectTag(tagId: number) {
+    setTagsWithState((prevTags) =>
+      prevTags.map((t) => (t.id === tagId ? { ...t, isSelected: true } : t))
+    );
+  }
+
+  function deselectTag(tagId: number) {
+    setTagsWithState((prevTags) =>
+      prevTags.map((t) => (t.id === tagId ? { ...t, isSelected: false } : t))
+    );
+  }
+
+  useEffect(() => {
+    const selectedTags = tagsWithState
+      .filter((tag) => tag.isSelected)
+      .map((tag) => ({ id: tag.id, name: tag.name }));
+    setTags(selectedTags);
+  }, [tagsWithState]);
+
   const dropdownRef = useRef<HTMLDetailsElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState<
     "dropdown-start" | "dropdown-end"
   >("dropdown-start");
-
-  useEffect(() => {
-    if (tags) {
-      const existingSelections = new Map(
-        tagsWithState.map((tag) => [tag.id, tag.isSelected])
-      );
-      setTagsWithState(
-        tags.map((tag) => ({
-          ...tag,
-          isSelected: existingSelections.get(tag.id) ?? false,
-        }))
-      );
-    }
-  }, [tags]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -81,19 +94,18 @@ const TagSelector: React.FC<TagSelectorProps> = () => {
 
   const postTagMutation = usePostTag();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  if (error) {
-    return <div>Error loading tags</div>;
-  }
-
   function handleCreateTag(name: string) {
     postTagMutation.mutate(name, {
       onSuccess: (newTag) => {
         setTagsWithState((prev) => [...prev, { ...newTag, isSelected: false }]);
       },
     });
+  }
+
+  if (isLoading) {
+    return <div>Chargement...</div>;
+  } else if (error) {
+    return <div>Erreur lors du chargement des tags</div>;
   }
 
   return (
@@ -112,11 +124,7 @@ const TagSelector: React.FC<TagSelectorProps> = () => {
                 key={tag.id}
                 text={tag.name}
                 onDelete={() => {
-                  setTagsWithState((prevTags) =>
-                    prevTags.map((t) =>
-                      t.id === tag.id ? { ...t, isSelected: false } : t
-                    )
-                  );
+                  deselectTag(tag.id);
                 }}
               />
             ))}
@@ -138,11 +146,7 @@ const TagSelector: React.FC<TagSelectorProps> = () => {
                         key={tag.id}
                         className={`w-full text-left px-4 py-2 hover:bg-gray-200 rounded `}
                         onClick={() => {
-                          setTagsWithState((prevTags) =>
-                            prevTags.map((t) =>
-                              t.id === tag.id ? { ...t, isSelected: true } : t
-                            )
-                          );
+                          selectTag(tag.id);
                         }}
                       >
                         {tag.name}

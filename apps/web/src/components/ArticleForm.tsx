@@ -15,6 +15,7 @@ import type {
   ArticleWithTags,
   CreateArticleRequest,
   EditArticleRequest,
+  Tag,
 } from "@lafineequipe/types";
 import TagSelector from "./TagSelector";
 
@@ -38,8 +39,10 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
     CreateArticleRequest | EditArticleRequest
   >({
     ...initialData,
-    tagsId: initialData.tagsId || [],
+    tags: [],
   });
+
+  const initialTags = initialData.tags || [];
 
   const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
     noClick: true,
@@ -72,6 +75,13 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
         content: prev.content + stringToInsert,
       }));
     }
+  };
+
+  const setTags = (tags: Tag[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags,
+    }));
   };
 
   const handleInputChange = (
@@ -237,7 +247,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
                 </div>
 
                 {/* Tags */}
-                <TagSelector />
+                <TagSelector initialTags={initialTags} setTags={setTags} />
 
                 <div className="flex-1 flex flex-col min-h-0">
                   {/* Content */}

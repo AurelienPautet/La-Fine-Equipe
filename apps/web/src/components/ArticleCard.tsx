@@ -89,7 +89,7 @@ const ArticleCard: React.FC<{
                         key={index}
                         className="badge badge-primary badge-xs flex-shrink-0"
                       >
-                        {tag}
+                        {tag.name}
                       </span>
                     ))}
                     {article.tags.length > 3 && (

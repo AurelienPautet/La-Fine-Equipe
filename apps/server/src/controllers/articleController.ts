@@ -21,7 +21,7 @@ const getArticlesWithTags = async (
       date: articles.date,
       createdAt: articles.createdAt,
       updatedAt: articles.updatedAt,
-      tagName: tags.name,
+      tags: { id: tags.id, name: tags.name },
     })
     .from(articles)
     .leftJoin(articleTags, eq(articles.id, articleTags.articleId))
@@ -50,14 +50,15 @@ const getArticlesWithTags = async (
         date: row.date,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
-        tags: row.tagName ? [row.tagName] : [],
+        tags: row.tags ? [row.tags] : [],
       });
-    } else if (row.tagName) {
-      articlesMap.get(row.id)!.tags.push(row.tagName);
-      articlesMap.get(row.id)!.tagsId?.push(row.id);
+    } else {
+      const existingArticle = articlesMap.get(row.id);
+      if (row.tags && existingArticle) {
+        existingArticle.tags.push(row.tags);
+      }
     }
   }
-
   return Array.from(articlesMap.values());
 };
 
@@ -112,8 +113,8 @@ export const getLatestsArticle = async (req: Request, res: Response) => {
 export const createArticle = async (req: Request, res: Response) => {
   try {
     const validatedData = createArticleRequestSchema.parse(req.body);
-    const { title, content, author, date, tagsId } = validatedData;
-
+    const { title, content, author, date, tags } = validatedData;
+    console.log("tagsId", tags);
     const slug = title
       .toLowerCase()
       .normalize("NFD")
@@ -141,10 +142,10 @@ export const createArticle = async (req: Request, res: Response) => {
       .returning()
       .execute();
 
-    for (const tagId of tagsId) {
+    for (const tag of tags) {
       await db
         .insert(articleTags)
-        .values({ articleId: article.id, tagId })
+        .values({ articleId: article.id, tagId: tag.id })
         .execute();
     }
 
@@ -165,7 +166,7 @@ export const editArticle = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const validatedData = createArticleRequestSchema.parse(req.body);
-    const { title, content, author, date, tagsId } = validatedData;
+    const { title, content, author, date, tags } = validatedData;
     const slug = title
       .toLowerCase()
       .normalize("NFD")
@@ -198,10 +199,10 @@ export const editArticle = async (req: Request, res: Response) => {
       .where(eq(articleTags.articleId, article.id))
       .execute();
 
-    for (const tagId of tagsId) {
+    for (const tag of tags) {
       await db
         .insert(articleTags)
-        .values({ articleId: article.id, tagId })
+        .values({ articleId: article.id, tagId: tag.id })
         .execute();
     }
 
