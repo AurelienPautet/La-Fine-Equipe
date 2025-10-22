@@ -1,8 +1,9 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
 import type { Tag } from "@lafineequipe/types";
-
+import TagDisplay from "./TagDisplay";
 import { useTags, usePostTag } from "../hooks/TagsHooks";
+import { FaPlus } from "react-icons/fa";
 
 interface TagSelectorProps {}
 
@@ -21,13 +22,20 @@ const TagSelector: React.FC<TagSelectorProps> = () => {
       : []
   );
   const dropdownRef = useRef<HTMLDetailsElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<
+    "dropdown-start" | "dropdown-end"
+  >("dropdown-start");
 
   useEffect(() => {
     if (tags) {
+      const existingSelections = new Map(
+        tagsWithState.map((tag) => [tag.id, tag.isSelected])
+      );
       setTagsWithState(
         tags.map((tag) => ({
           ...tag,
-          isSelected: false,
+          isSelected: existingSelections.get(tag.id) ?? false,
         }))
       );
     }
@@ -49,6 +57,28 @@ const TagSelector: React.FC<TagSelectorProps> = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const updateDropdownPosition = () => {
+      if (dropdownRef.current && containerRef.current) {
+        const dropdownRect = dropdownRef.current.getBoundingClientRect();
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const containerCenter = containerRect.left + containerRect.width / 2;
+        if (dropdownRect.left < containerCenter) {
+          setDropdownPosition("dropdown-start");
+        } else {
+          setDropdownPosition("dropdown-end");
+        }
+      }
+    };
+
+    updateDropdownPosition();
+    window.addEventListener("resize", updateDropdownPosition);
+
+    return () => {
+      window.removeEventListener("resize", updateDropdownPosition);
+    };
+  }, [tagsWithState]);
+
   const postTagMutation = usePostTag();
 
   if (isLoading) {
@@ -67,64 +97,77 @@ const TagSelector: React.FC<TagSelectorProps> = () => {
   }
 
   return (
-    <div className="w-fit">
-      <h4 className="font-bold mb-2">Select Tags:</h4>
-      <details className="dropdown" tabIndex={0} ref={dropdownRef}>
-        <summary className="btn m-1">
+    <div className="w-full ">
+      <div className="label flex flex-col  items-start">
+        <h4 className="label-text text-sm font-semibold">Tags sélectionnés:</h4>
+        <div
+          className="flex w-full flex-row flex-wrap items-center gap-2"
+          ref={containerRef}
+        >
+          {" "}
           {tagsWithState
             .filter((tag) => tag.isSelected)
             .map((tag) => (
-              <span
+              <TagDisplay
                 key={tag.id}
-                className="inline-block bg-blue-200 text-blue-800 text-sm px-2 py-1 rounded mr-2 mb-2"
-              >
-                {tag.name}
-              </span>
+                text={tag.name}
+                onDelete={() => {
+                  setTagsWithState((prevTags) =>
+                    prevTags.map((t) =>
+                      t.id === tag.id ? { ...t, isSelected: false } : t
+                    )
+                  );
+                }}
+              />
             ))}
-        </summary>
-        <ul
-          className="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
-          tabIndex={-1}
-        >
-          <li>
-            {tagsWithState && tagsWithState.length > 0 ? (
-              tagsWithState.map((tag: TagWithState) => (
-                <button
-                  key={tag.id}
-                  className={`w-full text-left px-4 py-2 hover:bg-gray-200 rounded ${
-                    tag.isSelected ? "bg-gray-300" : ""
-                  }`}
-                  onClick={() => {
-                    setTagsWithState((prevTags) =>
-                      prevTags.map((t) =>
-                        t.id === tag.id
-                          ? { ...t, isSelected: !t.isSelected }
-                          : t
-                      )
-                    );
+          <details
+            className={`dropdown dropdown-bottom ${dropdownPosition}`}
+            tabIndex={0}
+            ref={dropdownRef}
+          >
+            <summary className="btn btn-circle btn-sm btn-primary ">
+              <FaPlus />
+            </summary>
+            <ul className="menu  dropdown-content t  bg-white rounded-box  w-40 p-2 shadow-sm">
+              <li>
+                {tagsWithState && tagsWithState.length > 0 ? (
+                  tagsWithState
+                    .filter((tag) => !tag.isSelected)
+                    .map((tag: TagWithState) => (
+                      <button
+                        key={tag.id}
+                        className={`w-full text-left px-4 py-2 hover:bg-gray-200 rounded `}
+                        onClick={() => {
+                          setTagsWithState((prevTags) =>
+                            prevTags.map((t) =>
+                              t.id === tag.id ? { ...t, isSelected: true } : t
+                            )
+                          );
+                        }}
+                      >
+                        {tag.name}
+                      </button>
+                    ))
+                ) : (
+                  <div>Aucun tag disponible</div>
+                )}
+                <input
+                  type="text"
+                  placeholder="Ajouter un tag"
+                  className="input input-bordered border-primary bg-white w-full "
+                  onKeyDown={async (e) => {
+                    if (e.key === "Enter") {
+                      console.log("Creating tag:", e.currentTarget.value);
+                      handleCreateTag(e.currentTarget.value);
+                      e.currentTarget.value = "";
+                    }
                   }}
-                >
-                  {tag.name}
-                </button>
-              ))
-            ) : (
-              <div>No tags available</div>
-            )}
-            <input
-              type="text"
-              placeholder="Add new tag"
-              className="input input-bordered w-full mt-2"
-              onKeyDown={async (e) => {
-                if (e.key === "Enter") {
-                  console.log("Creating tag:", e.currentTarget.value);
-                  handleCreateTag(e.currentTarget.value);
-                  e.currentTarget.value = "";
-                }
-              }}
-            />
-          </li>
-        </ul>
-      </details>
+                />
+              </li>
+            </ul>
+          </details>
+        </div>
+      </div>
     </div>
   );
 };
