@@ -15,7 +15,6 @@ import FigureCard from "../components/FigureCard";
 
 const HomePage: React.FC = () => {
   const { data: latestsArticles, error, isLoading } = useLatestsArticle();
-  console.log("Latests article data:", latestsArticles, error);
 
   return (
     <div className="min-h-screen">

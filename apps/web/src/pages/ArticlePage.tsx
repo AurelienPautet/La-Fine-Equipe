@@ -14,7 +14,6 @@ const ArticlePage: React.FC = () => {
   const { data, error, isLoading } = useArticle(slug || "");
 
   useEffect(() => {
-    console.log("Fetched article data:", data, error);
     if (data) {
       setArticle(data);
     }
