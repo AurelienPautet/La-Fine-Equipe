@@ -1,3 +1,4 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import {
   FaHandsHelping,
@@ -32,10 +33,10 @@ const Header: React.FC = () => {
           <li className="group relative">
             <Link
               to="/"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-600 rounded-lg mx-1 flex items-center gap-2"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaHome className="w-4 h-4" />
-              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-600 ease-in-out whitespace-nowrap md:max-w-none">
+              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap md:max-w-none">
                 Accueil
               </span>
             </Link>
@@ -43,10 +44,10 @@ const Header: React.FC = () => {
           <li className="group relative">
             <Link
               to="/join"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-600 rounded-lg mx-1 flex items-center gap-2"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaHandsHelping className="w-4 h-4" />
-              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-600 ease-in-out whitespace-nowrap md:max-w-none">
+              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap md:max-w-none">
                 Nous rejoindre
               </span>
             </Link>
@@ -54,10 +55,10 @@ const Header: React.FC = () => {
           <li className="group relative">
             <Link
               to="/about"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-600 rounded-lg mx-1 flex items-center gap-2"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaUsers className="w-4 h-4" />
-              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-600 ease-in-out whitespace-nowrap md:max-w-none">
+              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap md:max-w-none">
                 Notre Équipe
               </span>
             </Link>
@@ -65,10 +66,10 @@ const Header: React.FC = () => {
           <li className="group relative">
             <Link
               to="/article"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-600 rounded-lg mx-1 flex items-center gap-2"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaNewspaper className="w-4 h-4" />
-              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-600 ease-in-out whitespace-nowrap md:max-w-none">
+              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap md:max-w-none">
                 Articles
               </span>
             </Link>
@@ -76,10 +77,10 @@ const Header: React.FC = () => {
           <li className="group relative">
             <Link
               to="/act"
-              className="hover:bg-primary hover:text-primary-content transition-all duration-600 rounded-lg mx-1 flex items-center gap-2"
+              className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaScroll className="w-4 h-4" />
-              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-600 ease-in-out whitespace-nowrap md:max-w-none">
+              <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap md:max-w-none">
                 Règlementations
               </span>
             </Link>
