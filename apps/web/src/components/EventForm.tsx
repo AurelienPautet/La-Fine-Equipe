@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDropzone, type FileWithPath } from "react-dropzone";
-import { useUploadFile } from "../hooks/FileHooks";
-import {
-  FaEdit,
-  FaSave,
-  FaEye,
-  FaCalendarAlt,
-  FaUser,
-  FaTag,
-} from "react-icons/fa";
+import { useUploadFile, useDeleteFile } from "../hooks/FileHooks";
+import { FaEdit, FaSave, FaEye, FaCalendarAlt, FaUser } from "react-icons/fa";
 import EventsDisplay from "./EventDisplay";
 import "cally";
 import type {
@@ -56,12 +49,23 @@ const EventsForm: React.FC<EventsFormProps> = ({
   ));
 
   const uploadMutation = useUploadFile("events");
+  const deleteMutation = useDeleteFile();
+
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+
+  useEffect(() => {
+    const embedRegex = /<embed src="([^"]+)"[^>]*>/g;
+    const matches = [...(initialData.content.matchAll(embedRegex) || [])];
+    const extractedUrls = matches.map((match) => match[1]);
+    setUploadedFiles(extractedUrls);
+  }, [initialData]);
 
   const handleDrop = async (acceptedFiles: readonly FileWithPath[]) => {
     const result = await Promise.all(
       acceptedFiles.map((file) => uploadMutation.mutateAsync(file))
     );
     console.log("Uploaded files:", result);
+    setUploadedFiles((prev) => [...prev, ...result.map((res) => res.url)]);
     for (const res of result) {
       let stringToInsert = "";
       if (res.type.startsWith("image/")) {
@@ -96,6 +100,11 @@ const EventsForm: React.FC<EventsFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    for (const fileUrl of uploadedFiles) {
+      if (!formData.content.includes(fileUrl)) {
+        deleteMutation.mutate(fileUrl);
+      }
+    }
     await onSubmit(formData);
   };
 
@@ -183,7 +192,7 @@ const EventsForm: React.FC<EventsFormProps> = ({
                     <label className="label">
                       <span className="label-text font-semibold flex items-center gap-2">
                         <FaCalendarAlt className="w-4 h-4" />
-                        Date de publication
+                        Date de l'évenemnt
                       </span>
                     </label>
                     <button

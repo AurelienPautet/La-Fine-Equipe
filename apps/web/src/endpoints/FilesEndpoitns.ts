@@ -21,3 +21,24 @@ export async function uploadFile(
   console.log("Upload response:", result);
   return result;
 }
+
+export async function deleteFile(
+  fileName: string
+): Promise<{ success: boolean }> {
+  console.log("Deleting file:", fileName);
+  console.log(
+    "DELETE URL:",
+    `${API_URL}/api/files/delete?url=${encodeURIComponent(fileName)}`
+  );
+  const response = await fetch(
+    `${API_URL}/api/files/delete?url=${encodeURIComponent(fileName)}`,
+    {
+      method: "DELETE",
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Failed to delete file");
+  }
+  const result = await response.json();
+  return result;
+}

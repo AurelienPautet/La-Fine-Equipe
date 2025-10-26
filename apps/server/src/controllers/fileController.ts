@@ -1,4 +1,4 @@
-import { request, Request, Response } from "express";
+import { Request, Response } from "express";
 import fileUpload from "express-fileupload";
 import { put, del } from "@vercel/blob";
 
@@ -9,7 +9,7 @@ export const uploadFile = async (req: Request, res: Response) => {
       .json({ success: false, message: "No file uploaded" });
   }
 
-  let folder = req.params.folder || "";
+  const folder = req.params.folder || "";
 
   const file = req.files.file as fileUpload.UploadedFile;
 
@@ -28,8 +28,17 @@ export const uploadFile = async (req: Request, res: Response) => {
 };
 
 export const deleteFile = async (req: Request, res: Response) => {
-  const { searchParams } = new URL(req.url);
-  const urlToDelete = searchParams.get("url") as string;
-  await del(urlToDelete);
+  const fullUrl = `${req.protocol}://${req.get("host")}${req.url}`;
+  const { searchParams } = new URL(fullUrl);
+  let urlToDelete = searchParams.get("url") as string;
+  urlToDelete = decodeURIComponent(urlToDelete);
+  try {
+    await del(urlToDelete);
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Error deleting file" });
+  }
   return res.status(204).send();
 };
