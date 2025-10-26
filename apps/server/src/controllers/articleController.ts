@@ -28,11 +28,13 @@ const getArticlesWithTags = async (
     .leftJoin(tags, eq(articleTags.tagId, tags.id));
 
   if (whereCondition) {
-    query = query.where(whereCondition) as any;
+    // @ts-expect-error Drizzle ORM typing issue with dynamic where
+    query = query.where(whereCondition);
   }
 
   if (orderBy) {
-    query = query.orderBy(orderBy) as any;
+    // @ts-expect-error Drizzle ORM typing issue with dynamic orderBy
+    query = query.orderBy(orderBy);
   }
 
   const results = await query.execute();
@@ -64,7 +66,10 @@ const getArticlesWithTags = async (
 
 export const getAllArticles = async (_req: Request, res: Response) => {
   try {
-    const allArticlesWithTags = await getArticlesWithTags();
+    const allArticlesWithTags = await getArticlesWithTags(
+      undefined,
+      desc(articles.date)
+    );
     res.status(200).json({ success: true, data: allArticlesWithTags });
   } catch (error) {
     console.error("Error fetching articles:", error);
@@ -84,7 +89,7 @@ export const getArticleBySlug = async (req: Request, res: Response) => {
     }
 
     res.json({ success: true, data: articlesWithTags[0] });
-  } catch (error) {
+  } catch {
     res.status(500).json({ success: false, error: "Failed to fetch article" });
   }
 };
@@ -103,7 +108,7 @@ export const getLatestsArticle = async (req: Request, res: Response) => {
     }
 
     res.json({ success: true, data: [allArticles[0], allArticles[1]] });
-  } catch (error) {
+  } catch {
     res
       .status(500)
       .json({ success: false, error: "Failed to fetch latests article" });
