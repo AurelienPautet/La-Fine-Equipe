@@ -8,7 +8,7 @@ coverage/
 .idea/
 .turbo/
 .github/
-
+other_stuff/
 commands.md
 
 migrations/
