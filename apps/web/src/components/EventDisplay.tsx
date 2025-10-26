@@ -6,27 +6,27 @@ import rehypeRaw from "rehype-raw";
 import { FaUser, FaCalendarAlt, FaTag } from "react-icons/fa";
 import type { Tag } from "@lafineequipe/types";
 
-interface ArticleMetadata {
+interface EventsMetadata {
   title: string;
   author: string;
   date: string;
   tags: Tag[];
 }
 
-interface ArticleDisplayProps {
-  metadata: ArticleMetadata;
+interface EventsDisplayProps {
+  metadata: EventsMetadata;
   content: string;
   isPreview?: boolean;
 }
 
-const ArticleDisplay: React.FC<ArticleDisplayProps> = ({
+const EventsDisplay: React.FC<EventsDisplayProps> = ({
   metadata,
   content,
   isPreview = false,
 }) => {
   return (
-    <article className="w-full">
-      {/* Article Header */}
+    <events className="w-full">
+      {/* Events Header */}
       <header className="mb-8 pb-6 border-b border-base-300">
         {/* Title */}
         <h1
@@ -34,7 +34,7 @@ const ArticleDisplay: React.FC<ArticleDisplayProps> = ({
             isPreview ? "text-2xl lg:text-3xl" : "text-3xl lg:text-4xl"
           }`}
         >
-          {metadata.title || "Titre de l'article"}
+          {metadata.title || "Titre de l'events"}
         </h1>
 
         {/* Metadata */}
@@ -71,7 +71,7 @@ const ArticleDisplay: React.FC<ArticleDisplayProps> = ({
         </div>
       </header>
 
-      {/* Article Content */}
+      {/* Events Content */}
       <div
         className={`prose max-w-none prose-headings:text-secondary prose-a:text-primary hover:prose-a:text-primary-focus prose-strong:text-secondary prose-code:bg-primary/10 prose-code:text-primary prose-code:px-2 prose-code:py-1 prose-code:rounded ${
           isPreview ? "prose-sm lg:prose-base" : "prose-lg"
@@ -81,8 +81,8 @@ const ArticleDisplay: React.FC<ArticleDisplayProps> = ({
           {content || "*Votre contenu apparaîtra ici...*"}
         </ReactMarkdown>
       </div>
-    </article>
+    </events>
   );
 };
 
-export default ArticleDisplay;
+export default EventsDisplay;

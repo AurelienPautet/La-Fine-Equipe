@@ -9,25 +9,25 @@ import {
   FaUser,
   FaTag,
 } from "react-icons/fa";
-import ArticleDisplay from "./ArticleDisplay";
+import EventsDisplay from "./EventDisplay";
 import "cally";
 import type {
-  ArticleWithTags,
-  CreateArticleRequest,
-  EditArticleRequest,
+  EventsWithTags,
+  CreateEventsRequest,
+  EditEventsRequest,
   Tag,
 } from "@lafineequipe/types";
 import TagSelector from "./TagSelector";
 
-interface ArticleFormProps {
-  initialData: CreateArticleRequest | EditArticleRequest | ArticleWithTags;
-  onSubmit: (data: CreateArticleRequest | EditArticleRequest) => Promise<void>;
+interface EventsFormProps {
+  initialData: CreateEventsRequest | EditEventsRequest | EventsWithTags;
+  onSubmit: (data: CreateEventsRequest | EditEventsRequest) => Promise<void>;
   isSubmitting: boolean;
   submitButtonText: string;
   submitButtonLoadingText: string;
 }
 
-const ArticleForm: React.FC<ArticleFormProps> = ({
+const EventsForm: React.FC<EventsFormProps> = ({
   initialData,
   onSubmit,
   isSubmitting,
@@ -36,7 +36,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
 }) => {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [formData, setFormData] = useState<
-    CreateArticleRequest | EditArticleRequest
+    CreateEventsRequest | EditEventsRequest
   >({
     ...initialData,
     tags: [],
@@ -55,7 +55,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
     </li>
   ));
 
-  const uploadMutation = useUploadFile("articles");
+  const uploadMutation = useUploadFile("events");
 
   const handleDrop = async (acceptedFiles: readonly FileWithPath[]) => {
     const result = await Promise.all(
@@ -146,7 +146,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
                   <label className="label">
                     <span className="label-text text-lg font-semibold flex items-center gap-2">
                       <FaEdit className="w-4 h-4" />
-                      Titre de l'article
+                      Titre de l'events
                     </span>
                   </label>
                   <input
@@ -155,7 +155,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
                     value={formData.title}
                     onChange={handleInputChange}
                     className="input input-bordered input-primary text-lg"
-                    placeholder="Entrez le titre de votre article..."
+                    placeholder="Entrez le titre de votre events..."
                     required
                   />
                 </div>
@@ -268,7 +268,7 @@ const ArticleForm: React.FC<ArticleFormProps> = ({
                       value={formData.content}
                       onChange={handleInputChange}
                       className="mt-3 textarea textarea-bordered textarea-primary w-full flex-1 font-mono resize-none"
-                      placeholder="Écrivez votre article ici...
+                      placeholder="Écrivez votre events ici...
 
 Vous pouvez utiliser du Markdown :
 - **texte en gras**
@@ -321,7 +321,7 @@ Deposé des fichiers (pdf et images) pour les insérer directement dans le conte
                 <h2 className="text-2xl font-bold text-secondary">Aperçu</h2>
               </div>
               <div className="overflow-y-auto flex-1 border rounded-lg p-4 bg-base-50">
-                <ArticleDisplay
+                <EventsDisplay
                   metadata={{
                     title: formData.title,
                     author: formData.author,
@@ -340,4 +340,4 @@ Deposé des fichiers (pdf et images) pour les insérer directement dans le conte
   );
 };
 
-export default ArticleForm;
+export default EventsForm;

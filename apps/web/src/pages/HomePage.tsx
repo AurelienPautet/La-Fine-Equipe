@@ -8,14 +8,14 @@ import {
   FaHandshake,
   FaHandsHelping,
 } from "react-icons/fa";
-import ArticleCard from "../components/ArticleCard";
-import { useLatestsArticle } from "../hooks/ArticleHooks";
+import EventsCard from "../components/EventCard";
+import { useLatestsEvents } from "../hooks/EventHooks";
 import FigureCard from "../components/FigureCard";
 import { MdEvent } from "react-icons/md";
 import MarkinEventCard from "../components/MarkinEventCard";
 
 const HomePage: React.FC = () => {
-  const { data: latestsArticles, error, isLoading } = useLatestsArticle();
+  const { data: latestsEvents, error, isLoading } = useLatestsEvents();
 
   return (
     <div className="min-h-screen">
@@ -57,50 +57,46 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Latests Article Section */}
+      {/* Latests Events Section */}
       <section className="py-20 bg-primary-focus">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-5xl font-bold text-secondary mb-4 flex items-center justify-center gap-4">
               <FaBook className="w-10 h-10" />
-              Derniers Articles
+              Derniers Events
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
           </div>
           <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-10">
             {isLoading && (
               <>
-                <ArticleCard
+                <EventsCard
                   className="w-1/3"
                   loading={true}
-                  article={undefined}
+                  events={undefined}
                 />
-                <ArticleCard
+                <EventsCard
                   className="w-1/3"
                   loading={true}
-                  article={undefined}
+                  events={undefined}
                 />
               </>
             )}
             {error && (
-              <p className="text-red-500">Erreur de chargement des articles.</p>
+              <p className="text-red-500">Erreur de chargement des events.</p>
             )}
 
-            {latestsArticles?.map((article) => (
-              <ArticleCard
-                className="w-1/3"
-                key={article.id}
-                article={article}
-              />
+            {latestsEvents?.map((events) => (
+              <EventsCard className="w-1/3" key={events.id} events={events} />
             ))}
           </div>
           <div className="text-center mt-8">
             <Link
-              to="/article"
+              to="/events"
               className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
             >
               <FaBook className="w-5 h-5" />
-              Voir tous nos articles
+              Voir tous nos events
             </Link>
           </div>
         </div>
@@ -241,7 +237,7 @@ DOCUMENTAIRE (75% des sièges)"
               description="Organisation d'une collecte de fournitures scolaires pour les étudiants dans le besoin."
               date="15 septembre 2023"
               imageUrl="/events/collecte_fournitures.jpg"
-              articleUrl="/article/collecte-fournitures-scolaires"
+              eventsUrl="/events/collecte-fournitures-scolaires"
             />
           </div>
         </div>

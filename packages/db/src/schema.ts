@@ -5,7 +5,7 @@ export const tags = pgTable("LaFineEquipe-tags", {
   name: text("name").notNull().unique(),
 });
 
-export const articles = pgTable("LaFineEquipe-articles", {
+export const events = pgTable("LaFineEquipe-events", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   slug: text("slug").notNull().unique(),
@@ -18,20 +18,11 @@ export const articles = pgTable("LaFineEquipe-articles", {
     .$onUpdateFn(() => new Date()),
 });
 
-export const articleTags = pgTable("LaFineEquipe-article_tags", {
-  articleId: integer("article_id")
-    .references(() => articles.id)
+export const eventsTags = pgTable("LaFineEquipe-events_tags", {
+  eventsId: integer("events_id")
+    .references(() => events.id)
     .notNull(),
   tagId: integer("tag_id")
     .references(() => tags.id)
     .notNull(),
-});
-
-export const markingEvents = pgTable("LaFineEquipe-marking_events", {
-  id: serial("id").primaryKey(),
-  articleUrl: text("article_url"),
-  imageUrl: text("image_url").notNull(),
-  title: text("title").notNull(),
-  description: text("description").notNull(),
-  date: timestamp("date").notNull(),
 });

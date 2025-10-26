@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaEdit } from "react-icons/fa";
-import ArticleForm from "../components/ArticleForm";
+import EventsForm from "../components/EventForm";
 import PageHeader from "../components/PageHeader";
 import MarkdownGuide from "../components/MarkdownGuide";
-import { usePostArticle } from "../hooks/ArticleHooks";
+import { usePostEvents } from "../hooks/EventHooks";
 
-const CreateArticlePage: React.FC = () => {
+const CreateEventsPage: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const postArticle = usePostArticle();
+  const postEvents = usePostEvents();
 
   const initialFormData: any = {
     title: "",
@@ -21,7 +21,7 @@ const CreateArticlePage: React.FC = () => {
 
   const handleSubmit = async (formData: any) => {
     setIsSubmitting(true);
-    postArticle.mutate(
+    postEvents.mutate(
       {
         title: formData.title,
         content: formData.content,
@@ -31,10 +31,10 @@ const CreateArticlePage: React.FC = () => {
       },
       {
         onSuccess: () => {
-          navigate("/article");
+          navigate("/events");
         },
         onError: (error) => {
-          console.error("Error creating article:", error);
+          console.error("Error creating events:", error);
           setIsSubmitting(false);
         },
       }
@@ -45,7 +45,7 @@ const CreateArticlePage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-accent to-base-200">
       {/* Header */}
       <PageHeader
-        title="Créer un Article"
+        title="Créer un Events"
         subtitle="Partagez vos idées et expériences avec La Fine Équipe"
         icon={<FaEdit className="w-10 h-10" />}
       />
@@ -56,20 +56,20 @@ const CreateArticlePage: React.FC = () => {
           {/* Navigation */}
           <div className="mb-8">
             <Link
-              to="/article"
+              to="/events"
               className="btn btn-outline btn-primary hover:btn-primary transition-all duration-300 flex items-center gap-2 w-fit"
             >
               <FaArrowLeft className="w-4 h-4" />
-              Retour aux articles
+              Retour aux events
             </Link>
           </div>
 
-          {/* Article Form */}
-          <ArticleForm
+          {/* Events Form */}
+          <EventsForm
             initialData={initialFormData}
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}
-            submitButtonText="Créer l'article"
+            submitButtonText="Créer l'events"
             submitButtonLoadingText="Création en cours..."
           />
 
@@ -81,4 +81,4 @@ const CreateArticlePage: React.FC = () => {
   );
 };
 
-export default CreateArticlePage;
+export default CreateEventsPage;

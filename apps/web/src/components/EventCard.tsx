@@ -7,13 +7,13 @@ import {
   FaCalendarAlt,
   FaTag,
 } from "react-icons/fa";
-import type { ArticleWithTags } from "@lafineequipe/types";
+import type { EventsWithTags } from "@lafineequipe/types";
 
-const ArticleCard: React.FC<{
-  article: ArticleWithTags | undefined;
+const EventsCard: React.FC<{
+  events: EventsWithTags | undefined;
   className?: string;
   loading?: boolean;
-}> = ({ article, loading = false, className }) => {
+}> = ({ events, loading = false, className }) => {
   if (loading) {
     return (
       <div
@@ -40,7 +40,7 @@ const ArticleCard: React.FC<{
     );
   }
 
-  if (!article) {
+  if (!events) {
     return null;
   }
 
@@ -56,35 +56,35 @@ const ArticleCard: React.FC<{
           <div className="flex-1 min-w-0">
             {/* Fixed height title with truncation */}
             <h2 className="card-title text-secondary text-xl mb-3 h-14 line-clamp-2">
-              {article.title || "Article sans titre"}
+              {events.title || "Events sans titre"}
             </h2>
 
             {/* Metadata Section with fixed space */}
             <div className="space-y-2 h-20 overflow-hidden">
               {/* Author */}
-              {article.author && (
+              {events.author && (
                 <div className="flex items-center gap-2 text-base-content/60">
                   <FaUser className="w-3 h-3 text-primary flex-shrink-0" />
-                  <span className="text-sm truncate">{article.author}</span>
+                  <span className="text-sm truncate">{events.author}</span>
                 </div>
               )}
 
               {/* Date */}
-              {article.date && (
+              {events.date && (
                 <div className="flex items-center gap-2 text-base-content/60">
                   <FaCalendarAlt className="w-3 h-3 text-primary flex-shrink-0" />
                   <span className="text-sm truncate">
-                    {new Date(article.date).toLocaleDateString()}
+                    {new Date(events.date).toLocaleDateString()}
                   </span>
                 </div>
               )}
 
               {/* Tags with fixed height and overflow handling */}
-              {article.tags.length > 0 && (
+              {events.tags.length > 0 && (
                 <div className="flex items-start gap-2 text-base-content/60">
                   <FaTag className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex flex-wrap gap-1 overflow-hidden max-h-8">
-                    {article.tags.slice(0, 3).map((tag, index) => (
+                    {events.tags.slice(0, 3).map((tag, index) => (
                       <span
                         key={index}
                         className="badge badge-primary badge-xs flex-shrink-0"
@@ -92,9 +92,9 @@ const ArticleCard: React.FC<{
                         {tag.name}
                       </span>
                     ))}
-                    {article.tags.length > 3 && (
+                    {events.tags.length > 3 && (
                       <span className="badge badge-primary badge-xs flex-shrink-0">
-                        +{article.tags.length - 3}
+                        +{events.tags.length - 3}
                       </span>
                     )}
                   </div>
@@ -107,10 +107,10 @@ const ArticleCard: React.FC<{
         {/* Fixed position button at bottom */}
         <div className="card-actions justify-end mt-4">
           <Link
-            to={`/article/${article.slug}`}
+            to={`/events/${events.slug}`}
             className="btn btn-primary btn-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
           >
-            Lire l'article
+            Lire l'events
             <FaArrowRight className="w-3 h-3" />
           </Link>
         </div>
@@ -119,4 +119,4 @@ const ArticleCard: React.FC<{
   );
 };
 
-export default ArticleCard;
+export default EventsCard;

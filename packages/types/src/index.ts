@@ -1,13 +1,10 @@
 export type {
-  Article,
-  ArticleWithTags,
-  CreateArticleRequest,
-  EditArticleRequest,
-} from "./article";
-export {
-  createArticleRequestSchema,
-  editArticleRequestSchema,
-} from "./article";
+  Events,
+  EventsWithTags,
+  CreateEventsRequest,
+  EditEventsRequest,
+} from "./event";
+export { createEventsRequestSchema, editEventsRequestSchema } from "./event";
 
 export type { Tag, CreateTagRequest } from "./tag";
 export { createTagRequestSchema } from "./tag";

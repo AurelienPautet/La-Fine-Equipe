@@ -4,7 +4,7 @@ dotenv.config();
 import express from "express";
 import fileUpload from "express-fileupload";
 import cors from "cors";
-import articleRoutes from "./routes/articleRoutes";
+import eventsRoutes from "./routes/eventRoutes";
 import tagRoutes from "./routes/tagRoutes";
 import fileRoutes from "./routes/fileRoutes";
 
@@ -23,7 +23,7 @@ app.get("/", (_, res) => {
 });
 
 // Routes
-app.use("/api/articles", articleRoutes);
+app.use("/api/events", eventsRoutes);
 app.use("/api/tags", tagRoutes);
 app.use("/api/files", fileRoutes);
 

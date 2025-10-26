@@ -65,12 +65,12 @@ const Header: React.FC = () => {
           </li>
           <li className="group relative">
             <Link
-              to="/article"
+              to="/events"
               className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaNewspaper className="w-4 h-4" />
               <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap md:max-w-none">
-                Articles
+                Events
               </span>
             </Link>
           </li>

@@ -1,15 +1,15 @@
 import { InferSelectModel } from "drizzle-orm";
-import { articles } from "@lafineequipe/db/src/schema";
+import { events } from "@lafineequipe/db/src/schema";
 import { z } from "zod";
 import { Tag, tagSchema } from "./tag";
 
-export type Article = InferSelectModel<typeof articles>;
+export type Events = InferSelectModel<typeof events>;
 
-export interface ArticleWithTags extends Article {
+export interface EventsWithTags extends Events {
   tags: Tag[];
 }
 
-export const createArticleRequestSchema = z.object({
+export const createEventsRequestSchema = z.object({
   title: z.string().min(1, "Title is required"),
   date: z.coerce.date({
     required_error: "Date is required",
@@ -20,9 +20,9 @@ export const createArticleRequestSchema = z.object({
   tags: z.array(tagSchema).optional().default([]),
 });
 
-export const editArticleRequestSchema = createArticleRequestSchema.extend({
+export const editEventsRequestSchema = createEventsRequestSchema.extend({
   id: z.number().min(1, "ID is required"),
 });
 
-export type CreateArticleRequest = z.infer<typeof createArticleRequestSchema>;
-export type EditArticleRequest = z.infer<typeof editArticleRequestSchema>;
+export type CreateEventsRequest = z.infer<typeof createEventsRequestSchema>;
+export type EditEventsRequest = z.infer<typeof editEventsRequestSchema>;

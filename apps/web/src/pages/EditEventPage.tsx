@@ -1,29 +1,26 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaEdit } from "react-icons/fa";
-import ArticleForm from "../components/ArticleForm";
+import EventsForm from "../components/EventForm";
 import PageHeader from "../components/PageHeader";
 import MarkdownGuide from "../components/MarkdownGuide";
-import type {
-  CreateArticleRequest,
-  EditArticleRequest,
-} from "@lafineequipe/types";
-import { useArticle, useEditArticle } from "../hooks/ArticleHooks";
+import type { CreateEventsRequest } from "@lafineequipe/types";
+import { useEditEvents, useEvent } from "../hooks/EventHooks";
 
-const EditArticlePage: React.FC = () => {
+const EditEventsPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: article, error, isLoading: loading } = useArticle(slug || "");
-  const editArticle = useEditArticle();
+  const { data: events, error, isLoading: loading } = useEvent(slug || "");
+  const editEvents = useEditEvents();
 
-  const handleSubmit = async (formData: CreateArticleRequest) => {
+  const handleSubmit = async (formData: CreateEventsRequest) => {
     setIsSubmitting(true);
     try {
-      let res = await editArticle.mutateAsync({
-        articleData: {
-          id: article?.id || 0,
+      let res = await editEvents.mutateAsync({
+        eventsData: {
+          id: events?.id || 0,
           title: formData.title,
           date: formData.date,
           content: formData.content,
@@ -31,22 +28,20 @@ const EditArticlePage: React.FC = () => {
           tags: formData.tags,
         },
       });
-      navigate(`/article/${res.slug}`);
+      navigate(`/events/${res.slug}`);
     } catch (error) {
-      console.error("Failed to edit article:", error);
+      console.error("Failed to edit events:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading || !article) {
+  if (loading || !events) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-accent to-base-200 flex items-center justify-center">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg text-primary mb-4"></div>
-          <p className="text-xl text-base-content">
-            Chargement de l'article...
-          </p>
+          <p className="text-xl text-base-content">Chargement de l'events...</p>
         </div>
       </div>
     );
@@ -56,8 +51,8 @@ const EditArticlePage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-accent to-base-200">
       {/* Header */}
       <PageHeader
-        title="Modifier l'Article"
-        subtitle="Modifiez votre article et partagez vos idées avec La Fine Équipe"
+        title="Modifier l'Events"
+        subtitle="Modifiez votre events et partagez vos idées avec La Fine Équipe"
         icon={<FaEdit className="w-10 h-10" />}
       />
 
@@ -67,23 +62,23 @@ const EditArticlePage: React.FC = () => {
           {/* Navigation */}
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <Link
-              to={`/article/${slug}`}
+              to={`/events/${slug}`}
               className="btn btn-outline btn-primary hover:btn-primary transition-all duration-300 flex items-center gap-2 w-fit"
             >
               <FaArrowLeft className="w-4 h-4" />
-              Retour à l'article
+              Retour à l'events
             </Link>
             <Link
-              to="/article"
+              to="/events"
               className="btn btn-outline btn-secondary hover:btn-secondary transition-all duration-300 flex items-center gap-2 w-fit"
             >
-              Voir tous les articles
+              Voir tous les events
             </Link>
           </div>
 
-          {/* Article Form */}
-          <ArticleForm
-            initialData={article}
+          {/* Events Form */}
+          <EventsForm
+            initialData={events}
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}
             submitButtonText="Sauvegarder les modifications"
@@ -98,4 +93,4 @@ const EditArticlePage: React.FC = () => {
   );
 };
 
-export default EditArticlePage;
+export default EditEventsPage;

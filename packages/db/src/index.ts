@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { articles } from "./schema";
+import { events } from "./schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -16,7 +16,7 @@ export function getDb() {
       idleTimeoutMillis: 10000,
       connectionTimeoutMillis: 10000,
     });
-    _db = drizzle(pool, { schema: { articles } });
+    _db = drizzle(pool, { schema: { events } });
   }
   return _db;
 }

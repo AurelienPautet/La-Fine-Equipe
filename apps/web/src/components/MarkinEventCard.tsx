@@ -5,7 +5,7 @@ interface MarkinEventCardProps {
   description: string;
   date: string;
   imageUrl: string;
-  articleUrl?: string;
+  eventsUrl?: string;
 }
 
 const MarkinEventCard: React.FC<MarkinEventCardProps> = ({
@@ -13,7 +13,7 @@ const MarkinEventCard: React.FC<MarkinEventCardProps> = ({
   description,
   date,
   imageUrl,
-  articleUrl,
+  eventsUrl,
 }) => {
   return (
     <div>
@@ -21,7 +21,7 @@ const MarkinEventCard: React.FC<MarkinEventCardProps> = ({
       <p>{description}</p>
       <p>{date}</p>
       <img src={imageUrl} alt={title} />
-      {articleUrl && <a href={articleUrl}>Read more</a>}
+      {eventsUrl && <a href={eventsUrl}>Read more</a>}
     </div>
   );
 };

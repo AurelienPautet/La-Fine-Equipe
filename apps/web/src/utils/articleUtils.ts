@@ -1,12 +1,12 @@
-interface ArticleMetadata {
+interface EventsMetadata {
   title: string;
   author: string;
   date: string;
   tags: string;
 }
 
-interface ParsedArticle {
-  metadata: ArticleMetadata;
+interface ParsedEvents {
+  metadata: EventsMetadata;
   content: string;
   fullContent: string;
 }
@@ -14,14 +14,16 @@ interface ParsedArticle {
 /**
  * Parses a markdown file with frontmatter and extracts metadata and content
  * @param markdownText - The raw markdown text including frontmatter
- * @returns Parsed article with metadata and content
+ * @returns Parsed events with metadata and content
  */
-export const parseMarkdownWithFrontmatter = (markdownText: string): ParsedArticle => {
+export const parseMarkdownWithFrontmatter = (
+  markdownText: string
+): ParsedEvents => {
   // Extract frontmatter
   const frontMatterRegex = /^---\s*\n([\s\S]*?)\n---/;
   const match = markdownText.match(frontMatterRegex);
 
-  let metadata: ArticleMetadata = {
+  let metadata: EventsMetadata = {
     title: "",
     author: "",
     date: "",
@@ -60,32 +62,36 @@ export const parseMarkdownWithFrontmatter = (markdownText: string): ParsedArticl
 };
 
 /**
- * Fetches and parses a markdown article from the public/posts directory
- * @param slug - The article slug (filename without .md extension)
- * @returns Promise that resolves to parsed article data
+ * Fetches and parses a markdown events from the public/posts directory
+ * @param slug - The events slug (filename without .md extension)
+ * @returns Promise that resolves to parsed events data
  */
-export const fetchArticle = async (slug: string): Promise<ParsedArticle> => {
+export const fetchEvents = async (slug: string): Promise<ParsedEvents> => {
   try {
     const response = await fetch(`/posts/${slug}.md`);
-    
+
     if (!response.ok) {
-      throw new Error(`Failed to fetch article: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch events: ${response.status} ${response.statusText}`
+      );
     }
-    
+
     const text = await response.text();
     return parseMarkdownWithFrontmatter(text);
   } catch (error) {
-    console.error(`Error fetching article "${slug}":`, error);
+    console.error(`Error fetching events "${slug}":`, error);
     throw error;
   }
 };
 
 /**
- * Fetches metadata only for an article (useful for article lists/cards)
- * @param slug - The article slug (filename without .md extension)
- * @returns Promise that resolves to article metadata
+ * Fetches metadata only for an events (useful for events lists/cards)
+ * @param slug - The events slug (filename without .md extension)
+ * @returns Promise that resolves to events metadata
  */
-export const fetchArticleMetadata = async (slug: string): Promise<ArticleMetadata> => {
-  const article = await fetchArticle(slug);
-  return article.metadata;
+export const fetchEventsMetadata = async (
+  slug: string
+): Promise<EventsMetadata> => {
+  const events = await fetchEvents(slug);
+  return events.metadata;
 };
