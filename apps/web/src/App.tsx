@@ -12,10 +12,12 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ActPage from "./pages/ActPage";
 import JoinUsPage from "./pages/JoinUsPage";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <QueryClientProvider client={queryClient}>
         <div
           data-theme="lafine"
