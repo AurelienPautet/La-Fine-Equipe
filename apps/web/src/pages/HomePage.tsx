@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import {
   FaUsers,
   FaBook,
-  FaGem,
   FaHeart,
   FaLightbulb,
   FaHandshake,
@@ -12,6 +11,8 @@ import {
 import ArticleCard from "../components/ArticleCard";
 import { useLatestsArticle } from "../hooks/ArticleHooks";
 import FigureCard from "../components/FigureCard";
+import { MdEvent } from "react-icons/md";
+import MarkinEventCard from "../components/MarkinEventCard";
 
 const HomePage: React.FC = () => {
   const { data: latestsArticles, error, isLoading } = useLatestsArticle();
@@ -224,6 +225,25 @@ DOCUMENTAIRE (75% des sièges)"
             bgColor="bg-secondary"
             icon={<FaHeart />}
           />
+        </div>
+      </section>
+
+      {/* Events section */}
+      <section className="p-6 py-20 bg-base-100">
+        <div className="text-center mb-12">
+          <h2 className="text-5xl font-bold text-secondary mb-4 flex items-center justify-center gap-4">
+            <MdEvent className="w-10 h-10" />
+            Nos Evenements Marquants
+          </h2>
+          <div>
+            <MarkinEventCard
+              title="Collecte de fournitures scolaires"
+              description="Organisation d'une collecte de fournitures scolaires pour les étudiants dans le besoin."
+              date="15 septembre 2023"
+              imageUrl="/events/collecte_fournitures.jpg"
+              articleUrl="/article/collecte-fournitures-scolaires"
+            />
+          </div>
         </div>
       </section>
     </div>
