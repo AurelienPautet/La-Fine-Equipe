@@ -28,7 +28,7 @@ const Footer: React.FC = () => {
             className="flex items-center gap-1 "
           >
             <FaInstagram className="w-6 h-6 hover:text-primary transition-colors" />
-            Instagram
+            <p className="hidden sm:block">Instagram</p>
           </a>
           <a
             href="https://www.linkedin.com/company/la-fine-%C3%A9quipe-lyon3/posts/?feedView=all"
@@ -36,14 +36,14 @@ const Footer: React.FC = () => {
             className="flex items-center gap-1 "
           >
             <FaLinkedin className="w-6 h-6 hover:text-primary transition-colors" />
-            LinkedIn
+            <p className="hidden sm:block">LinkedIn</p>
           </a>
           <a
             href="mailto:lafineequipe.lyon3@gmail.com"
             className="flex items-center gap-1 "
           >
             <IoIosMail className="w-6 h-6 hover:text-primary transition-colors" />
-            lafineequipe.lyon3@gmail.com
+            <p className="hidden sm:block">lafineequipe.lyon3@gmail.com</p>
           </a>
         </div>
       </aside>
