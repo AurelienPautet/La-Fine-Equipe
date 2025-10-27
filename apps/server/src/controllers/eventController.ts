@@ -15,7 +15,11 @@ const getEventsWithTags = async (
       slug: events.slug,
       content: events.content,
       author: events.author,
-      date: events.date,
+      startDate: events.startDate,
+      endDate: events.endDate,
+      location: events.location,
+      maxAttendees: events.maxAttendees,
+      thumbnailUrl: events.thumbnailUrl,
       createdAt: events.createdAt,
       updatedAt: events.updatedAt,
       tags: { id: tags.id, name: tags.name },
@@ -46,7 +50,11 @@ const getEventsWithTags = async (
         slug: row.slug,
         content: row.content,
         author: row.author,
-        date: row.date,
+        startDate: row.startDate,
+        endDate: row.endDate,
+        location: row.location,
+        maxAttendees: row.maxAttendees,
+        thumbnailUrl: row.thumbnailUrl,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         tags: row.tags ? [row.tags] : [],
@@ -65,7 +73,7 @@ export const getAllEvents = async (_req: Request, res: Response) => {
   try {
     const allEventsWithTags = await getEventsWithTags(
       undefined,
-      desc(events.date)
+      desc(events.startDate)
     );
     res.status(200).json({ success: true, data: allEventsWithTags });
   } catch (error) {
@@ -110,7 +118,17 @@ export const getLatestsEvents = async (req: Request, res: Response) => {
 export const createEvents = async (req: Request, res: Response) => {
   try {
     const validatedData = createEventsRequestSchema.parse(req.body);
-    const { title, content, author, date, tags } = validatedData;
+    const {
+      title,
+      content,
+      author,
+      startDate,
+      endDate,
+      location,
+      maxAttendees,
+      thumbnailUrl,
+      tags,
+    } = validatedData;
     const slug = title
       .toLowerCase()
       .normalize("NFD")
@@ -141,7 +159,17 @@ export const createEvents = async (req: Request, res: Response) => {
 
     const [newEvent] = await db
       .insert(events)
-      .values({ title, content, author, slug, date })
+      .values({
+        title,
+        content,
+        author,
+        slug,
+        startDate,
+        endDate,
+        location,
+        maxAttendees,
+        thumbnailUrl,
+      })
       .returning()
       .execute();
 
@@ -169,7 +197,17 @@ export const editEvents = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const validatedData = createEventsRequestSchema.parse(req.body);
-    const { title, content, author, date, tags } = validatedData;
+    const {
+      title,
+      content,
+      author,
+      startDate,
+      endDate,
+      location,
+      maxAttendees,
+      thumbnailUrl,
+      tags,
+    } = validatedData;
     const slug = title
       .toLowerCase()
       .normalize("NFD")
@@ -192,7 +230,17 @@ export const editEvents = async (req: Request, res: Response) => {
 
     const [updatedEvent] = await db
       .update(events)
-      .set({ title, content, author, slug, date })
+      .set({
+        title,
+        content,
+        author,
+        slug,
+        startDate,
+        endDate,
+        location,
+        maxAttendees,
+        thumbnailUrl,
+      })
       .where(eq(events.id, Number(id)))
       .returning()
       .execute();

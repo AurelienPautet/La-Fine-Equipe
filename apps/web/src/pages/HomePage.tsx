@@ -12,7 +12,6 @@ import EventsCard from "../components/EventCard";
 import { useLatestsEvents } from "../hooks/EventHooks";
 import FigureCard from "../components/FigureCard";
 import { MdEvent } from "react-icons/md";
-import MarkinEventCard from "../components/MarkinEventCard";
 
 const HomePage: React.FC = () => {
   const { data: latestsEvents, error, isLoading } = useLatestsEvents();
@@ -63,7 +62,7 @@ const HomePage: React.FC = () => {
           <div className="text-center mb-12">
             <h2 className="text-5xl font-bold text-secondary mb-4 flex items-center justify-center gap-4">
               <FaBook className="w-10 h-10" />
-              Derniers Events
+              Nos prochains événements
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
           </div>
@@ -229,17 +228,9 @@ DOCUMENTAIRE (75% des sièges)"
         <div className="text-center mb-12">
           <h2 className="text-5xl font-bold text-secondary mb-4 flex items-center justify-center gap-4">
             <MdEvent className="w-10 h-10" />
-            Nos Evenements Marquants
+            Nos Événements Marquants
           </h2>
-          <div>
-            <MarkinEventCard
-              title="Collecte de fournitures scolaires"
-              description="Organisation d'une collecte de fournitures scolaires pour les étudiants dans le besoin."
-              date="15 septembre 2023"
-              imageUrl="/events/collecte_fournitures.jpg"
-              eventsUrl="/events/collecte-fournitures-scolaires"
-            />
-          </div>
+          <div></div>
         </div>
       </section>
     </div>

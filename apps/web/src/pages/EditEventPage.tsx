@@ -19,14 +19,7 @@ const EditEventsPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       let res = await editEvents.mutateAsync({
-        eventsData: {
-          id: events?.id || 0,
-          title: formData.title,
-          date: formData.date,
-          content: formData.content,
-          author: formData.author,
-          tags: formData.tags,
-        },
+        eventsData: { ...formData, id: events?.id as number },
       });
       navigate(`/events/${res.slug}`);
     } catch (error) {

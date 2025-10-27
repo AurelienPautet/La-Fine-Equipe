@@ -10,7 +10,7 @@ import {
 
 const Header: React.FC = () => {
   return (
-    <div className="navbar h-10 bg-primary shadow-xl border-b-4 border-primary sticky top-0 z-50">
+    <div className="navbar h-10 bg-primary shadow-xl border-b-4 border-primary sticky top-0 z-[1000] px-4">
       <div className="flex-1">
         <Link
           to="/"
@@ -70,7 +70,7 @@ const Header: React.FC = () => {
             >
               <FaNewspaper className="w-4 h-4" />
               <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap md:max-w-none">
-                Events
+                Événements
               </span>
             </Link>
           </li>

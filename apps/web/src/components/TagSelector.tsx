@@ -4,6 +4,7 @@ import type { Tag } from "@lafineequipe/types";
 import TagDisplay from "./TagDisplay";
 import { useTags, usePostTag } from "../hooks/TagsHooks";
 import { FaPlus } from "react-icons/fa";
+import Popover from "./Popover";
 
 interface TagSelectorProps {
   setTags: (_tags: Tag[]) => void;
@@ -18,16 +19,18 @@ const TagSelector: React.FC<TagSelectorProps> = ({ setTags, initialTags }) => {
   const { data: tags, error, isLoading } = useTags();
 
   const [tagsWithState, setTagsWithState] = useState<TagWithState[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && tags) {
+    if (!isLoading && tags && !isInitialized) {
       const updatedTagsWithState = tags.map((tag) => {
         const isSelected = initialTags.some((t) => t.id === tag.id);
         return { ...tag, isSelected };
       });
       setTagsWithState(updatedTagsWithState);
+      setIsInitialized(true);
     }
-  }, [isLoading]);
+  }, [isLoading, tags, initialTags, isInitialized]);
 
   function selectTag(tagId: number) {
     setTagsWithState((prevTags) =>
@@ -46,37 +49,21 @@ const TagSelector: React.FC<TagSelectorProps> = ({ setTags, initialTags }) => {
       .filter((tag) => tag.isSelected)
       .map((tag) => ({ id: tag.id, name: tag.name }));
     setTags(selectedTags);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tagsWithState]);
 
-  const dropdownRef = useRef<HTMLDetailsElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dropdownPosition, setDropdownPosition] = useState<
     "dropdown-start" | "dropdown-end"
   >("dropdown-start");
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        dropdownRef.current.open = false;
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
     const updateDropdownPosition = () => {
-      if (dropdownRef.current && containerRef.current) {
-        const dropdownRect = dropdownRef.current.getBoundingClientRect();
+      if (containerRef.current) {
         const containerRect = containerRef.current.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
         const containerCenter = containerRect.left + containerRect.width / 2;
-        if (dropdownRect.left < containerCenter) {
+        if (containerCenter < windowWidth / 2) {
           setDropdownPosition("dropdown-start");
         } else {
           setDropdownPosition("dropdown-end");
@@ -140,37 +127,48 @@ const TagSelector: React.FC<TagSelectorProps> = ({ setTags, initialTags }) => {
               }}
             />
           ))}
-          <details
-            className={`dropdown dropdown-bottom ${dropdownPosition}`}
-            tabIndex={0}
-            ref={dropdownRef}
+          <Popover
+            trigger={
+              <div
+                className="btn btn-circle btn-sm btn-primary"
+                onClick={() => console.log("fgf")}
+              >
+                <FaPlus />
+              </div>
+            }
+            dropdownClassName="menu bg-white rounded-box w-40 p-2 shadow-sm z-50"
+            align={dropdownPosition}
           >
-            <summary className="btn btn-circle btn-sm btn-primary ">
-              <FaPlus />
-            </summary>
-            <ul className="menu  dropdown-content t  bg-white rounded-box  w-40 p-2 shadow-sm">
-              <li>
+            <ul className="space-y-1 w-full overflow-x-hidden">
+              <ul className="h-fit max-h-40 overflow-y-auto overflow-x-hidden">
                 {tagsWithState && tagsWithState.length > 0 ? (
                   notSelectedTags.map((tag: TagWithState) => (
-                    <button
-                      key={tag.id}
-                      className={`w-full text-left px-4 py-2 hover:bg-gray-200 rounded `}
-                      onClick={() => {
-                        selectTag(tag.id);
-                      }}
-                    >
-                      {tag.name}
-                    </button>
+                    <li key={tag.id}>
+                      <button
+                        type="button"
+                        className="w-full text-left px-4 py-2 hover:bg-gray-200 rounded"
+                        onClick={() => {
+                          selectTag(tag.id);
+                        }}
+                      >
+                        {tag.name}
+                      </button>
+                    </li>
                   ))
                 ) : (
-                  <div>Aucun tag disponible</div>
+                  <li>
+                    <div className="px-4 py-2">Aucun tag disponible</div>
+                  </li>
                 )}
+              </ul>
+              <li>
                 <input
                   type="text"
                   placeholder="Ajouter un tag"
-                  className="input input-bordered border-primary bg-white w-full "
+                  className="input input-bordered border-primary bg-white w-full"
                   onKeyDown={async (e) => {
                     if (e.key === "Enter") {
+                      e.preventDefault();
                       console.log("Creating tag:", e.currentTarget.value);
                       handleCreateTag(e.currentTarget.value);
                       e.currentTarget.value = "";
@@ -179,7 +177,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({ setTags, initialTags }) => {
                 />
               </li>
             </ul>
-          </details>
+          </Popover>
         </div>
       </div>
     </div>

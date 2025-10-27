@@ -5,11 +5,16 @@ import rehypeRaw from "rehype-raw";
 
 import { FaUser, FaCalendarAlt, FaTag } from "react-icons/fa";
 import type { Tag } from "@lafineequipe/types";
+import { FaLocationPin, FaUserGroup } from "react-icons/fa6";
 
 interface EventsMetadata {
   title: string;
   author: string;
-  date: string;
+  startDate: Date;
+  endDate: Date;
+  location: string;
+  maxAttendees?: number | null;
+  thumbnailUrl?: string | null;
   tags: Tag[];
 }
 
@@ -25,7 +30,7 @@ const EventsDisplay: React.FC<EventsDisplayProps> = ({
   isPreview = false,
 }) => {
   return (
-    <events className="w-full">
+    <article className="w-full">
       {/* Events Header */}
       <header className="mb-8 pb-6 border-b border-base-300">
         {/* Title */}
@@ -48,10 +53,30 @@ const EventsDisplay: React.FC<EventsDisplayProps> = ({
           )}
 
           {/* Date */}
-          {metadata.date && (
+          {metadata.startDate && (
             <div className="flex items-center gap-2">
               <FaCalendarAlt className="w-4 h-4 text-primary" />
-              <span>{metadata.date}</span>
+              <span>Début:</span>
+              <span>
+                {new Date(metadata.startDate).toLocaleString("fr-FR")}
+              </span>
+              <span> - Fin:</span>
+              <span>{new Date(metadata.endDate).toLocaleString("fr-FR")}</span>
+            </div>
+          )}
+
+          {/* Location */}
+          <div className="flex items-center gap-2">
+            <FaLocationPin className="w-4 h-4 text-primary" />
+            <span>{metadata.location}</span>
+          </div>
+
+          {/* Max Attendees */}
+          {metadata.maxAttendees && (
+            <div className="flex items-center gap-2">
+              <FaUserGroup className="w-4 h-4 text-primary" />
+              <span>Capacité:</span>
+              <span>{metadata.maxAttendees}</span>
             </div>
           )}
 
@@ -81,7 +106,7 @@ const EventsDisplay: React.FC<EventsDisplayProps> = ({
           {content || "*Votre contenu apparaîtra ici...*"}
         </ReactMarkdown>
       </div>
-    </events>
+    </article>
   );
 };
 

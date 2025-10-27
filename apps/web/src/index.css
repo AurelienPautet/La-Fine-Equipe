@@ -55,3 +55,69 @@
   --depth: 2;
   --noise: 1;
 }
+
+/* Custom time picker dropdown styling to match DaisyUI */
+.timepicker::-webkit-datetime-edit-fields-wrapper {
+  padding: 0.5rem;
+}
+
+.timepicker::-webkit-datetime-edit {
+  padding: 0.25rem;
+}
+
+.timepicker::-webkit-datetime-edit-hour-field,
+.timepicker::-webkit-datetime-edit-minute-field,
+.timepicker::-webkit-datetime-edit-ampm-field {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-selector);
+  background-color: hsl(var(--b2));
+  color: hsl(var(--bc));
+}
+
+.timepicker::-webkit-datetime-edit-hour-field:focus,
+.timepicker::-webkit-datetime-edit-minute-field:focus,
+.timepicker::-webkit-datetime-edit-ampm-field:focus {
+  background-color: hsl(var(--p));
+  color: hsl(var(--pc));
+  outline: none;
+}
+
+/* Time picker list dropdown (Webkit/Blink browsers) */
+.timepicker::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: var(--radius-selector);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.timepicker::-webkit-calendar-picker-indicator:hover {
+  background-color: hsl(var(--b2));
+}
+
+/* Popover positioning fix */
+[popover] {
+  position: fixed;
+  inset: unset;
+  margin: 0;
+}
+
+/* Use anchor positioning when supported */
+@supports (anchor-name: --anchor) {
+  [popover][style*="position-anchor"] {
+    position: absolute;
+    position-anchor: var(--position-anchor);
+    inset-area: bottom;
+    margin-top: 0.5rem;
+  }
+}
+
+/* Fallback for browsers without anchor positioning */
+@supports not (anchor-name: --anchor) {
+  #time-popover {
+    top: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%);
+    bottom: auto;
+    margin-top: 0.5rem;
+  }
+}

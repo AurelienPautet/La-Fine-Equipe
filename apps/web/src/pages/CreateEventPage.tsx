@@ -21,24 +21,15 @@ const CreateEventsPage: React.FC = () => {
 
   const handleSubmit = async (formData: any) => {
     setIsSubmitting(true);
-    postEvents.mutate(
-      {
-        title: formData.title,
-        content: formData.content,
-        author: formData.author,
-        date: new Date(formData.date),
-        tags: formData.tags,
+    postEvents.mutate(formData, {
+      onSuccess: () => {
+        navigate("/events");
       },
-      {
-        onSuccess: () => {
-          navigate("/events");
-        },
-        onError: (error) => {
-          console.error("Error creating events:", error);
-          setIsSubmitting(false);
-        },
-      }
-    );
+      onError: (error) => {
+        console.error("Error creating events:", error);
+        setIsSubmitting(false);
+      },
+    });
   };
 
   return (

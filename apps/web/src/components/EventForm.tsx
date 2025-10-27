@@ -1,8 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useDropzone, type FileWithPath } from "react-dropzone";
 import { useUploadFile, useDeleteFile } from "../hooks/FileHooks";
-import { FaEdit, FaSave, FaEye, FaCalendarAlt, FaUser } from "react-icons/fa";
+import {
+  FaEdit,
+  FaSave,
+  FaEye,
+  FaUser,
+  FaFileUpload,
+  FaImage,
+} from "react-icons/fa";
 import EventsDisplay from "./EventDisplay";
+import DateTimePicker from "./DateTimePicker";
 import "cally";
 import type {
   EventsWithTags,
@@ -11,6 +19,7 @@ import type {
   Tag,
 } from "@lafineequipe/types";
 import TagSelector from "./TagSelector";
+import { FaLocationPin, FaUserGroup } from "react-icons/fa6";
 
 interface EventsFormProps {
   initialData: CreateEventsRequest | EditEventsRequest | EventsWithTags;
@@ -32,40 +41,50 @@ const EventsForm: React.FC<EventsFormProps> = ({
     CreateEventsRequest | EditEventsRequest
   >({
     ...initialData,
-    tags: [],
+    tags: initialData.tags || [],
+    maxAttendees: initialData.maxAttendees ?? undefined,
+    thumbnailUrl: initialData.thumbnailUrl ?? undefined,
   });
+
+  const ensureValidDate = (date: Date | undefined | null): Date => {
+    if (!date) return new Date();
+    const d = new Date(date);
+    return isNaN(d.getTime()) ? new Date() : d;
+  };
 
   const initialTags = initialData.tags || [];
 
-  const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     noClick: true,
     onDrop: (acceptedFiles) => handleDrop(acceptedFiles),
   });
 
-  const files = acceptedFiles.map((file) => (
-    <li key={file.name} className="text-sm">
-      {file.name} - {file.size} bytes
-    </li>
-  ));
-
-  const uploadMutation = useUploadFile("events");
-  const deleteMutation = useDeleteFile();
-
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
-
-  useEffect(() => {
-    const embedRegex = /<embed src="([^"]+)"[^>]*>/g;
-    const matches = [...(initialData.content.matchAll(embedRegex) || [])];
-    const extractedUrls = matches.map((match) => match[1]);
-    setUploadedFiles(extractedUrls);
-  }, [initialData]);
-
-  const handleDrop = async (acceptedFiles: readonly FileWithPath[]) => {
+  const handleDrop = async (
+    acceptedFiles: readonly FileWithPath[],
+    type: "thumbnail" | "file" = "file"
+  ) => {
     const result = await Promise.all(
       acceptedFiles.map((file) => uploadMutation.mutateAsync(file))
     );
     console.log("Uploaded files:", result);
+
+    if (type === "thumbnail") {
+      if (formData.thumbnailUrl != "" && formData.thumbnailUrl) {
+        if (formData.thumbnailUrl.includes(".blob.vercel-storage.com")) {
+          deleteMutation.mutate(formData.thumbnailUrl as string);
+        }
+        formData.thumbnailUrl = "";
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        thumbnailUrl: result[0]?.url,
+      }));
+      return;
+    }
+
     setUploadedFiles((prev) => [...prev, ...result.map((res) => res.url)]);
+
     for (const res of result) {
       let stringToInsert = "";
       if (res.type.startsWith("image/")) {
@@ -81,17 +100,39 @@ const EventsForm: React.FC<EventsFormProps> = ({
     }
   };
 
-  const setTags = (tags: Tag[]) => {
+  const uploadMutation = useUploadFile("events");
+  const deleteMutation = useDeleteFile();
+
+  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+
+  useEffect(() => {
+    const embedRegex = /<embed src="([^"]+)"[^>]*>/g;
+    const matches = [...(initialData.content.matchAll(embedRegex) || [])];
+    const extractedUrls = matches.map((match) => match[1]);
+    setUploadedFiles(extractedUrls);
+  }, [initialData]);
+
+  const setTags = useCallback((tags: Tag[]) => {
     setFormData((prev) => ({
       ...prev,
       tags,
     }));
-  };
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
+    const target = e.target as HTMLInputElement;
+    const { name } = target;
+
+    let value: string | number | undefined = (
+      e.target as HTMLInputElement | HTMLTextAreaElement
+    ).value;
+
+    if ("type" in target && target.type === "number") {
+      value = target.value === "" ? undefined : Number(target.value);
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -109,7 +150,7 @@ const EventsForm: React.FC<EventsFormProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto h-full">
+    <div className="max-w-6xl  h-full">
       {/* Mode Toggle - Mobile Only */}
       <div className="flex justify-center mb-8 lg:hidden">
         <div className="btn-group">
@@ -135,13 +176,13 @@ const EventsForm: React.FC<EventsFormProps> = ({
       </div>
 
       {/* Desktop: Side by side, Mobile: Toggle */}
-      <div className="grid lg:grid-cols-2 gap-8 h-fit lg:h-min-[1000px]">
+      <div className="grid lg:grid-cols-2 gap-8 h-fit lg:h-min-[1600px]">
         {/* Edit Form - Always visible on desktop, conditional on mobile */}
         <div
           className={`h-full ${isPreviewMode ? "hidden lg:block" : "block"}`}
         >
           <div className="card bg-base-100 shadow-2xl border-2 border-primary/20 h-full flex flex-col">
-            <div className="card-body p-6 lg:p-8 flex flex-col h-full">
+            <div className="card-body  lg:p-8 flex flex-col h-full">
               <div className="flex items-center gap-2 mb-6 flex-shrink-0">
                 <FaEdit className="w-5 h-5 text-primary" />
                 <h2 className="text-2xl font-bold text-secondary">Édition</h2>
@@ -155,7 +196,7 @@ const EventsForm: React.FC<EventsFormProps> = ({
                   <label className="label">
                     <span className="label-text text-lg font-semibold flex items-center gap-2">
                       <FaEdit className="w-4 h-4" />
-                      Titre de l'events
+                      Titre de l'évenemnt
                     </span>
                   </label>
                   <input
@@ -188,75 +229,104 @@ const EventsForm: React.FC<EventsFormProps> = ({
                       required
                     />
                   </div>
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold flex items-center gap-2">
-                        <FaCalendarAlt className="w-4 h-4" />
-                        Date de l'évenemnt
-                      </span>
-                    </label>
-                    <button
-                      popoverTarget="cally-popover1"
-                      className="input input-bordered input-primary w-full text-left"
-                      id="cally1"
-                      style={{ "anchor-name": "--cally1" } as any}
-                      type="button"
-                    >
-                      {formData.date
-                        ? new Date(formData.date).toLocaleDateString("fr-FR", {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })
-                        : "Choisir une date"}
-                    </button>
-                    <div
-                      popover=""
-                      id="cally-popover1"
-                      className="dropdown bg-base-100 rounded-box shadow-lg border border-base-300"
-                      style={{ "position-anchor": "--cally1" } as any}
-                    >
-                      <calendar-date
-                        className="cally"
-                        onchange={(e: any) => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            date: e.target.value,
-                          }));
-                        }}
-                        value={
-                          new Date(formData.date).toISOString().split("T")[0]
-                        }
-                      >
-                        <svg
-                          aria-label="Previous"
-                          className="fill-current size-4"
-                          slot="previous"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          {...({} as any)}
-                        >
-                          <path d="M15.75 19.5 8.25 12l7.5-7.5"></path>
-                        </svg>
-                        <svg
-                          aria-label="Next"
-                          className="fill-current size-4"
-                          slot="next"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          {...({} as any)}
-                        >
-                          <path d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                        </svg>
-                        <calendar-month></calendar-month>
-                      </calendar-date>
-                    </div>
-                  </div>
+                </div>
+
+                {/* Start Date and Time Picker */}
+                <DateTimePicker
+                  label="Date et heure de début de l'événement"
+                  value={formData.startDate}
+                  onChange={(date) =>
+                    setFormData((prev) => ({ ...prev, startDate: date }))
+                  }
+                />
+
+                {/* End Date and Time Picker */}
+                <DateTimePicker
+                  label="Date et heure de fin de l'événement"
+                  value={formData.endDate}
+                  onChange={(date) =>
+                    setFormData((prev) => ({ ...prev, endDate: date }))
+                  }
+                />
+
+                {/* Location */}
+                <div className="form-control flex flex-col gap-1">
+                  <label className="label">
+                    <span className="label-text text-sm font-semibold flex items-center gap-2">
+                      <FaLocationPin className="w-4 h-4" />
+                      Lieu de l'évenemnt
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    className="input input-bordered input-primary text-sm"
+                    placeholder="Manufacture des Tabacs"
+                    required
+                  />
+                </div>
+
+                {/* Max Attendees */}
+                <div className="form-control flex flex-col gap-1">
+                  <label className="label">
+                    <span className="label-text text-sm font-semibold flex items-center gap-2">
+                      <FaUserGroup className="w-4 h-4" />
+                      Nombre maximum de participants (optionnel)
+                    </span>
+                  </label>
+                  <input
+                    type="number"
+                    name="maxAttendees"
+                    value={formData.maxAttendees}
+                    onChange={handleInputChange}
+                    className="input input-bordered input-primary text-sm"
+                    placeholder="laissez vide pour illimité"
+                    min={1}
+                  />
                 </div>
 
                 {/* Tags */}
                 <TagSelector initialTags={initialTags} setTags={setTags} />
+
+                {/* Thumbnail URL */}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text text-sm font-semibold flex items-center gap-2">
+                      <FaImage className="w-4 h-4" />
+                      URL de la miniature de l'évenemnt (optionnel)
+                    </span>
+                  </label>
+                  <div className="flex flex-row items-center gap-2 ">
+                    <input
+                      type="text"
+                      name="thumbnailUrl"
+                      value={formData.thumbnailUrl || ""}
+                      onChange={handleInputChange}
+                      className="input input-bordered input-primary text-sm "
+                      placeholder="Entrez l'URL de la miniature de votre événement..."
+                    />
+                    <div className="">
+                      <label className="btn btn-outline btn-primary">
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={(e) => {
+                            if (e.target.files) {
+                              handleDrop(
+                                Array.from(e.target.files),
+                                "thumbnail"
+                              );
+                            }
+                          }}
+                        />
+                        <FaFileUpload className="w-4 h-4 mr-2" />
+                        Télécharger un fichier
+                      </label>
+                    </div>
+                  </div>
+                </div>
 
                 <div className="flex-1 flex flex-col min-h-0">
                   {/* Content */}
@@ -276,15 +346,16 @@ const EventsForm: React.FC<EventsFormProps> = ({
                       name="content"
                       value={formData.content}
                       onChange={handleInputChange}
-                      className="mt-3 textarea textarea-bordered textarea-primary w-full flex-1 font-mono resize-none"
-                      placeholder="Écrivez votre events ici...
+                      className="mt-3 textarea textarea-bordered textarea-primary min-h-72 w-full flex-1 font-mono resize-none"
+                      placeholder="Écrivez votre la description et ou le résultat de l'événement ici...
 
 Vous pouvez utiliser du Markdown :
+- # Titre de niveau 1 
 - **texte en gras**
 - *texte en italique*
 - [liens](https://example.com)
 - `code`
-- etc.
+- voir plus bas pour le guide du Markdown.
 
 Deposé des fichiers (pdf et images) pour les insérer directement dans le contenu !
 "
@@ -292,7 +363,6 @@ Deposé des fichiers (pdf et images) pour les insérer directement dans le conte
                     />
                   </div>
                 </div>
-                <ul>{files}</ul>
 
                 {/* Submit Button */}
                 <div className="card-actions justify-end pt-6 flex-shrink-0">
@@ -334,7 +404,11 @@ Deposé des fichiers (pdf et images) pour les insérer directement dans le conte
                   metadata={{
                     title: formData.title,
                     author: formData.author,
-                    date: new Date(formData.date).toISOString().split("T")[0],
+                    startDate: ensureValidDate(formData.startDate),
+                    endDate: ensureValidDate(formData.endDate),
+                    location: formData.location,
+                    maxAttendees: formData.maxAttendees,
+                    thumbnailUrl: formData.thumbnailUrl,
                     tags: formData.tags || [],
                   }}
                   content={formData.content}

@@ -27,7 +27,9 @@ const EventsPage: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-b from-accent to-base-200 flex items-center justify-center">
         <div className="text-center">
           <div className="loading loading-spinner loading-lg text-primary mb-4"></div>
-          <p className="text-xl text-base-content">Chargement de l'events...</p>
+          <p className="text-xl text-base-content">
+            Chargement de l'événement...
+          </p>
         </div>
       </div>
     );
@@ -39,13 +41,13 @@ const EventsPage: React.FC = () => {
         <div className="text-center w-full flex items-center flex-col">
           <TbError404 className="w-20 h-20" />
           <h1 className="text-4xl font-bold text-secondary mb-4">
-            Events non trouvé
+            Événement non trouvé
           </h1>
           <p className="text-lg text-base-content mb-8">
-            Désolé, nous n'avons pas pu trouver cet events.
+            Désolé, nous n'avons pas pu trouver cet événement.
           </p>
           <Link to="/events" className="btn btn-primary btn-lg">
-            ← Retour aux events
+            ← Retour aux événements
           </Link>
         </div>
       </div>
@@ -70,7 +72,7 @@ const EventsPage: React.FC = () => {
               to="/events"
               className="btn btn-outline btn-primary hover:btn-primary transition-all duration-300"
             >
-              ← Retour aux events
+              ← Retour aux événements
             </Link>
 
             {/* Edit Button */}
@@ -80,7 +82,7 @@ const EventsPage: React.FC = () => {
                 className="btn btn-secondary shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
               >
                 <FaPen className="w-4 h-4" />
-                Modifier l'events
+                Modifier l'événement
               </Link>
             )}
           </div>
@@ -93,7 +95,11 @@ const EventsPage: React.FC = () => {
                   metadata={{
                     title: Events.title,
                     author: Events.author || "",
-                    date: new Date(Events.date).toLocaleDateString(),
+                    startDate: Events.startDate,
+                    endDate: Events.endDate,
+                    location: Events.location,
+                    maxAttendees: Events.maxAttendees,
+                    thumbnailUrl: Events.thumbnailUrl,
                     tags: Events.tags || [],
                   }}
                   content={Events.content}
@@ -109,7 +115,7 @@ const EventsPage: React.FC = () => {
               to="/events"
               className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
             >
-              Voir plus d'events
+              Voir plus d'événements
             </Link>
           </div>
         </div>

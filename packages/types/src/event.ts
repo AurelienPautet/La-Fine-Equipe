@@ -11,13 +11,23 @@ export interface EventsWithTags extends Events {
 
 export const createEventsRequestSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  date: z.coerce.date({
+  startDate: z.coerce.date({
+    required_error: "Date is required",
+    invalid_type_error: "Invalid date format",
+  }),
+  endDate: z.coerce.date({
     required_error: "Date is required",
     invalid_type_error: "Invalid date format",
   }),
   content: z.string().min(1, "Content is required"),
   author: z.string().min(1, "Author is required"),
   tags: z.array(tagSchema).optional().default([]),
+  location: z.string().min(1, "Location is required"),
+  maxAttendees: z
+    .number()
+    .min(1, "Max attendees must be at least 1")
+    .optional(),
+  thumbnailUrl: z.string().url().optional(),
 });
 
 export const editEventsRequestSchema = createEventsRequestSchema.extend({

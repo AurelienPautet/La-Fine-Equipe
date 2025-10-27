@@ -11,7 +11,11 @@ export const events = pgTable("LaFineEquipe-events", {
   slug: text("slug").notNull().unique(),
   content: text("content").notNull(),
   author: text("author").notNull(),
-  date: timestamp("date").notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  location: text("location").notNull(),
+  maxAttendees: integer("max_attendees"),
+  thumbnailUrl: text("thumbnail_url"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
