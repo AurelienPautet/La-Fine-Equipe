@@ -6,7 +6,7 @@ import rehypeRaw from "rehype-raw";
 import { FaUser, FaCalendarAlt, FaTag } from "react-icons/fa";
 import type { Tag } from "@lafineequipe/types";
 import { FaLocationPin, FaUserGroup } from "react-icons/fa6";
-
+import ReservateButton from "./ReservateButton";
 interface EventsMetadata {
   title: string;
   author: string;
@@ -16,6 +16,7 @@ interface EventsMetadata {
   maxAttendees?: number | null;
   thumbnailUrl?: string | null;
   tags: Tag[];
+  id?: number;
 }
 
 interface EventsDisplayProps {
@@ -95,7 +96,15 @@ const EventsDisplay: React.FC<EventsDisplayProps> = ({
           )}
         </div>
       </header>
-
+      <div className="w-full flex items-center justify-center sticky left-0 top-20">
+        <ReservateButton
+          eventId={metadata.id}
+          eventTitle={metadata.title}
+          eventStartDate={metadata.startDate}
+          eventEndDate={metadata.endDate}
+          eventLocation={metadata.location}
+        />
+      </div>
       {/* Events Content */}
       <div
         className={`prose max-w-none prose-headings:text-secondary prose-a:text-primary hover:prose-a:text-primary-focus prose-strong:text-secondary prose-code:bg-primary/10 prose-code:text-primary prose-code:px-2 prose-code:py-1 prose-code:rounded ${

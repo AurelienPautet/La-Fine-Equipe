@@ -20,7 +20,6 @@ import type {
 } from "@lafineequipe/types";
 import TagSelector from "./TagSelector";
 import { FaLocationPin, FaUserGroup } from "react-icons/fa6";
-
 interface EventsFormProps {
   initialData: CreateEventsRequest | EditEventsRequest | EventsWithTags;
   onSubmit: (data: CreateEventsRequest | EditEventsRequest) => Promise<void>;

@@ -7,6 +7,7 @@ import cors from "cors";
 import eventsRoutes from "./routes/eventRoutes";
 import tagRoutes from "./routes/tagRoutes";
 import fileRoutes from "./routes/fileRoutes";
+import reservationRoutes from "./routes/reservationRoutes";
 
 const app = express();
 app.use(cors());
@@ -26,6 +27,7 @@ app.get("/", (_, res) => {
 app.use("/api/events", eventsRoutes);
 app.use("/api/tags", tagRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/reservations", reservationRoutes);
 
 const PORT = process.env.PORT || 4000;
 

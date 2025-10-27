@@ -1,6 +1,6 @@
 import { InferSelectModel } from "drizzle-orm";
-import { events } from "@lafineequipe/db/src/schema";
 import { z } from "zod";
+import { events } from "@lafineequipe/db/src/schema";
 import { Tag, tagSchema } from "./tag";
 
 export type Events = InferSelectModel<typeof events>;

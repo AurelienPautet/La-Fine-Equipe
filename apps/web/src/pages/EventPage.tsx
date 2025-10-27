@@ -101,6 +101,7 @@ const EventsPage: React.FC = () => {
                     maxAttendees: Events.maxAttendees,
                     thumbnailUrl: Events.thumbnailUrl,
                     tags: Events.tags || [],
+                    id: Events.id,
                   }}
                   content={Events.content}
                   isPreview={false}

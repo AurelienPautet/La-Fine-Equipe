@@ -1,4 +1,11 @@
-import { pgTable, text, serial, timestamp, integer } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  timestamp,
+  integer,
+  boolean,
+} from "drizzle-orm/pg-core";
 
 export const tags = pgTable("LaFineEquipe-tags", {
   id: serial("id").primaryKey(),
@@ -29,4 +36,16 @@ export const eventsTags = pgTable("LaFineEquipe-events_tags", {
   tagId: integer("tag_id")
     .references(() => tags.id)
     .notNull(),
+});
+
+export const eventsReservations = pgTable("LaFineEquipe-events_reservations", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id")
+    .references(() => events.id)
+    .notNull(),
+  lastName: text("last_name").notNull(),
+  firstName: text("first_name").notNull(),
+  phone: text("phone").notNull(),
+  isMember: boolean("is_member").notNull(),
+  reservedAt: timestamp("reserved_at").defaultNow(),
 });
