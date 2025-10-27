@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { db } from "@lafineequipe/db";
 import { events, tags, eventsTags } from "@lafineequipe/db/src/schema";
 import { EventsWithTags, createEventsRequestSchema } from "@lafineequipe/types";
-import { eq, desc, SQL, and, not } from "drizzle-orm";
+import { eq, desc, SQL, and, not, isNull } from "drizzle-orm";
 
 const getEventsWithTags = async (
   whereCondition?: SQL,
@@ -28,10 +28,14 @@ const getEventsWithTags = async (
     .leftJoin(eventsTags, eq(events.id, eventsTags.eventsId))
     .leftJoin(tags, eq(eventsTags.tagId, tags.id));
 
+  // Always filter out deleted events
+  const conditions = [isNull(events.deletedAt)];
   if (whereCondition) {
-    // @ts-expect-error Drizzle ORM typing issue with dynamic where
-    query = query.where(whereCondition);
+    conditions.push(whereCondition);
   }
+
+  // @ts-expect-error Drizzle ORM typing issue with dynamic where
+  query = query.where(and(...conditions));
 
   if (orderBy) {
     // @ts-expect-error Drizzle ORM typing issue with dynamic orderBy
@@ -101,7 +105,10 @@ export const getEventsBySlug = async (req: Request, res: Response) => {
 
 export const getLatestsEvents = async (req: Request, res: Response) => {
   try {
-    const allEvents = await getEventsWithTags(undefined, desc(events.date));
+    const allEvents = await getEventsWithTags(
+      undefined,
+      desc(events.startDate)
+    );
 
     if (allEvents.length === 0) {
       return res.status(404).json({ success: false, error: "No events found" });
@@ -263,5 +270,26 @@ export const editEvents = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, errors: error.errors });
     }
     res.status(500).json({ success: false, error: "Failed to edit events" });
+  }
+};
+
+export const deleteEvent = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const [deletedEvent] = await db
+      .update(events)
+      .set({ deletedAt: new Date() })
+      .where(eq(events.id, Number(id)))
+      .returning()
+      .execute();
+
+    if (!deletedEvent) {
+      return res.status(404).json({ success: false, error: "Event not found" });
+    }
+
+    res.json({ success: true, data: deletedEvent });
+  } catch {
+    res.status(500).json({ success: false, error: "Failed to delete event" });
   }
 };

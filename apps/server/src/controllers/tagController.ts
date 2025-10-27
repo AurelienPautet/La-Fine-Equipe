@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { db } from "@lafineequipe/db";
 import { tags } from "@lafineequipe/db/src/schema";
 import { createTagRequestSchema } from "@lafineequipe/types";
+import { eq, isNull } from "drizzle-orm";
 
 export const createTag = async (req: Request, res: Response) => {
   try {
@@ -21,9 +22,34 @@ export const createTag = async (req: Request, res: Response) => {
 
 export const getTags = async (req: Request, res: Response) => {
   try {
-    const tagsList = await db.select().from(tags).execute();
+    const tagsList = await db
+      .select()
+      .from(tags)
+      .where(isNull(tags.deletedAt))
+      .execute();
     res.status(200).json({ success: true, data: tagsList });
   } catch (error) {
     res.status(500).json({ success: false, error: "Failed to fetch tags" });
+  }
+};
+
+export const deleteTag = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const [deletedTag] = await db
+      .update(tags)
+      .set({ deletedAt: new Date() })
+      .where(eq(tags.id, Number(id)))
+      .returning()
+      .execute();
+
+    if (!deletedTag) {
+      return res.status(404).json({ success: false, error: "Tag not found" });
+    }
+
+    res.json({ success: true, data: deletedTag });
+  } catch {
+    res.status(500).json({ success: false, error: "Failed to delete tag" });
   }
 };

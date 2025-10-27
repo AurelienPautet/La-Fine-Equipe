@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "@lafineequipe/db";
-import { eq } from "drizzle-orm";
+import { eq, isNull, and } from "drizzle-orm";
 import { events, eventsReservations } from "@lafineequipe/db/src/schema";
 
 export const createReservation = async (req: Request, res: Response) => {
@@ -38,10 +38,41 @@ export const getReservationsForEvent = async (req: Request, res: Response) => {
     const reservations = await db
       .select()
       .from(eventsReservations)
-      .where(eq(eventsReservations.eventId, eventId));
+      .where(
+        and(
+          eq(eventsReservations.eventId, eventId),
+          isNull(eventsReservations.deletedAt)
+        )
+      )
+      .execute();
     res.status(200).json(reservations);
   } catch (error) {
     console.error("Error fetching reservations:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const deleteReservation = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const [deletedReservation] = await db
+      .update(eventsReservations)
+      .set({ deletedAt: new Date() })
+      .where(eq(eventsReservations.id, Number(id)))
+      .returning()
+      .execute();
+
+    if (!deletedReservation) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Reservation not found" });
+    }
+
+    res.json({ success: true, data: deletedReservation });
+  } catch {
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to delete reservation" });
   }
 };

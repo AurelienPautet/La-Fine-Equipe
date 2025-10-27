@@ -5,7 +5,7 @@ import {
   createCategoryRequestSchema,
   reorderCategoriesRequestSchema,
 } from "@lafineequipe/types";
-import { eq, max } from "drizzle-orm";
+import { eq, max, isNull } from "drizzle-orm";
 
 export const createCategory = async (req: Request, res: Response) => {
   try {
@@ -44,6 +44,7 @@ export const getCategories = async (req: Request, res: Response) => {
     const categoriesList = await db
       .select()
       .from(regulationsCategories)
+      .where(isNull(regulationsCategories.deletedAt))
       .orderBy(regulationsCategories.order)
       .execute();
     res.status(200).json({ success: true, data: categoriesList });
@@ -160,5 +161,37 @@ export const editCategory = async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, errors: err.errors });
     }
     res.status(500).json({ success: false, error: "Failed to edit category" });
+  }
+};
+
+export const deleteCategory = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const categoryId = parseInt(id, 10);
+
+    if (isNaN(categoryId)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid category ID" });
+    }
+
+    const [deletedCategory] = await db
+      .update(regulationsCategories)
+      .set({ deletedAt: new Date() })
+      .where(eq(regulationsCategories.id, categoryId))
+      .returning()
+      .execute();
+
+    if (!deletedCategory) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Category not found" });
+    }
+
+    res.status(200).json({ success: true, data: deletedCategory });
+  } catch {
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to delete category" });
   }
 };

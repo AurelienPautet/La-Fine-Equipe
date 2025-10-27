@@ -2,13 +2,14 @@ import { Request, Response } from "express";
 import { db } from "@lafineequipe/db";
 import { regulations } from "@lafineequipe/db/src/schema";
 import { createRegulationRequestSchema } from "@lafineequipe/types";
-import { eq, desc, and, not } from "drizzle-orm";
+import { eq, desc, and, not, isNull } from "drizzle-orm";
 
 export const getAllRegulations = async (_req: Request, res: Response) => {
   try {
     const allRegulations = await db
       .select()
       .from(regulations)
+      .where(isNull(regulations.deletedAt))
       .orderBy(desc(regulations.date))
       .execute();
     res.status(200).json({ success: true, data: allRegulations });
@@ -24,7 +25,7 @@ export const getRegulationBySlug = async (req: Request, res: Response) => {
     const [regulation] = await db
       .select()
       .from(regulations)
-      .where(eq(regulations.slug, slug))
+      .where(and(eq(regulations.slug, slug), isNull(regulations.deletedAt)))
       .execute();
 
     if (!regulation) {
@@ -46,6 +47,7 @@ export const getLatestRegulations = async (req: Request, res: Response) => {
     const latestRegulations = await db
       .select()
       .from(regulations)
+      .where(isNull(regulations.deletedAt))
       .orderBy(desc(regulations.date))
       .limit(2)
       .execute();
@@ -172,5 +174,30 @@ export const editRegulation = async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ success: false, error: "Failed to edit regulation" });
+  }
+};
+
+export const deleteRegulation = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const [deletedRegulation] = await db
+      .update(regulations)
+      .set({ deletedAt: new Date() })
+      .where(eq(regulations.id, Number(id)))
+      .returning()
+      .execute();
+
+    if (!deletedRegulation) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Regulation not found" });
+    }
+
+    res.json({ success: true, data: deletedRegulation });
+  } catch {
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to delete regulation" });
   }
 };

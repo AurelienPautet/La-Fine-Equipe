@@ -5,6 +5,7 @@ import {
   getCategoryById,
   reorderCategories,
   editCategory,
+  deleteCategory,
 } from "../controllers/categoryController";
 
 const router = Router();
@@ -14,5 +15,6 @@ router.get("/", getCategories);
 router.put("/reorder", reorderCategories);
 router.get("/:id", getCategoryById);
 router.put("/:id", editCategory);
+router.delete("/:id", deleteCategory);
 
 export default router;
