@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDropzone, type FileWithPath } from "react-dropzone";
 import { useUploadFile, useDeleteFile } from "../hooks/FileHooks";
-import { FaEdit, FaSave, FaEye, FaUser } from "react-icons/fa";
+import { useAllCategories } from "../hooks/CategoriesHooks";
+import { FaEdit, FaSave, FaEye, FaPen } from "react-icons/fa";
 import RegulationDisplay from "./RegulationDisplay";
 import DateTimePicker from "./DateTimePicker";
+import CategorySelector from "./CategorySelector";
 import "cally";
 import type {
   Regulation,
   CreateRegulationRequest,
   EditRegulationRequest,
+  Categories,
 } from "@lafineequipe/types";
 
 interface RegulationFormProps {
@@ -29,10 +32,14 @@ const RegulationForm: React.FC<RegulationFormProps> = ({
   submitButtonLoadingText,
 }) => {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Categories | null>(
+    null
+  );
   const [formData, setFormData] = useState<
     CreateRegulationRequest | EditRegulationRequest
   >({
     ...initialData,
+    description: initialData.description ?? undefined,
   });
 
   const ensureValidDate = (date: Date | undefined | null): Date => {
@@ -86,6 +93,17 @@ const RegulationForm: React.FC<RegulationFormProps> = ({
     setUploadedFiles(extractedUrls);
   }, [initialData]);
 
+  const { data: categories } = useAllCategories();
+
+  useEffect(() => {
+    if (categories && formData.categoryId && selectedCategory === null) {
+      const category = categories.find((c) => c.id === formData.categoryId);
+      if (category) {
+        setSelectedCategory(category);
+      }
+    }
+  }, [categories, formData.categoryId, selectedCategory]);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -99,12 +117,16 @@ const RegulationForm: React.FC<RegulationFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedCategory) {
+      alert("Veuillez sélectionner une catégorie");
+      return;
+    }
     for (const fileUrl of uploadedFiles) {
       if (!formData.content.includes(fileUrl)) {
         deleteMutation.mutate(fileUrl);
       }
     }
-    await onSubmit(formData);
+    await onSubmit({ ...formData, categoryId: selectedCategory.id });
   };
 
   return (
@@ -168,23 +190,21 @@ const RegulationForm: React.FC<RegulationFormProps> = ({
                   />
                 </div>
 
-                {/* Author and Date */}
-                <div className="grid md:grid-cols-2 gap-4">
+                {/* Description */}
+                <div className="flex gap-4 w-full">
                   <div className="form-control">
                     <label className="label">
                       <span className="label-text font-semibold flex items-center gap-2">
-                        <FaUser className="w-4 h-4" />
-                        Auteur
+                        <FaPen className="w-4 h-4" />
+                        Description
                       </span>
                     </label>
-                    <input
-                      type="text"
-                      name="author"
-                      value={formData.author}
+                    <textarea
+                      name="description"
+                      value={formData.description}
                       onChange={handleInputChange}
-                      className="input input-bordered input-primary"
-                      placeholder="Votre nom"
-                      required
+                      className="input input-bordered input-primary w-full"
+                      placeholder="Entrez une description..."
                     />
                   </div>
                 </div>
@@ -196,6 +216,13 @@ const RegulationForm: React.FC<RegulationFormProps> = ({
                   onChange={(date) =>
                     setFormData((prev) => ({ ...prev, date: date }))
                   }
+                  hasTime={false}
+                />
+
+                {/* Category Selector */}
+                <CategorySelector
+                  selectedCategory={selectedCategory}
+                  onCategoryChange={setSelectedCategory}
                 />
 
                 <div className="flex-1 flex flex-col min-h-0">
@@ -273,7 +300,7 @@ Déposez des fichiers (pdf et images) pour les insérer directement dans le cont
                 <RegulationDisplay
                   metadata={{
                     title: formData.title,
-                    author: formData.author,
+                    description: formData.description,
                     date: ensureValidDate(formData.date),
                   }}
                   content={formData.content}

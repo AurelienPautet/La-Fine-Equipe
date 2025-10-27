@@ -21,3 +21,15 @@ export {
   createRegulationRequestSchema,
   editRegulationRequestSchema,
 } from "./regulation";
+
+export type {
+  Categories,
+  CreateCategoryRequest,
+  EditCategoryRequest,
+  ReorderCategoriesRequest,
+} from "./category";
+export {
+  createCategoryRequestSchema,
+  editCategoryRequestSchema,
+  reorderCategoriesRequestSchema,
+} from "./category";

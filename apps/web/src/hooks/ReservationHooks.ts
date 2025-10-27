@@ -16,9 +16,9 @@ export function useCreateReservation() {
   });
 }
 
-export function useReservationsForEvent(eventId: number) {
+export function useReservationsForEvent(slug: string) {
   return useQuery<Reservation[], Error>({
-    queryKey: ["reservations", eventId],
-    queryFn: () => getReservationsForEvent(eventId),
+    queryKey: ["reservations", slug],
+    queryFn: () => getReservationsForEvent(slug),
   });
 }

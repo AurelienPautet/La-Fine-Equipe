@@ -8,6 +8,7 @@ interface DateTimePickerProps {
   value: Date | undefined | null;
   onChange: (date: Date) => void;
   className?: string;
+  hasTime?: boolean;
 }
 
 const DateTimePicker: React.FC<DateTimePickerProps> = ({
@@ -15,6 +16,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   value,
   onChange,
   className = "",
+  hasTime = true,
 }) => {
   const ensureValidDate = (date: Date | undefined | null): Date => {
     if (!date) return new Date();
@@ -122,7 +124,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         </div>
 
         {/* Time Picker */}
-        <div className="w-44">
+        <div className={`w-44 ${hasTime ? "block" : "hidden"}`}>
           <Popover
             trigger={
               <div className="input input-bordered input-primary w-full text-left flex items-center gap-2">

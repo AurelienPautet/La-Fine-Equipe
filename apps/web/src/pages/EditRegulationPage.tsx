@@ -4,7 +4,10 @@ import { useRegulation, useEditRegulation } from "../hooks/RegulationHooks";
 import RegulationForm from "../components/RegulationForm";
 import PageHeader from "../components/PageHeader";
 import { FaFileAlt, FaSpinner } from "react-icons/fa";
-import type { EditRegulationRequest } from "@lafineequipe/types";
+import type {
+  EditRegulationRequest,
+  CreateRegulationRequest,
+} from "@lafineequipe/types";
 
 const EditRegulationPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -13,9 +16,7 @@ const EditRegulationPage: React.FC = () => {
   const editRegulation = useEditRegulation();
 
   const handleSubmit = async (
-    data:
-      | EditRegulationRequest
-      | { title: string; author: string; date: Date; content: string }
+    data: CreateRegulationRequest | EditRegulationRequest
   ) => {
     if (!regulation) return;
 

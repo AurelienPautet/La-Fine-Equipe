@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "@lafineequipe/db";
 import { eq } from "drizzle-orm";
-import { eventsReservations } from "@lafineequipe/db/src/schema";
+import { events, eventsReservations } from "@lafineequipe/db/src/schema";
 
 export const createReservation = async (req: Request, res: Response) => {
   const { eventId, lastName, firstName, phone, isMember } = req.body;
@@ -21,11 +21,20 @@ export const createReservation = async (req: Request, res: Response) => {
 };
 
 export const getReservationsForEvent = async (req: Request, res: Response) => {
-  const eventId = parseInt(req.query.eventId as string, 10);
-  if (isNaN(eventId)) {
-    return res.status(400).json({ error: "Invalid event ID" });
+  const { slug } = req.params;
+  if (!slug) {
+    return res.status(400).json({ error: "Invalid event slug" });
   }
   try {
+    const [event] = await db
+      .select()
+      .from(events)
+      .where(eq(events.slug, slug))
+      .limit(1);
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+    const eventId = event.id;
     const reservations = await db
       .select()
       .from(eventsReservations)

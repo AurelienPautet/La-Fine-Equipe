@@ -29,11 +29,25 @@ export const events = pgTable("LaFineEquipe-events", {
     .$onUpdateFn(() => new Date()),
 });
 
+export const regulationsCategories = pgTable(
+  "LaFineEquipe-regulations_categories",
+  {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull().unique(),
+    abbreviation: text("abbreviation").notNull(),
+    titleSchema: text("title_schema").notNull(),
+    order: integer("order").notNull().default(0),
+  }
+);
+
 export const regulations = pgTable("LaFineEquipe-regulations", {
   id: serial("id").primaryKey(),
+  categoryId: integer("category_id")
+    .references(() => regulationsCategories.id)
+    .notNull(),
   title: text("title").notNull(),
+  description: text("description"),
   slug: text("slug").notNull().unique(),
-  author: text("author").notNull(),
   content: text("content").notNull(),
   date: timestamp("date").notNull(),
   createdAt: timestamp("created_at").defaultNow(),

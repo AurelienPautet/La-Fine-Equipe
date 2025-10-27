@@ -3,11 +3,11 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 
-import { FaUser, FaCalendarAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaPen } from "react-icons/fa";
 
 interface RegulationMetadata {
   title: string;
-  author: string;
+  description: string | undefined;
   date: Date;
 }
 
@@ -37,11 +37,11 @@ const RegulationDisplay: React.FC<RegulationDisplayProps> = ({
 
         {/* Metadata */}
         <div className="flex flex-wrap items-center gap-4 text-sm lg:text-base text-base-content/70">
-          {/* Author */}
-          {metadata.author && (
+          {/* Description */}
+          {metadata.description && (
             <div className="flex items-center gap-2">
-              <FaUser className="w-4 h-4 text-primary" />
-              <span>{metadata.author}</span>
+              <FaPen className="w-4 h-4 text-primary" />
+              <span>{metadata.description}</span>
             </div>
           )}
 

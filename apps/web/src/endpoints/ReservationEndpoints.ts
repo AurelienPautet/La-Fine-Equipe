@@ -26,11 +26,9 @@ export async function postReservation(
 }
 
 export async function getReservationsForEvent(
-  eventId: number
+  slug: string
 ): Promise<Reservation[]> {
-  const response = await fetch(
-    `${API_URL}/api/reservations?eventId=${eventId}`
-  );
+  const response = await fetch(`${API_URL}/api/reservations/event/${slug}`);
   if (!response.ok) {
     throw new Error("Failed to fetch reservations");
   }

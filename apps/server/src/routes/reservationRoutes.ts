@@ -6,6 +6,6 @@ import {
 } from "../controllers/reservationController";
 const router = Router();
 router.post("/", createReservation);
-router.get("/", getReservationsForEvent);
+router.get("/event/:slug", getReservationsForEvent);
 
 export default router;

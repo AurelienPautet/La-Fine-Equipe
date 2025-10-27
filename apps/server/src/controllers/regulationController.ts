@@ -67,7 +67,7 @@ export const getLatestRegulations = async (req: Request, res: Response) => {
 export const createRegulation = async (req: Request, res: Response) => {
   try {
     const validatedData = createRegulationRequestSchema.parse(req.body);
-    const { title, content, author, date } = validatedData;
+    const { categoryId, title, content, description, date } = validatedData;
     const slug = title
       .toLowerCase()
       .normalize("NFD")
@@ -99,9 +99,10 @@ export const createRegulation = async (req: Request, res: Response) => {
     const [newRegulation] = await db
       .insert(regulations)
       .values({
+        categoryId,
         title,
         content,
-        author,
+        description,
         slug,
         date,
       })
@@ -125,7 +126,7 @@ export const editRegulation = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const validatedData = createRegulationRequestSchema.parse(req.body);
-    const { title, content, author, date } = validatedData;
+    const { categoryId, title, content, description, date } = validatedData;
     const slug = title
       .toLowerCase()
       .normalize("NFD")
@@ -152,9 +153,10 @@ export const editRegulation = async (req: Request, res: Response) => {
     const [updatedRegulation] = await db
       .update(regulations)
       .set({
+        categoryId,
         title,
         content,
-        author,
+        description,
         slug,
         date,
       })

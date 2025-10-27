@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { usePostRegulation } from "../hooks/RegulationHooks";
 import RegulationForm from "../components/RegulationForm";
 import PageHeader from "../components/PageHeader";
@@ -10,13 +10,14 @@ const CreateRegulationPage: React.FC = () => {
   const navigate = useNavigate();
   const postRegulation = usePostRegulation();
 
+  const state = useLocation().state;
   const initialData: CreateRegulationRequest = {
     title: "",
-    author: "",
+    description: "",
+    categoryId: state?.categoryId || "",
     date: new Date(),
     content: "",
   };
-
   const handleSubmit = async (data: CreateRegulationRequest) => {
     try {
       await postRegulation.mutateAsync(data);

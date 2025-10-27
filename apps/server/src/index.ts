@@ -9,6 +9,7 @@ import tagRoutes from "./routes/tagRoutes";
 import fileRoutes from "./routes/fileRoutes";
 import reservationRoutes from "./routes/reservationRoutes";
 import regulationRoutes from "./routes/regulationRoutes";
+import categoryRoutes from "./routes/categoryRoutes";
 
 const app = express();
 app.use(cors());
@@ -30,6 +31,7 @@ app.use("/api/tags", tagRoutes);
 app.use("/api/files", fileRoutes);
 app.use("/api/reservations", reservationRoutes);
 app.use("/api/regulations", regulationRoutes);
+app.use("/api/categories", categoryRoutes);
 
 const PORT = process.env.PORT || 4000;
 
