@@ -10,7 +10,13 @@ const RegulationsPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className=" h-screen w-screen flex flex-col items-center">
+        <PageHeader
+          title="Règlements"
+          subtitle="Consultez tous les règlements de La Fine Équipe"
+          icon={<FaFileAlt className="w-12 h-12" />}
+          className="py-20 w-full"
+        />
         <div className="flex flex-col items-center gap-4">
           <FaSpinner className="w-12 h-12 animate-spin text-primary" />
           <p className="text-lg">Chargement des règlements...</p>

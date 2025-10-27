@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { FaArrowLeft, FaEdit } from "react-icons/fa";
+import { FaArrowLeft, FaCalendar, FaEdit } from "react-icons/fa";
 import EventsForm from "../components/EventForm";
 import PageHeader from "../components/PageHeader";
 import MarkdownGuide from "../components/MarkdownGuide";
@@ -35,6 +35,17 @@ const EditEventsPage: React.FC = () => {
         <div className="text-center">
           <div className="loading loading-spinner loading-lg text-primary mb-4"></div>
           <p className="text-xl text-base-content">Chargement de l'events...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !events) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="alert alert-error max-w-md">
+          <FaCalendar className="w-6 h-6" />
+          <span>Erreur: Événement non trouvé</span>
         </div>
       </div>
     );
