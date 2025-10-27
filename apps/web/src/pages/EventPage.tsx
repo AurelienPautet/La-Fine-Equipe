@@ -6,6 +6,7 @@ import { useEvent } from "../hooks/EventHooks";
 import type { EventsWithTags } from "@lafineequipe/types";
 import { TbError404 } from "react-icons/tb";
 import PageHeader from "../components/PageHeader";
+import { FaChartBar, FaChartColumn } from "react-icons/fa6";
 
 const EventsPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -75,6 +76,13 @@ const EventsPage: React.FC = () => {
               ← Retour aux événements
             </Link>
 
+            <Link
+              to={`/events/${slug}/reservations`}
+              className="btn btn-secondary btn-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
+            >
+              <FaChartColumn className="w-4 h-4" />
+              Voir les réservations
+            </Link>
             {/* Edit Button */}
             {slug && (
               <Link
@@ -86,39 +94,39 @@ const EventsPage: React.FC = () => {
               </Link>
             )}
           </div>
+        </div>
 
-          {/* Events Content */}
-          <article className="card bg-base-100 shadow-2xl border-2 border-primary/20">
-            <div className="card-body p-8 lg:p-12">
-              {Events && (
-                <EventsDisplay
-                  metadata={{
-                    title: Events.title,
-                    author: Events.author || "",
-                    startDate: Events.startDate,
-                    endDate: Events.endDate,
-                    location: Events.location,
-                    maxAttendees: Events.maxAttendees,
-                    thumbnailUrl: Events.thumbnailUrl,
-                    tags: Events.tags || [],
-                    id: Events.id,
-                  }}
-                  content={Events.content}
-                  isPreview={false}
-                />
-              )}
-            </div>
-          </article>
-
-          {/* Navigation Footer */}
-          <div className="text-center mt-12">
-            <Link
-              to="/events"
-              className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-            >
-              Voir plus d'événements
-            </Link>
+        {/* Events Content */}
+        <article className="card bg-base-100 shadow-2xl border-2 border-primary/20">
+          <div className="card-body p-8 lg:p-12">
+            {Events && (
+              <EventsDisplay
+                metadata={{
+                  title: Events.title,
+                  author: Events.author || "",
+                  startDate: Events.startDate,
+                  endDate: Events.endDate,
+                  location: Events.location,
+                  maxAttendees: Events.maxAttendees,
+                  thumbnailUrl: Events.thumbnailUrl,
+                  tags: Events.tags || [],
+                  id: Events.id,
+                }}
+                content={Events.content}
+                isPreview={false}
+              />
+            )}
           </div>
+        </article>
+
+        {/* Navigation Footer */}
+        <div className="text-center mt-12">
+          <Link
+            to="/events"
+            className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+          >
+            Voir plus d'événements
+          </Link>
         </div>
       </div>
     </div>

@@ -16,6 +16,7 @@ import RegulationsPage from "./pages/RegulationsPage";
 import RegulationPage from "./pages/RegulationPage";
 import CreateRegulationPage from "./pages/CreateRegulationPage";
 import EditRegulationPage from "./pages/EditRegulationPage";
+import EventReservationsPage from "./pages/EventReservationsPage";
 
 function App() {
   return (
@@ -37,6 +38,10 @@ function App() {
               <Route path="/events/create" element={<CreateEventsPage />} />
               <Route path="/events/edit/:slug" element={<EditEventsPage />} />
               <Route path="/events/:slug" element={<EventPage />} />
+              <Route
+                path="/events/:slug/reservations"
+                element={<EventReservationsPage />}
+              />
               <Route path="/regulations" element={<RegulationsPage />} />
               <Route
                 path="/regulations/create"
