@@ -76,7 +76,7 @@ const Header: React.FC = () => {
           </li>
           <li className="group relative">
             <Link
-              to="/act"
+              to="/regulations"
               className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
               <FaScroll className="w-4 h-4" />

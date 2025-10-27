@@ -10,9 +10,12 @@ import CreateEventsPage from "./pages/CreateEventPage";
 import EditEventsPage from "./pages/EditEventPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import ActPage from "./pages/ActPage";
 import JoinUsPage from "./pages/JoinUsPage";
 import ScrollToTop from "./components/ScrollToTop";
+import RegulationsPage from "./pages/RegulationsPage";
+import RegulationPage from "./pages/RegulationPage";
+import CreateRegulationPage from "./pages/CreateRegulationPage";
+import EditRegulationPage from "./pages/EditRegulationPage";
 
 function App() {
   return (
@@ -34,7 +37,16 @@ function App() {
               <Route path="/events/create" element={<CreateEventsPage />} />
               <Route path="/events/edit/:slug" element={<EditEventsPage />} />
               <Route path="/events/:slug" element={<EventPage />} />
-              <Route path="/act" element={<ActPage />} />
+              <Route path="/regulations" element={<RegulationsPage />} />
+              <Route
+                path="/regulations/create"
+                element={<CreateRegulationPage />}
+              />
+              <Route
+                path="/regulations/edit/:slug"
+                element={<EditRegulationPage />}
+              />
+              <Route path="/regulations/:slug" element={<RegulationPage />} />
               <Route path="/join" element={<JoinUsPage />} />
               <Route path="/about" element={<OurTeamPage />} />
             </Routes>
