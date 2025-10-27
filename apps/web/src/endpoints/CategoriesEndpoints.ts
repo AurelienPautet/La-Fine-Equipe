@@ -101,3 +101,13 @@ export async function reorderCategories(
   const categories = await response.json();
   return categories.data;
 }
+
+export async function deleteCategoryMutation(id: number): Promise<void> {
+  const response = await fetch(`${API_URL}/api/categories/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete category");
+  }
+}

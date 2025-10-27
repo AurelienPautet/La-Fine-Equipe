@@ -5,6 +5,7 @@ import {
   getLatestRegulations,
   getRegulations,
   editRegulationMutation,
+  deleteRegulationMutation,
 } from "../endpoints/RegulationEndpoints";
 import type { Regulation } from "@lafineequipe/types";
 
@@ -48,6 +49,21 @@ export const useEditRegulation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["regulations"],
+      });
+    },
+  });
+};
+
+export const useDeleteRegulation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteRegulationMutation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["regulations"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["latest-regulations"],
       });
     },
   });

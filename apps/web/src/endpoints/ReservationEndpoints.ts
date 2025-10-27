@@ -35,3 +35,13 @@ export async function getReservationsForEvent(
   const reservations = await response.json();
   return reservations;
 }
+
+export async function deleteReservationMutation(id: number): Promise<void> {
+  const response = await fetch(`${API_URL}/api/reservations/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete reservation");
+  }
+}

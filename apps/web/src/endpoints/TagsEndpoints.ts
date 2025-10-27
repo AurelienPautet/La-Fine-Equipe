@@ -28,3 +28,13 @@ export async function postTag(name: string): Promise<Tag> {
   const tag = await response.json();
   return tag.data;
 }
+
+export async function deleteTagMutation(id: number): Promise<void> {
+  const response = await fetch(`${API_URL}/api/tags/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete tag");
+  }
+}

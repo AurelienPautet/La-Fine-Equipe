@@ -91,3 +91,13 @@ export async function editRegulationMutation({
   const regulation = await response.json();
   return regulation.data;
 }
+
+export async function deleteRegulationMutation(id: number): Promise<void> {
+  const response = await fetch(`${API_URL}/api/regulations/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete regulation");
+  }
+}

@@ -86,3 +86,13 @@ export async function editEventsMutation({
   const events = await response.json();
   return events.data;
 }
+
+export async function deleteEventMutation(id: number): Promise<void> {
+  const response = await fetch(`${API_URL}/api/events/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete event");
+  }
+}

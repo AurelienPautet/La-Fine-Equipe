@@ -1,6 +1,10 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
-import { getTags, postTag } from "../endpoints/TagsEndpoints";
+import {
+  getTags,
+  postTag,
+  deleteTagMutation,
+} from "../endpoints/TagsEndpoints";
 
 export const useTags = () => {
   return useQuery({
@@ -13,6 +17,16 @@ export const usePostTag = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (name: string) => postTag(name),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
+    },
+  });
+};
+
+export const useDeleteTag = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteTagMutation,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
     },

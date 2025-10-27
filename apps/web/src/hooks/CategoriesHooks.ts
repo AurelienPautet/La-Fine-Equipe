@@ -6,6 +6,7 @@ import {
   postCategories,
   editCategories,
   reorderCategories,
+  deleteCategoryMutation,
 } from "../endpoints/CategoriesEndpoints";
 import type {
   CreateCategoryRequest,
@@ -58,6 +59,16 @@ export const useReorderCategories = () => {
   return useMutation({
     mutationFn: (reorderData: ReorderCategoriesRequest[]) =>
       reorderCategories(reorderData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+    },
+  });
+};
+
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteCategoryMutation,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },

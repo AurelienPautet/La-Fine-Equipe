@@ -5,6 +5,7 @@ import {
   getLatestsEvents,
   getEvents,
   editEventsMutation,
+  deleteEventMutation,
 } from "../endpoints/EventsEnpoints";
 import type { EventsWithTags } from "@lafineequipe/types";
 
@@ -48,6 +49,21 @@ export const useEditEvents = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["events"],
+      });
+    },
+  });
+};
+
+export const useDeleteEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteEventMutation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["events"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["latests-events"],
       });
     },
   });
