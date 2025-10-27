@@ -7,7 +7,7 @@ import { FaCalendarAlt, FaPen } from "react-icons/fa";
 
 interface RegulationMetadata {
   title: string;
-  description: string | undefined;
+  description: string | undefined | null;
   date: Date;
 }
 

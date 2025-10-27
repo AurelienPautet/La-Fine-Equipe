@@ -1,6 +1,8 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import EditCategoryButton from "./EditCategoryButton";
+import DeleteButton from "./DeleteButton";
+import { useDeleteCategory } from "../hooks/CategoriesHooks";
 import { FaPlus } from "react-icons/fa";
 import type { Categories, Regulation } from "@lafineequipe/types";
 import RegulationCard from "./RegulationCard";
@@ -14,6 +16,12 @@ const DisplayCategory: React.FC<DisplayCategoryProps> = ({
   category,
   regulations,
 }) => {
+  const deleteCategoryMutation = useDeleteCategory();
+
+  const handleDelete = async (id: number) => {
+    await deleteCategoryMutation.mutateAsync(id);
+  };
+
   const categoryRegulations = useMemo(
     () => regulations.filter((reg) => reg.categoryId === category.id),
     [regulations, category.id]
@@ -32,7 +40,16 @@ const DisplayCategory: React.FC<DisplayCategoryProps> = ({
               {category.name}
             </h2>
           </div>
-          <EditCategoryButton category={category} />
+          <div className="flex gap-2">
+            <EditCategoryButton category={category} />
+            <DeleteButton
+              id={category.id}
+              entityName={`la catégorie "${category.name}"`}
+              deleteMutation={handleDelete}
+              className="btn-sm"
+              confirmMessage={`Êtes-vous sûr de vouloir supprimer la catégorie "${category.name}" ? Cette action est irréversible.`}
+            />
+          </div>
         </div>
 
         <div className="divider my-0"></div>

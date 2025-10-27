@@ -1,10 +1,14 @@
 import React from "react";
-import { useReservationsForEvent } from "../hooks/ReservationHooks";
+import {
+  useReservationsForEvent,
+  useDeleteReservation,
+} from "../hooks/ReservationHooks";
 import PageHeader from "../components/PageHeader";
 import { FaChartColumn, FaArrowLeft } from "react-icons/fa6";
 import { useParams, Link } from "react-router-dom";
 import { useEvent } from "../hooks/EventHooks";
 import { TbError404 } from "react-icons/tb";
+import DeleteButton from "../components/DeleteButton";
 
 const EventReservationsPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -15,6 +19,12 @@ const EventReservationsPage: React.FC = () => {
     isLoading: reservationsLoading,
     isError,
   } = useReservationsForEvent(slug!);
+
+  const deleteReservationMutation = useDeleteReservation();
+
+  const handleDelete = async (id: number) => {
+    await deleteReservationMutation.mutateAsync(id);
+  };
 
   const isLoading = eventLoading || reservationsLoading;
 
@@ -90,6 +100,7 @@ const EventReservationsPage: React.FC = () => {
                         <th>Téléphone</th>
                         <th>Membre</th>
                         <th>Réservé le</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -129,6 +140,15 @@ const EventReservationsPage: React.FC = () => {
                                 hour: "2-digit",
                                 minute: "2-digit",
                               })}
+                          </td>
+                          <td>
+                            <DeleteButton
+                              id={reservation.id}
+                              entityName={`la réservation de "${reservation.firstName} ${reservation.lastName}"`}
+                              deleteMutation={handleDelete}
+                              className="btn-xs"
+                              confirmMessage={`Êtes-vous sûr de vouloir supprimer la réservation de "${reservation.firstName} ${reservation.lastName}" ? Cette action est irréversible.`}
+                            />
                           </td>
                         </tr>
                       ))}

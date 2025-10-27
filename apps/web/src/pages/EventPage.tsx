@@ -2,17 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FaEdit, FaPen } from "react-icons/fa";
 import EventsDisplay from "../components/EventDisplay";
-import { useEvent } from "../hooks/EventHooks";
+import { useEvent, useDeleteEvent } from "../hooks/EventHooks";
 import type { EventsWithTags } from "@lafineequipe/types";
 import { TbError404 } from "react-icons/tb";
 import PageHeader from "../components/PageHeader";
 import { FaChartBar, FaChartColumn } from "react-icons/fa6";
+import DeleteButton from "../components/DeleteButton";
 
 const EventsPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [Events, setEvents] = useState<EventsWithTags | null>(null);
 
   const { data, error, isLoading } = useEvent(slug || "");
+  const deleteEventMutation = useDeleteEvent();
+
+  const handleDelete = async (id: number) => {
+    await deleteEventMutation.mutateAsync(id);
+  };
 
   useEffect(() => {
     if (data) {
@@ -76,23 +82,37 @@ const EventsPage: React.FC = () => {
               ← Retour aux événements
             </Link>
 
-            <Link
-              to={`/events/${slug}/reservations`}
-              className="btn btn-secondary btn-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
-            >
-              <FaChartColumn className="w-4 h-4" />
-              Voir les réservations
-            </Link>
-            {/* Edit Button */}
-            {slug && (
+            <div className="flex flex-col sm:flex-row gap-2">
               <Link
-                to={`/events/edit/${slug}`}
-                className="btn btn-secondary shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
+                to={`/events/${slug}/reservations`}
+                className="btn btn-secondary btn-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
               >
-                <FaPen className="w-4 h-4" />
-                Modifier l'événement
+                <FaChartColumn className="w-4 h-4" />
+                Voir les réservations
               </Link>
-            )}
+              {/* Edit Button */}
+              {slug && (
+                <>
+                  <Link
+                    to={`/events/edit/${slug}`}
+                    className="btn btn-secondary shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
+                  >
+                    <FaPen className="w-4 h-4" />
+                    Modifier l'événement
+                  </Link>
+                  <DeleteButton
+                    id={Events?.id || 0}
+                    entityName={`l'événement "${Events?.title || ""}"`}
+                    deleteMutation={handleDelete}
+                    redirectPath="/events"
+                    className="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                    confirmMessage={`Êtes-vous sûr de vouloir supprimer l'événement "${
+                      Events?.title || ""
+                    }" ? Cette action est irréversible.`}
+                  />
+                </>
+              )}
+            </div>
           </div>
         </div>
 

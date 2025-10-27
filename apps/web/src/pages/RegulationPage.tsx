@@ -1,13 +1,19 @@
 import React from "react";
 import { useParams, Link } from "react-router-dom";
-import { useRegulation } from "../hooks/RegulationHooks";
+import { useRegulation, useDeleteRegulation } from "../hooks/RegulationHooks";
 import RegulationDisplay from "../components/RegulationDisplay";
 import { FaSpinner, FaFileAlt, FaEdit, FaPen } from "react-icons/fa";
 import PageHeader from "../components/PageHeader";
+import DeleteButton from "../components/DeleteButton";
 
 const RegulationPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: regulation, isLoading, isError } = useRegulation(slug!);
+  const deleteRegulationMutation = useDeleteRegulation();
+
+  const handleDelete = async (id: number) => {
+    await deleteRegulationMutation.mutateAsync(id);
+  };
 
   if (isLoading) {
     return (
@@ -60,15 +66,27 @@ const RegulationPage: React.FC = () => {
               ← Retour aux règlements
             </Link>
 
-            {/* Edit Button */}
+            {/* Edit and Delete Buttons */}
             {slug && (
-              <Link
-                to={`/regulations/edit/${slug}`}
-                className="btn btn-secondary shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
-              >
-                <FaPen className="w-4 h-4" />
-                Modifier le règlement
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Link
+                  to={`/regulations/edit/${slug}`}
+                  className="btn btn-secondary shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
+                >
+                  <FaPen className="w-4 h-4" />
+                  Modifier le règlement
+                </Link>
+                <DeleteButton
+                  id={regulation?.id || 0}
+                  entityName={`le règlement "${regulation?.title || ""}"`}
+                  deleteMutation={handleDelete}
+                  redirectPath="/regulations"
+                  className="shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                  confirmMessage={`Êtes-vous sûr de vouloir supprimer le règlement "${
+                    regulation?.title || ""
+                  }" ? Cette action est irréversible.`}
+                />
+              </div>
             )}
           </div>
 
@@ -79,7 +97,7 @@ const RegulationPage: React.FC = () => {
                 <RegulationDisplay
                   metadata={{
                     title: regulation.title,
-                    author: regulation.author,
+                    description: regulation.description,
                     date: regulation.date,
                   }}
                   content={regulation.content}
