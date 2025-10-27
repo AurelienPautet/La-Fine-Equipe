@@ -10,6 +10,7 @@ import {
 export const tags = pgTable("LaFineEquipe-tags", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const events = pgTable("LaFineEquipe-events", {
@@ -27,6 +28,7 @@ export const events = pgTable("LaFineEquipe-events", {
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdateFn(() => new Date()),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const regulationsCategories = pgTable(
@@ -37,6 +39,7 @@ export const regulationsCategories = pgTable(
     abbreviation: text("abbreviation").notNull(),
     titleSchema: text("title_schema").notNull(),
     order: integer("order").notNull().default(0),
+    deletedAt: timestamp("deleted_at"),
   }
 );
 
@@ -54,6 +57,7 @@ export const regulations = pgTable("LaFineEquipe-regulations", {
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdateFn(() => new Date()),
+  deletedAt: timestamp("deleted_at"),
 });
 
 export const eventsTags = pgTable("LaFineEquipe-events_tags", {
@@ -75,4 +79,5 @@ export const eventsReservations = pgTable("LaFineEquipe-events_reservations", {
   phone: text("phone").notNull(),
   isMember: boolean("is_member").notNull(),
   reservedAt: timestamp("reserved_at").defaultNow(),
+  deletedAt: timestamp("deleted_at"),
 });
