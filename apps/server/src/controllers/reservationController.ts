@@ -4,13 +4,13 @@ import { eq, isNull, and } from "drizzle-orm";
 import { events, eventsReservations } from "@lafineequipe/db/src/schema";
 
 export const createReservation = async (req: Request, res: Response) => {
-  const { eventId, lastName, firstName, phone, isMember } = req.body;
+  const { eventId, lastName, firstName, email, isMember } = req.body;
   try {
     const newReservation = await db.insert(eventsReservations).values({
       eventId: eventId,
       lastName: lastName,
       firstName: firstName,
-      phone: phone,
+      email: email,
       isMember: isMember,
     });
     res.status(201).json(newReservation);

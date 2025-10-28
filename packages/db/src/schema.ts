@@ -76,7 +76,7 @@ export const eventsReservations = pgTable("LaFineEquipe-events_reservations", {
     .notNull(),
   lastName: text("last_name").notNull(),
   firstName: text("first_name").notNull(),
-  phone: text("phone").notNull(),
+  email: text("email").notNull(),
   isMember: boolean("is_member").notNull(),
   reservedAt: timestamp("reserved_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),

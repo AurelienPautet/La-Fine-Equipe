@@ -97,7 +97,7 @@ const EventReservationsPage: React.FC = () => {
                       <tr>
                         <th>Nom</th>
                         <th>Prénom</th>
-                        <th>Téléphone</th>
+                        <th>Email</th>
                         <th>Membre</th>
                         <th>Réservé le</th>
                         <th>Actions</th>
@@ -116,7 +116,7 @@ const EventReservationsPage: React.FC = () => {
                             {reservation.firstName}
                           </td>
                           <td className="text-base-content/70">
-                            {reservation.phone}
+                            {reservation.email}
                           </td>
                           <td>
                             <span

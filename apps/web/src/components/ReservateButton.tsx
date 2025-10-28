@@ -40,7 +40,7 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
   const [reservationData, setReservationData] = React.useState({
     firstName: "",
     lastName: "",
-    phoneNumber: "",
+    email: "",
     isMember: false,
   });
 
@@ -77,7 +77,7 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
         eventId: eventId,
         firstName: reservationData.firstName,
         lastName: reservationData.lastName,
-        phone: reservationData.phoneNumber,
+        email: reservationData.email,
         isMember: reservationData.isMember,
       },
       {
@@ -176,14 +176,14 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
                 <div className="form-control flex flex-col gap-2 mb-4 w-full justify-center items-center">
                   <label className="label">
                     <span className="label-text text-lg text-base-content">
-                      Numéro de téléphone
+                      Adresse Email
                     </span>
                   </label>
                   <input
-                    type="tel"
+                    type="email"
                     className="input input-bordered input-primary text-lg"
-                    name="phoneNumber"
-                    value={reservationData.phoneNumber}
+                    name="email"
+                    value={reservationData.email}
                     onChange={handleInputChange}
                     disabled={status === "submitting"}
                   />
