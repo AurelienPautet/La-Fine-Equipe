@@ -42,7 +42,7 @@ const HomePage: React.FC = () => {
                 className="btn btn-primary btn-lg text-primary-content shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
               >
                 <FaUsers className="w-5 h-5" />
-                Découvrir l'équipe
+                Découvrir l&apos;équipe
               </Link>
               <Link
                 to="/join"
@@ -88,9 +88,11 @@ const HomePage: React.FC = () => {
             {latestsEvents?.length === 0 && !isLoading ? (
               <p className="text-gray-500">Aucun événement à venir.</p>
             ) : (
-              latestsEvents?.map((event) => (
-                <EventsCard className="w-1/3" key={event.id} events={event} />
-              ))
+              latestsEvents?.map((event) =>
+                event ? (
+                  <EventsCard className="w-1/3" key={event.id} events={event} />
+                ) : null
+              )
             )}
           </div>
           <div className="text-center mt-8">
