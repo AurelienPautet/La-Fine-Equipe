@@ -6,6 +6,7 @@ import {
   FaHome,
   FaNewspaper,
   FaScroll,
+  FaSignOutAlt,
   FaUsers,
 } from "react-icons/fa";
 
@@ -46,7 +47,8 @@ const Header: React.FC = () => {
               className="btn btn-sm btn-secondary ml-4 normal-case"
               onClick={logout}
             >
-              Logout
+              <FaSignOutAlt className="w-4 h-4" />
+              <span className="hidden lg:block">Déconnexion</span>
             </button>
           )}
         </Link>
