@@ -63,7 +63,7 @@ const JoinUsPage: React.FC = () => {
       Rejoins notre equipe en t'inscrivant sur HelloAsso"
       >
         {isAuthenticated && (
-          <div className="flex flex-col w-full items-center p-2 gap-4 md:flex-row ">
+          <div className="flex flex-col w-full items-center justify-center p-4 gap-4 md:flex-row ">
             <ConfirmationModal
               title="Confirmation de mise à jour"
               message={ConfirmationModalMessage}
@@ -71,7 +71,7 @@ const JoinUsPage: React.FC = () => {
               setOpen={setConfirmationModalOpen}
             />
             <button
-              className="btn w-1/3 btn-sm btn-secondary ml-4"
+              className="btn w-1/3 btn-sm btn-secondary "
               onClick={() => {
                 openActifSettingsModal();
               }}
@@ -151,7 +151,7 @@ const JoinUsPage: React.FC = () => {
               </form>
             </dialog>
             <button
-              className="btn w-1/3 btn-sm  btn-secondary ml-4"
+              className="btn w-1/3 btn-sm  btn-secondary "
               onClick={() => {
                 openSimpleSettingsModal();
               }}
