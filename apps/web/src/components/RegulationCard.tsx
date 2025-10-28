@@ -23,7 +23,7 @@ const RegulationCard: React.FC<RegulationCardProps> = ({
   const generateRegulationTitle = (): string => {
     return category.titleSchema
       .replace("[date]", formatDate(regulation.date))
-      .replace("[title]", regulation.title);
+      .replace("[titre]", regulation.title);
   };
 
   return (
