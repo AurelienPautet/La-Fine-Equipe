@@ -10,6 +10,7 @@ import fileRoutes from "./routes/fileRoutes";
 import reservationRoutes from "./routes/reservationRoutes";
 import regulationRoutes from "./routes/regulationRoutes";
 import categoryRoutes from "./routes/categoryRoutes";
+import authRoutes from "./routes/authRoutes";
 
 const app = express();
 app.use(cors());
@@ -26,6 +27,7 @@ app.get("/", (_, res) => {
 });
 
 // Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/events", eventsRoutes);
 app.use("/api/tags", tagRoutes);
 app.use("/api/files", fileRoutes);

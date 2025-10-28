@@ -7,14 +7,16 @@ import {
   editRegulation,
   deleteRegulation,
 } from "../controllers/regulationController";
+import { verifyToken } from "../controllers/authController";
 
 const router = Router();
 
 router.get("/", getAllRegulations);
 router.get("/latest", getLatestRegulations);
-router.post("/", createRegulation);
 router.get("/:slug", getRegulationBySlug);
-router.put("/:id", editRegulation);
-router.delete("/:id", deleteRegulation);
+
+router.post("/", verifyToken, createRegulation);
+router.put("/:id", verifyToken, editRegulation);
+router.delete("/:id", verifyToken, deleteRegulation);
 
 export default router;

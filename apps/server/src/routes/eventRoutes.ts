@@ -8,13 +8,15 @@ import {
   deleteEvent,
 } from "../controllers/eventController";
 
+import { verifyToken } from "../controllers/authController";
 const router = Router();
 
 router.get("/", getAllEvents);
 router.get("/latests", getLatestsEvents);
-router.post("/", createEvents);
 router.get("/:slug", getEventsBySlug);
-router.put("/:id", editEvents);
-router.delete("/:id", deleteEvent);
+
+router.post("/", verifyToken, createEvents);
+router.put("/:id", verifyToken, editEvents);
+router.delete("/:id", verifyToken, deleteEvent);
 
 export default router;

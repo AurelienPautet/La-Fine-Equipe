@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { createTag, getTags, deleteTag } from "../controllers/tagController";
 
+import { verifyToken } from "../controllers/authController";
 const router = Router();
 
-router.post("/", createTag);
 router.get("/", getTags);
-router.delete("/:id", deleteTag);
+
+router.post("/", verifyToken, createTag);
+router.delete("/:id", verifyToken, deleteTag);
 
 export default router;

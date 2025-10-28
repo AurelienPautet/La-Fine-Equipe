@@ -8,13 +8,16 @@ import {
   deleteCategory,
 } from "../controllers/categoryController";
 
+import { verifyToken } from "../controllers/authController";
+
 const router = Router();
 
-router.post("/", createCategory);
 router.get("/", getCategories);
-router.put("/reorder", reorderCategories);
 router.get("/:id", getCategoryById);
-router.put("/:id", editCategory);
-router.delete("/:id", deleteCategory);
+
+router.post("/", verifyToken, createCategory);
+router.put("/reorder", verifyToken, reorderCategories);
+router.put("/:id", verifyToken, editCategory);
+router.delete("/:id", verifyToken, deleteCategory);
 
 export default router;
