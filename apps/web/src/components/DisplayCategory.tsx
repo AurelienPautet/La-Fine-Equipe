@@ -70,9 +70,11 @@ const DisplayCategory: React.FC<DisplayCategoryProps> = ({
         <div className="mt-6">
           {categoryRegulations.length > 0 ? (
             <div>
-              <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                Règlements ({categoryRegulations.length})
-              </h3>
+              {isAuthenticated && (
+                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                  Règlements ({categoryRegulations.length})
+                </h3>
+              )}
               <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
                 {categoryRegulations.map((regulation) => (
                   <RegulationCard
