@@ -77,12 +77,12 @@ const JoinUsPage: React.FC = () => {
               }}
             >
               <FaEdit className="w-10 mr-2" />
-              Modifier adhésion membres actif
+              Modifier adhésion membres actifs
             </button>
             <dialog id="modify_actif_settings" className="modal">
               <div className="modal-box w-full max-w-md">
                 <h3 className="font-bold text-lg mb-4">
-                  Modifier adhésion membres actif
+                  Modifier adhésion membres actifs
                 </h3>
                 <form
                   onSubmit={(e) => {
@@ -120,7 +120,7 @@ const JoinUsPage: React.FC = () => {
                   </div>
                   <div className="form-control mb-4">
                     <label className="label">
-                      <span className="label-text">Price</span>
+                      <span className="label-text">Prix</span>
                     </label>
                     <input
                       type="number"
@@ -157,12 +157,12 @@ const JoinUsPage: React.FC = () => {
               }}
             >
               <FaEdit className="w-10 mr-2" />
-              Modifier adhésion membres simple
+              Modifier adhésion membres simples
             </button>
             <dialog id="modify_simple_settings" className="modal">
               <div className="modal-box w-full max-w-md">
                 <h3 className="font-bold text-lg mb-4">
-                  Modifier adhésion membres simple
+                  Modifier adhésion membres simples
                 </h3>
                 <form
                   onSubmit={(e) => {
