@@ -95,7 +95,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
               required
             />
             <p className="text-xs text-secondary/50">
-              Utilisez <code>[date]</code> pour la date et <code>[title]</code>{" "}
+              Utilisez <code>[date]</code> pour la date et <code>[titre]</code>{" "}
               pour le titre du règlement.
             </p>
           </div>

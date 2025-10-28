@@ -1,8 +1,59 @@
 import React from "react";
+import { FaEdit, FaSpinner, FaUserPlus } from "react-icons/fa";
 import PageHeader from "../components/PageHeader";
-import { FaUserPlus } from "react-icons/fa";
+import ConfirmationModal from "../components/ConfirmationModal";
+import {
+  useMembersSettings,
+  useUpdateActifMembersSettings,
+  useUpdateSimpleMembersSettings,
+} from "../hooks/MemberSettingsHooks";
+import { useAuth } from "../components/AuthProvider";
 
 const JoinUsPage: React.FC = () => {
+  const { data, isLoading, error } = useMembersSettings();
+  const updateActifMembersSettingsMutation = useUpdateActifMembersSettings();
+  const updateSimpleMembersSettingsMutation = useUpdateSimpleMembersSettings();
+  const { isAuthenticated } = useAuth();
+  const actifSettings = data?.actifSettings;
+  console.log(actifSettings, data);
+  const simpleSettings = data?.simpleSettings;
+  const [ConfirmationModalOpen, setConfirmationModalOpen] =
+    React.useState(false);
+  const [ConfirmationModalMessage, setConfirmationModalMessage] =
+    React.useState("");
+
+  const openSimpleSettingsModal = () => {
+    const modal = document.getElementById(
+      "modify_simple_settings"
+    ) as HTMLDialogElement | null;
+    if (modal) {
+      modal.showModal();
+    }
+  };
+
+  const openActifSettingsModal = () => {
+    const modal = document.getElementById(
+      "modify_actif_settings"
+    ) as HTMLDialogElement | null;
+    if (modal) {
+      modal.showModal();
+    }
+  };
+
+  const handleCloseModal = () => {
+    const modalSimple = document.getElementById(
+      "modify_simple_settings"
+    ) as HTMLDialogElement | null;
+    if (modalSimple) {
+      modalSimple.close();
+    }
+    const modalActif = document.getElementById(
+      "modify_actif_settings"
+    ) as HTMLDialogElement | null;
+    if (modalActif) {
+      modalActif.close();
+    }
+  };
   return (
     <div>
       <PageHeader
@@ -10,28 +61,205 @@ const JoinUsPage: React.FC = () => {
         icon={<FaUserPlus />}
         subtitle="
       Rejoins notre equipe en t'inscrivant sur HelloAsso"
-      />
+      >
+        {isAuthenticated && (
+          <div className="flex flex-col w-full items-center p-2 gap-4 md:flex-row ">
+            <ConfirmationModal
+              title="Confirmation de mise à jour"
+              message={ConfirmationModalMessage}
+              open={ConfirmationModalOpen}
+              setOpen={setConfirmationModalOpen}
+            />
+            <button
+              className="btn w-1/3 btn-sm btn-secondary ml-4"
+              onClick={() => {
+                openActifSettingsModal();
+              }}
+            >
+              <FaEdit className="w-10 mr-2" />
+              Modifier adhésion membres actif
+            </button>
+            <dialog id="modify_actif_settings" className="modal">
+              <div className="modal-box w-full max-w-md">
+                <h3 className="font-bold text-lg mb-4">
+                  Modifier adhésion membres actif
+                </h3>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleCloseModal();
+                    const formData = new FormData(e.currentTarget);
+                    const url = formData.get("url") as string;
+                    const price = parseFloat(formData.get("price") as string);
+                    updateActifMembersSettingsMutation.mutate(
+                      { url, price },
+                      {
+                        onSuccess: () => {
+                          handleCloseModal();
+                          setConfirmationModalMessage(
+                            "Les paramètres d'adhésion actif ont été mis à jour avec succès."
+                          );
+                          setConfirmationModalOpen(true);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  {/* Form fields for modifying actif members settings */}
+                  <div className="form-control mb-4">
+                    <label className="label">
+                      <span className="label-text">URL</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="url"
+                      defaultValue={actifSettings?.url}
+                      className="input input-bordered w-full"
+                      required
+                    />
+                  </div>
+                  <div className="form-control mb-4">
+                    <label className="label">
+                      <span className="label-text">Price</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="price"
+                      min="0"
+                      step="0.01"
+                      defaultValue={actifSettings?.price}
+                      className="input input-bordered w-full"
+                      required
+                    />
+                  </div>
+                  <div className="modal-action">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={handleCloseModal}
+                    >
+                      Annuler
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      Sauvegarder
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <form method="dialog" className="modal-backdrop">
+                <button>close</button>
+              </form>
+            </dialog>
+            <button
+              className="btn w-1/3 btn-sm  btn-secondary ml-4"
+              onClick={() => {
+                openSimpleSettingsModal();
+              }}
+            >
+              <FaEdit className="w-10 mr-2" />
+              Modifier adhésion membres simple
+            </button>
+            <dialog id="modify_simple_settings" className="modal">
+              <div className="modal-box w-full max-w-md">
+                <h3 className="font-bold text-lg mb-4">
+                  Modifier adhésion membres simple
+                </h3>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget);
+                    const url = formData.get("url") as string;
+                    updateSimpleMembersSettingsMutation.mutate(
+                      { url },
+                      {
+                        onSuccess: () => {
+                          handleCloseModal();
+                          setConfirmationModalMessage(
+                            "Les paramètres d'adhésion simple ont été mis à jour avec succès."
+                          );
+                          setConfirmationModalOpen(true);
+                        },
+                      }
+                    );
+                  }}
+                >
+                  {/* Form fields for modifying simple members settings */}
+                  <div className="form-control mb-4">
+                    <label className="label">
+                      <span className="label-text">URL</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="url"
+                      defaultValue={simpleSettings?.url}
+                      className="input input-bordered w-full"
+                      required
+                    />
+                  </div>
+                  <div className="modal-action">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={handleCloseModal}
+                    >
+                      Annuler
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      Sauvegarder
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <form method="dialog" className="modal-backdrop">
+                <button>close</button>
+              </form>
+            </dialog>
+          </div>
+        )}
+      </PageHeader>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg ">
           <div className="sticky left-0 top-20 text-center backdrop-blur-[1px] p-2 rounded-2xl mb-6 flex flex-col  sm:flex-row w-fit justify-center gap-4 ml-auto mr-auto">
-            <a
-              href="https://www.helloasso.com/associations/la-fine-equipe-lyon-iii/adhesions/devenir-membre-actif-pour-l-annee-2025-2026"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary btn-lg text-primary-content shadow-lg hover:shadow-xl  hover:scale-105 transition-all flex items-center gap-2"
-            >
-              <FaUserPlus />
-              Devenir membre actif
-            </a>
-            <a
-              href="https://www.helloasso.com/associations/la-fine-equipe-lyon-iii/adhesions/bulletin-d-adhesion-simple-a-la-fine-equipe"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary btn-lg text-primary-content shadow-lg hover:shadow-xl  hover:scale-105 transition-all flex items-center gap-2"
-            >
-              <FaUserPlus />
-              Adhésion simple
-            </a>
+            {error ? (
+              <div className="alert alert-error">
+                <p>Erreur lors du chargement des paramètres.</p>
+              </div>
+            ) : (
+              <>
+                <a
+                  href={actifSettings?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`btn btn-primary btn-lg text-primary-content shadow-lg hover:shadow-xl  hover:scale-105 transition-all flex items-center gap-2 ${
+                    isLoading ? "btn-disabled" : ""
+                  }`}
+                  aria-disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <FaSpinner className="animate-spin" />
+                  ) : (
+                    <FaUserPlus />
+                  )}
+                  Devenir membre actif
+                </a>
+                <a
+                  href={simpleSettings?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`btn btn-secondary btn-lg text-primary-content shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2 ${
+                    isLoading ? "btn-disabled" : ""
+                  }`}
+                  aria-disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <FaSpinner className="animate-spin" />
+                  ) : (
+                    <FaUserPlus />
+                  )}
+                  Adhésion simple
+                </a>
+              </>
+            )}
           </div>
           <h2 className="text-3xl font-bold mb-6 text-center text-primary">
             Devenir Membre de <span className="italic">La Fine Equipe</span>
@@ -73,7 +301,14 @@ const JoinUsPage: React.FC = () => {
             confère tous les avantages de l’adhésion simple, et permet,{" "}
             <span className="font-bold">pour l’année scolaire</span> en cours,
             moyennant une contribution de{" "}
-            <span className="text-primary font-bold">7 euros</span> :
+            <span className="text-primary font-bold">
+              {isLoading
+                ? "Chargement..."
+                : error
+                ? "Erreur"
+                : `${actifSettings?.price} euros`}
+            </span>{" "}
+            :
           </p>
           <ul className="ml-3 mb-4 list-disc list-inside">
             <li>De voter aux réunions de l’Assemblée générale</li>

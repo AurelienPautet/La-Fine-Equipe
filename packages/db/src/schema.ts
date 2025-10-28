@@ -1,3 +1,4 @@
+import { real } from "drizzle-orm/pg-core";
 import {
   pgTable,
   text,
@@ -81,3 +82,26 @@ export const eventsReservations = pgTable("LaFineEquipe-events_reservations", {
   reservedAt: timestamp("reserved_at").defaultNow(),
   deletedAt: timestamp("deleted_at"),
 });
+
+export const actifMembersSettings = pgTable(
+  "LaFineEquipe-actif_members_settings",
+  {
+    id: serial("id").primaryKey(),
+    url: text("url").notNull(),
+    price: real("price").notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdateFn(() => new Date()),
+  }
+);
+
+export const simpleMembersSettings = pgTable(
+  "LaFineEquipe-simple_members_settings",
+  {
+    id: serial("id").primaryKey(),
+    url: text("url").notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdateFn(() => new Date()),
+  }
+);

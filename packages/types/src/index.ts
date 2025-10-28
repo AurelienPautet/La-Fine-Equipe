@@ -33,3 +33,16 @@ export {
   editCategoryRequestSchema,
   reorderCategoriesRequestSchema,
 } from "./category";
+
+export type {
+  ActifMembersSettings,
+  SimpleMembersSettings,
+} from "./membersSettings";
+export {
+  editActifMembersSettingsRequestSchema,
+  editSimpleMembersSettingsRequestSchema,
+} from "./membersSettings";
+export type {
+  EditActifMembersSettingsRequest,
+  EditSimpleMembersSettingsRequest,
+} from "./membersSettings";
