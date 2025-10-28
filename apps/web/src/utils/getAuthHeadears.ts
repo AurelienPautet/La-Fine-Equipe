@@ -1,7 +1,9 @@
-export default function getAuthHeaders(): HeadersInit {
+export default function getAuthHeaders(
+  contentType: string = "application/json"
+): HeadersInit {
   const token = localStorage.getItem("adminToken");
   return {
-    "Content-Type": "application/json",
+    "Content-Type": contentType,
     ...(token && { Authorization: `Bearer ${token}` }),
   };
 }

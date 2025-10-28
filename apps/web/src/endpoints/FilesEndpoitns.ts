@@ -13,7 +13,7 @@ export async function uploadFile(
   const response = await fetch(`${API_URL}/api/files/upload/${folder}`, {
     method: "POST",
     headers: {
-      ...getAuthHeaders(),
+      ...getAuthHeaders("multipart/form-data"),
     },
     body: formData,
   });
