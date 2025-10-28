@@ -83,16 +83,20 @@ const EventsPage: React.FC = () => {
               <h3 className="text-2xl font-bold mb-4 text-base-content">
                 Aucun événement pour le moment
               </h3>
-              <p className="text-base-content/70 mb-8">
-                Soyez le premier à créer un événement !
-              </p>
-              <Link
-                to="/events/create"
-                className="btn btn-primary btn-lg gap-2"
-              >
-                <FaPlus className="w-5 h-5" />
-                Créer le premier événement
-              </Link>
+              {isAuthenticated && (
+                <>
+                  <p className="text-base-content/70 mb-8">
+                    Soyez le premier à créer un événement !
+                  </p>
+                  <Link
+                    to="/events/create"
+                    className="btn btn-primary btn-lg gap-2"
+                  >
+                    <FaPlus className="w-5 h-5" />
+                    Créer le premier événement
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}
