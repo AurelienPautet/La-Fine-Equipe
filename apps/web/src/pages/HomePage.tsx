@@ -85,6 +85,9 @@ const HomePage: React.FC = () => {
               <p className="text-red-500">Erreur de chargement des events.</p>
             )}
 
+            {latestsEvents?.length === 0 && !isLoading && (
+              <p className="text-gray-500">Aucun événement à venir.</p>
+            )}
             {latestsEvents?.map((events) => (
               <EventsCard className="w-1/3" key={events.id} events={events} />
             ))}
