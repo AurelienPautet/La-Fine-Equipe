@@ -1,4 +1,5 @@
 import type { FileWithPath } from "react-dropzone";
+import getAuthHeaders from "../utils/getAuthHeadears";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
@@ -11,6 +12,9 @@ export async function uploadFile(
   formData.append("file", file);
   const response = await fetch(`${API_URL}/api/files/upload/${folder}`, {
     method: "POST",
+    headers: {
+      ...getAuthHeaders(),
+    },
     body: formData,
   });
   console.log("Upload response:", response);
@@ -33,6 +37,9 @@ export async function deleteFile(
   const response = await fetch(
     `${API_URL}/api/files/delete?url=${encodeURIComponent(fileName)}`,
     {
+      headers: {
+        ...getAuthHeaders(),
+      },
       method: "DELETE",
     }
   );

@@ -5,8 +5,11 @@ import RegulationForm from "../components/RegulationForm";
 import PageHeader from "../components/PageHeader";
 import { FaFileAlt } from "react-icons/fa";
 import type { CreateRegulationRequest } from "@lafineequipe/types";
+import { useAuth } from "../components/AuthProvider";
+import LoginButton from "../components/LoginButton";
 
 const CreateRegulationPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const postRegulation = usePostRegulation();
 
@@ -26,6 +29,10 @@ const CreateRegulationPage: React.FC = () => {
       console.error("Failed to create regulation:", error);
     }
   };
+
+  if (!isAuthenticated) {
+    return <LoginButton />;
+  }
 
   return (
     <div className="min-h-screen pb-12">

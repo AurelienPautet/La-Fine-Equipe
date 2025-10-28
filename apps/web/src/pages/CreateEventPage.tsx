@@ -5,8 +5,12 @@ import EventsForm from "../components/EventForm";
 import PageHeader from "../components/PageHeader";
 import MarkdownGuide from "../components/MarkdownGuide";
 import { usePostEvents } from "../hooks/EventHooks";
+import { useAuth } from "../components/AuthProvider";
+import LoginButton from "../components/LoginButton";
 
 const CreateEventsPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const postEvents = usePostEvents();
@@ -31,6 +35,10 @@ const CreateEventsPage: React.FC = () => {
       },
     });
   };
+
+  if (!isAuthenticated) {
+    return <LoginButton />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent to-base-200">

@@ -6,10 +6,14 @@ import { useEvent, useDeleteEvent } from "../hooks/EventHooks";
 import type { EventsWithTags } from "@lafineequipe/types";
 import { TbError404 } from "react-icons/tb";
 import PageHeader from "../components/PageHeader";
-import { FaChartBar, FaChartColumn } from "react-icons/fa6";
+import { FaChartColumn } from "react-icons/fa6";
 import DeleteButton from "../components/DeleteButton";
+import { useAuth } from "../components/AuthProvider";
+import LoginButton from "../components/LoginButton";
 
 const EventsPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
   const { slug } = useParams<{ slug: string }>();
   const [Events, setEvents] = useState<EventsWithTags | null>(null);
 
@@ -83,16 +87,16 @@ const EventsPage: React.FC = () => {
             </Link>
 
             <div className="flex flex-col sm:flex-row gap-2">
-              <Link
-                to={`/events/${slug}/reservations`}
-                className="btn btn-secondary btn-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
-              >
-                <FaChartColumn className="w-4 h-4" />
-                Voir les réservations
-              </Link>
               {/* Edit Button */}
-              {slug && (
+              {slug && isAuthenticated && (
                 <>
+                  <Link
+                    to={`/events/${slug}/reservations`}
+                    className="btn btn-secondary btn-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
+                  >
+                    <FaChartColumn className="w-4 h-4" />
+                    Voir les réservations
+                  </Link>
                   <Link
                     to={`/events/edit/${slug}`}
                     className="btn btn-secondary shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"

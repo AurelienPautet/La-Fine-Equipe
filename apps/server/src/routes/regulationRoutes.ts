@@ -7,7 +7,7 @@ import {
   editRegulation,
   deleteRegulation,
 } from "../controllers/regulationController";
-import { verifyToken } from "../controllers/authController";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 const router = Router();
 
@@ -15,8 +15,8 @@ router.get("/", getAllRegulations);
 router.get("/latest", getLatestRegulations);
 router.get("/:slug", getRegulationBySlug);
 
-router.post("/", verifyToken, createRegulation);
-router.put("/:id", verifyToken, editRegulation);
-router.delete("/:id", verifyToken, deleteRegulation);
+router.post("/", authMiddleware, createRegulation);
+router.put("/:id", authMiddleware, editRegulation);
+router.delete("/:id", authMiddleware, deleteRegulation);
 
 export default router;

@@ -5,8 +5,10 @@ import RegulationDisplay from "../components/RegulationDisplay";
 import { FaSpinner, FaFileAlt, FaEdit, FaPen } from "react-icons/fa";
 import PageHeader from "../components/PageHeader";
 import DeleteButton from "../components/DeleteButton";
+import { useAuth } from "../components/AuthProvider";
 
 const RegulationPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const { slug } = useParams<{ slug: string }>();
   const { data: regulation, isLoading, isError } = useRegulation(slug!);
   const deleteRegulationMutation = useDeleteRegulation();
@@ -67,7 +69,7 @@ const RegulationPage: React.FC = () => {
             </Link>
 
             {/* Edit and Delete Buttons */}
-            {slug && (
+            {slug && isAuthenticated && (
               <div className="flex flex-col sm:flex-row gap-2">
                 <Link
                   to={`/regulations/edit/${slug}`}

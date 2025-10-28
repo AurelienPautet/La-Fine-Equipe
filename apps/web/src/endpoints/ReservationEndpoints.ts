@@ -6,6 +6,7 @@ import type {
 } from "@lafineequipe/types";
 
 import { createReservationSchema } from "@lafineequipe/types";
+import getAuthHeaders from "../utils/getAuthHeadears";
 
 export async function postReservation(
   data: CreateReservationRequest
@@ -14,7 +15,7 @@ export async function postReservation(
   const response = await fetch(`${API_URL}/api/reservations`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(validateData),
   });
@@ -38,6 +39,9 @@ export async function getReservationsForEvent(
 
 export async function deleteReservationMutation(id: number): Promise<void> {
   const response = await fetch(`${API_URL}/api/reservations/${id}`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
     method: "DELETE",
   });
 

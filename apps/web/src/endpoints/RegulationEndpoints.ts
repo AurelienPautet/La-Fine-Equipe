@@ -8,6 +8,7 @@ import {
   createRegulationRequestSchema,
   editRegulationRequestSchema,
 } from "@lafineequipe/types";
+import getAuthHeaders from "../utils/getAuthHeadears";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
@@ -51,7 +52,7 @@ export async function postRegulationMutation(
   const response = await fetch(`${API_URL}/api/regulations`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(validateData),
   });
@@ -78,7 +79,7 @@ export async function editRegulationMutation({
     {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json",
+        ...getAuthHeaders(),
       },
       body: JSON.stringify(validateData),
     }
@@ -94,6 +95,9 @@ export async function editRegulationMutation({
 
 export async function deleteRegulationMutation(id: number): Promise<void> {
   const response = await fetch(`${API_URL}/api/regulations/${id}`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
     method: "DELETE",
   });
 

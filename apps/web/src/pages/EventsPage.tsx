@@ -5,8 +5,10 @@ import EventsCard from "../components/EventCard";
 import type { EventsWithTags } from "@lafineequipe/types";
 import { useEvents } from "../hooks/EventHooks";
 import PageHeader from "../components/PageHeader";
+import { useAuth } from "../components/AuthProvider";
 const EventsPage: React.FC = () => {
   const { data: events, isLoading, isError, error } = useEvents();
+  const { isAuthenticated } = useAuth();
 
   if (isLoading) {
     return (
@@ -48,15 +50,17 @@ const EventsPage: React.FC = () => {
         className="py-20"
       >
         {/* Create New Events Button */}
-        <div className="mt-8">
-          <Link
-            to="/events/create"
-            className="btn btn-secondary btn-lg gap-2 shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            <FaPlus className="w-5 h-5" />
-            Créer un nouvel events
-          </Link>
-        </div>
+        {isAuthenticated && (
+          <div className="mt-8">
+            <Link
+              to="/events/create"
+              className="btn btn-secondary btn-lg gap-2 shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <FaPlus className="w-5 h-5" />
+              Créer un nouvel events
+            </Link>
+          </div>
+        )}
       </PageHeader>
 
       {/* Events Section */}

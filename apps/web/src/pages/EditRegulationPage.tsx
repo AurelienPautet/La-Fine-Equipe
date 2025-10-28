@@ -8,8 +8,11 @@ import type {
   EditRegulationRequest,
   CreateRegulationRequest,
 } from "@lafineequipe/types";
+import { useAuth } from "../components/AuthProvider";
+import LoginButton from "../components/LoginButton";
 
 const EditRegulationPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { data: regulation, isLoading, isError } = useRegulation(slug!);
@@ -32,6 +35,10 @@ const EditRegulationPage: React.FC = () => {
       console.error("Failed to edit regulation:", error);
     }
   };
+
+  if (!isAuthenticated) {
+    return <LoginButton />;
+  }
 
   if (isLoading) {
     return (

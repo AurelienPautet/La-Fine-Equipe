@@ -8,6 +8,7 @@ import {
   createEventsRequestSchema,
   editEventsRequestSchema,
 } from "@lafineequipe/types";
+import getAuthHeaders from "../utils/getAuthHeadears";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
@@ -51,7 +52,7 @@ export async function postEventsMutation(
   const response = await fetch(`${API_URL}/api/events`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(validateData),
   });
@@ -74,7 +75,7 @@ export async function editEventsMutation({
   const response = await fetch(`${API_URL}/api/events/${eventsData.id}`, {
     method: "PUT",
     headers: {
-      "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(validateData),
   });
@@ -90,6 +91,9 @@ export async function editEventsMutation({
 export async function deleteEventMutation(id: number): Promise<void> {
   const response = await fetch(`${API_URL}/api/events/${id}`, {
     method: "DELETE",
+    headers: {
+      ...getAuthHeaders(),
+    },
   });
 
   if (!response.ok) {

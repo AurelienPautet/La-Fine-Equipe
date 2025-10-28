@@ -8,6 +8,7 @@ import {
   createCategoryRequestSchema,
   reorderCategoriesRequestSchema,
 } from "@lafineequipe/types";
+import getAuthHeaders from "../utils/getAuthHeadears";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
@@ -40,7 +41,7 @@ export async function postCategories(
   const response = await fetch(`${API_URL}/api/categories`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(validateData),
   });
@@ -64,7 +65,7 @@ export async function editCategories(
   const response = await fetch(`${API_URL}/api/categories/${id}`, {
     method: "PUT",
     headers: {
-      "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(validateData),
   });
@@ -89,7 +90,7 @@ export async function reorderCategories(
   const response = await fetch(`${API_URL}/api/categories/reorder`, {
     method: "PUT",
     headers: {
-      "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(validateData),
   });
@@ -104,6 +105,9 @@ export async function reorderCategories(
 
 export async function deleteCategoryMutation(id: number): Promise<void> {
   const response = await fetch(`${API_URL}/api/categories/${id}`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
     method: "DELETE",
   });
 

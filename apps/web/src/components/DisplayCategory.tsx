@@ -6,6 +6,7 @@ import { useDeleteCategory } from "../hooks/CategoriesHooks";
 import { FaPlus } from "react-icons/fa";
 import type { Categories, Regulation } from "@lafineequipe/types";
 import RegulationCard from "./RegulationCard";
+import { useAuth } from "./AuthProvider";
 
 interface DisplayCategoryProps {
   category: Categories;
@@ -16,6 +17,7 @@ const DisplayCategory: React.FC<DisplayCategoryProps> = ({
   category,
   regulations,
 }) => {
+  const { isAuthenticated } = useAuth();
   const deleteCategoryMutation = useDeleteCategory();
 
   const handleDelete = async (id: number) => {
@@ -40,25 +42,29 @@ const DisplayCategory: React.FC<DisplayCategoryProps> = ({
               {category.name}
             </h2>
           </div>
-          <div className="flex gap-2">
-            <EditCategoryButton category={category} />
-            <DeleteButton
-              id={category.id}
-              entityName={`la catégorie "${category.name}"`}
-              deleteMutation={handleDelete}
-              className="btn-sm"
-              confirmMessage={`Êtes-vous sûr de vouloir supprimer la catégorie "${category.name}" ? Cette action est irréversible.`}
-            />
-          </div>
+          {isAuthenticated && (
+            <div className="flex gap-2">
+              <EditCategoryButton category={category} />
+              <DeleteButton
+                id={category.id}
+                entityName={`la catégorie "${category.name}"`}
+                deleteMutation={handleDelete}
+                className="btn-sm"
+                confirmMessage={`Êtes-vous sûr de vouloir supprimer la catégorie "${category.name}" ? Cette action est irréversible.`}
+              />
+            </div>
+          )}
         </div>
 
         <div className="divider my-0"></div>
 
         {/* Schema info */}
-        <p className="text-sm text-base-content/70 mt-4 mb-4">
-          <span className="font-semibold">Schéma de titre:</span>{" "}
-          {category.titleSchema}
-        </p>
+        {isAuthenticated && (
+          <p className="text-sm text-base-content/70 mt-4 mb-4">
+            <span className="font-semibold">Schéma de titre:</span>{" "}
+            {category.titleSchema}
+          </p>
+        )}
 
         {/* Regulations List */}
         <div className="mt-6">
@@ -87,16 +93,18 @@ const DisplayCategory: React.FC<DisplayCategoryProps> = ({
         </div>
 
         {/* Create Regulation Button */}
-        <div className="card-actions mt-6">
-          <Link
-            to="/regulations/create"
-            state={{ categoryId: category.id }}
-            className="btn btn-secondary btn-sm gap-2"
-          >
-            <FaPlus className="w-4 h-4" />
-            Ajouter un règlement
-          </Link>
-        </div>
+        {isAuthenticated && (
+          <div className="card-actions mt-6">
+            <Link
+              to="/regulations/create"
+              state={{ categoryId: category.id }}
+              className="btn btn-secondary btn-sm gap-2"
+            >
+              <FaPlus className="w-4 h-4" />
+              Ajouter un règlement
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

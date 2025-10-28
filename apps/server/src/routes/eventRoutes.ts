@@ -8,15 +8,15 @@ import {
   deleteEvent,
 } from "../controllers/eventController";
 
-import { verifyToken } from "../controllers/authController";
+import { authMiddleware } from "../middleware/authMiddleware";
 const router = Router();
 
 router.get("/", getAllEvents);
 router.get("/latests", getLatestsEvents);
 router.get("/:slug", getEventsBySlug);
 
-router.post("/", verifyToken, createEvents);
-router.put("/:id", verifyToken, editEvents);
-router.delete("/:id", verifyToken, deleteEvent);
+router.post("/", authMiddleware, createEvents);
+router.put("/:id", authMiddleware, editEvents);
+router.delete("/:id", authMiddleware, deleteEvent);
 
 export default router;

@@ -1,5 +1,8 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
+
+import dotenv from "dotenv";
+dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
@@ -27,11 +30,7 @@ export const login = (req: Request, res: Response) => {
   return res.status(401).json({ message: "Invalid password" });
 };
 
-export const verifyToken = (
-  req: Request,
-  res: Response,
-  next?: NextFunction
-) => {
+export const verifyToken = (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).json({ message: "Authorization header missing" });
@@ -43,9 +42,6 @@ export const verifyToken = (
   }
   try {
     jwt.verify(token, JWT_SECRET);
-    if (next) {
-      return next();
-    }
     return res.json({ valid: true });
   } catch {
     return res.status(401).json({ valid: false });

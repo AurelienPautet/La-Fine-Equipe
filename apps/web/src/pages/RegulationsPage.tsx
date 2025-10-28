@@ -6,8 +6,10 @@ import CreateCategoryButton from "../components/CreateCategoryButton";
 import ReorderCategories from "../components/ReorderCategories";
 import PageHeader from "../components/PageHeader";
 import { FaFileAlt, FaSpinner } from "react-icons/fa";
+import { useAuth } from "../components/AuthProvider";
 
 const RegulationsPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const { data: regulations, isLoading: regulationsLoading } = useRegulations();
   const { data: categories, isLoading: categoriesLoading } = useAllCategories();
 
@@ -39,10 +41,12 @@ const RegulationsPage: React.FC = () => {
         className="py-20"
       >
         {/* Control Buttons */}
-        <div className="mt-8 flex gap-4 flex-wrap justify-center">
-          <CreateCategoryButton />
-          <ReorderCategories />
-        </div>
+        {isAuthenticated && (
+          <div className="mt-8 flex gap-4 flex-wrap justify-center">
+            <CreateCategoryButton />
+            <ReorderCategories />
+          </div>
+        )}
       </PageHeader>
 
       <div className="container mx-auto px-4 py-12">
@@ -64,10 +68,14 @@ const RegulationsPage: React.FC = () => {
               <h3 className="text-2xl font-bold mb-4 text-base-content">
                 Aucune catégorie pour le moment
               </h3>
-              <p className="text-base-content/70 mb-8">
-                Créez une catégorie pour commencer !
-              </p>
-              <CreateCategoryButton />
+              {isAuthenticated && (
+                <>
+                  <p className="text-base-content/70 mb-8">
+                    Créez une catégorie pour commencer !
+                  </p>
+                  <CreateCategoryButton />
+                </>
+              )}
             </div>
           </div>
         )}

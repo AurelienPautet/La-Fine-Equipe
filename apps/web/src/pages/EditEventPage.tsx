@@ -6,8 +6,11 @@ import PageHeader from "../components/PageHeader";
 import MarkdownGuide from "../components/MarkdownGuide";
 import type { CreateEventsRequest } from "@lafineequipe/types";
 import { useEditEvents, useEvent } from "../hooks/EventHooks";
+import { useAuth } from "../components/AuthProvider";
+import LoginButton from "../components/LoginButton";
 
 const EditEventsPage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,6 +31,10 @@ const EditEventsPage: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (!isAuthenticated) {
+    return <LoginButton />;
+  }
 
   if (loading || !events) {
     return (

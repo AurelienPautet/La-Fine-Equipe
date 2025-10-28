@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import {
   FaHandsHelping,
   FaHome,
@@ -8,13 +9,27 @@ import {
   FaUsers,
 } from "react-icons/fa";
 
+import LoginModal from "./LoginModal";
+import { useAuth } from "./AuthProvider";
+
 const Header: React.FC = () => {
+  const [logoClicked, setLogoClicked] = useState(0);
+  const { logout, isAuthenticated } = useAuth();
+
+  const handleLogoClick = () => {
+    setLogoClicked(logoClicked + 1);
+    if (logoClicked >= 5) {
+      setLogoClicked(0);
+    }
+  };
+
   return (
     <div className="navbar h-10 bg-primary shadow-xl border-b-4 border-primary sticky top-0 z-[1000] px-4">
       <div className="flex-1">
         <Link
           to="/"
           className="flex items-center normal-case text-2xl font-bold text-secondary hover:text-primary-content transition-colors"
+          onClick={handleLogoClick}
         >
           <div className="avatar">
             <div className="w-12 h-12 rounded-full ">
@@ -26,6 +41,14 @@ const Header: React.FC = () => {
             </div>
           </div>
           <span className="ml-3 hidden md:block">La Fine Équipe</span>
+          {isAuthenticated && (
+            <button
+              className="btn btn-sm btn-secondary ml-4 normal-case"
+              onClick={logout}
+            >
+              Logout
+            </button>
+          )}
         </Link>
       </div>
       <div className="flex-none">
@@ -87,6 +110,12 @@ const Header: React.FC = () => {
           </li>
         </ul>
       </div>
+      <LoginModal
+        isOpen={logoClicked >= 5}
+        onClose={() => {
+          setLogoClicked(0);
+        }}
+      />
     </div>
   );
 };

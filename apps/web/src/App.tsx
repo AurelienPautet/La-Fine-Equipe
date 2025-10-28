@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const queryClient = new QueryClient();
 
+import { AuthProvider } from "./components/AuthProvider";
+
 import HomePage from "./pages/HomePage";
 import EventsPage from "./pages/EventsPage";
 import OurTeamPage from "./pages/OurTeamPage";
@@ -24,43 +26,45 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <QueryClientProvider client={queryClient}>
-        <div
-          data-theme="lafine"
-          className="min-h-screen bg-gradient-to-br from-accent to-base-100"
-        >
-          {/* Header/Navigation */}
-          <Header />
+        <AuthProvider>
+          <div
+            data-theme="lafine"
+            className="min-h-screen bg-gradient-to-br from-accent to-base-100"
+          >
+            {/* Header/Navigation */}
+            <Header />
 
-          {/* Main Content */}
-          <main className="min-h-screen">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/events" element={<EventsPage />} />
-              <Route path="/events/create" element={<CreateEventsPage />} />
-              <Route path="/events/edit/:slug" element={<EditEventsPage />} />
-              <Route path="/events/:slug" element={<EventPage />} />
-              <Route
-                path="/events/:slug/reservations"
-                element={<EventReservationsPage />}
-              />
-              <Route path="/regulations" element={<RegulationsPage />} />
-              <Route
-                path="/regulations/create"
-                element={<CreateRegulationPage />}
-              />
-              <Route
-                path="/regulations/edit/:slug"
-                element={<EditRegulationPage />}
-              />
-              <Route path="/regulations/:slug" element={<RegulationPage />} />
-              <Route path="/join" element={<JoinUsPage />} />
-              <Route path="/about" element={<OurTeamPage />} />
-            </Routes>
-          </main>
+            {/* Main Content */}
+            <main className="min-h-screen">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/events" element={<EventsPage />} />
+                <Route path="/events/create" element={<CreateEventsPage />} />
+                <Route path="/events/edit/:slug" element={<EditEventsPage />} />
+                <Route path="/events/:slug" element={<EventPage />} />
+                <Route
+                  path="/events/:slug/reservations"
+                  element={<EventReservationsPage />}
+                />
+                <Route path="/regulations" element={<RegulationsPage />} />
+                <Route
+                  path="/regulations/create"
+                  element={<CreateRegulationPage />}
+                />
+                <Route
+                  path="/regulations/edit/:slug"
+                  element={<EditRegulationPage />}
+                />
+                <Route path="/regulations/:slug" element={<RegulationPage />} />
+                <Route path="/join" element={<JoinUsPage />} />
+                <Route path="/about" element={<OurTeamPage />} />
+              </Routes>
+            </main>
 
-          {/* Footer */}
-          <Footer />
-        </div>
+            {/* Footer */}
+            <Footer />
+          </div>
+        </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>
   );
