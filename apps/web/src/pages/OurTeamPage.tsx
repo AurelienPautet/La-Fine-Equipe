@@ -2,7 +2,6 @@ import React from "react";
 import {
   FaUsers,
   FaHandshake,
-  FaLightbulb,
   FaHeart,
   FaBullseye,
   FaChess,
@@ -34,7 +33,7 @@ const OurTeamPage: React.FC = () => {
       {/* Hero Section */}
       <PageHeader
         title="À Propos de La Fine Équipe"
-        subtitle="Découvrez notre histoire, nos valeurs et notre passion pour l'aventure collective"
+        subtitle="Découvrez notre histoire et les membres qui composent notre équipe."
         icon={<FaUsers className="w-12 h-12" />}
         className="py-20"
       >
@@ -60,10 +59,10 @@ const OurTeamPage: React.FC = () => {
 
               <div className="prose lg:prose-lg max-w-none">
                 <p className="text-lg text-base-content leading-relaxed mb-6">
-                  🦎 <strong>La Fine Équipe</strong> est une association
-                  étudiante dynamique et passionnée, dédiée à la promotion de
-                  l'esprit d'équipe et à l'organisation d'événements mémorables
-                  pour la communauté universitaire.
+                  <strong>La Fine Équipe</strong> est une association étudiante
+                  de l'université Lyon 3 dynamique et passionnée, dédiée à la
+                  promotion de l'esprit d'équipe et à l'organisation
+                  d'événements mémorables pour la communauté universitaire.
                 </p>
                 <p className="text-lg text-base-content leading-relaxed mb-6">
                   Fondée sur des valeurs de{" "}

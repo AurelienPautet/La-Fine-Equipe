@@ -14,7 +14,7 @@ const router = Router();
 
 router.post("/", authMiddleware, createDivision);
 router.put("/:id", authMiddleware, editDivision);
-router.patch("/:id/reorder", authMiddleware, reorderDivisions);
+router.put("/reorder", authMiddleware, reorderDivisions);
 router.delete("/:id", authMiddleware, deleteDivision);
 router.get("/", getDivisions);
 
