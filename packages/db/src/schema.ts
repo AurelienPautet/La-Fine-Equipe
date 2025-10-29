@@ -1,4 +1,3 @@
-import { real } from "drizzle-orm/pg-core";
 import {
   pgTable,
   text,
@@ -6,6 +5,7 @@ import {
   timestamp,
   integer,
   boolean,
+  real,
 } from "drizzle-orm/pg-core";
 
 export const tags = pgTable("LaFineEquipe-tags", {
@@ -105,3 +105,26 @@ export const simpleMembersSettings = pgTable(
       .$onUpdateFn(() => new Date()),
   }
 );
+
+export const divisions = pgTable("LaFineEquipe-divisions", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  color: text("color").notNull(),
+  order: integer("order").notNull().default(0),
+  titleSchema: text("title_schema").notNull(),
+  deletedAt: timestamp("deleted_at"),
+});
+
+export const teamMembers = pgTable("LaFineEquipe-team_members", {
+  id: serial("id").primaryKey(),
+  divisionId: integer("division_id")
+    .references(() => divisions.id)
+    .notNull(),
+  name: text("name").notNull(),
+  role: text("role").notNull(),
+  email: text("email"),
+  photoUrl: text("photo_url"),
+  order: integer("order").notNull().default(0),
+  isActive: boolean("is_active").notNull().default(true),
+  deletedAt: timestamp("deleted_at"),
+});

@@ -14,6 +14,8 @@ import regulationRoutes from "./routes/regulationRoutes";
 import categoryRoutes from "./routes/categoryRoutes";
 import authRoutes from "./routes/authRoutes";
 import membersSettingsRoutes from "./routes/membersSettingsRoutes";
+import divisionRoutes from "./routes/divisionRoutes";
+import teamMemberRoutes from "./routes/teamMemberRoutes";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -49,6 +51,8 @@ app.use("/api/reservations", reservationRoutes);
 app.use("/api/regulations", regulationRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/members-settings", membersSettingsRoutes);
+app.use("/api/divisions", divisionRoutes);
+app.use("/api/team-members", teamMemberRoutes);
 
 const PORT = process.env.PORT || 4000;
 

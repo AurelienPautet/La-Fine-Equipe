@@ -46,3 +46,27 @@ export type {
   EditActifMembersSettingsRequest,
   EditSimpleMembersSettingsRequest,
 } from "./membersSettings";
+
+export type {
+  TeamMember,
+  CreateTeamMemberRequest,
+  EditTeamMemberRequest,
+  ReorderTeamMembersRequest,
+} from "./teamMember";
+export {
+  createTeamMemberRequestSchema,
+  editTeamMemberRequestSchema,
+  reorderTeamMembersRequestSchema,
+} from "./teamMember";
+
+export type {
+  Division,
+  CreateDivisionRequest,
+  EditDivisionRequest,
+  ReorderDivisionsRequest,
+} from "./division";
+export {
+  createDivisionRequestSchema,
+  editDivisionRequestSchema,
+  reorderDivisionsRequestSchema,
+} from "./division";
