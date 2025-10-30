@@ -9,7 +9,6 @@ import PageHeader from "../components/PageHeader";
 import { FaChartColumn } from "react-icons/fa6";
 import DeleteButton from "../components/DeleteButton";
 import { useAuth } from "../components/AuthProvider";
-import LoginButton from "../components/LoginButton";
 
 const EventsPage: React.FC = () => {
   const { isAuthenticated } = useAuth();

@@ -22,6 +22,7 @@ const getEventsWithTags = async (
       thumbnailUrl: events.thumbnailUrl,
       createdAt: events.createdAt,
       updatedAt: events.updatedAt,
+      memorable: events.memorable,
       tags: { id: tags.id, name: tags.name },
     })
     .from(events)
@@ -61,6 +62,7 @@ const getEventsWithTags = async (
         thumbnailUrl: row.thumbnailUrl,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
+        memorable: row.memorable,
         tags: row.tags ? [row.tags] : [],
       });
     } else {
@@ -119,6 +121,39 @@ export const getLatestsEvents = async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ success: false, error: "Failed to fetch latests events" });
+  }
+};
+
+export const getMemorableEvents = async (req: Request, res: Response) => {
+  try {
+    const memorableEvents = await getEventsWithTags(
+      and(eq(events.memorable, true), isNull(events.deletedAt)),
+      desc(events.startDate)
+    );
+    res.status(200).json({ success: true, data: memorableEvents });
+  } catch (error) {
+    console.error("Error fetching memorable events:", error);
+    res.status(500).json({ success: false, error: error });
+  }
+};
+
+export const changeEventMemorability = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { memorable } = req.body;
+    console.error("Memorability Request Body:", req.body);
+
+    const [updatedEvent] = await db
+      .update(events)
+      .set({ memorable })
+      .where(eq(events.id, Number(id)))
+      .returning()
+      .execute();
+
+    res.status(200).json({ success: true, data: updatedEvent });
+  } catch (error) {
+    console.error("Error changing event memorability:", error);
+    res.status(500).json({ success: false, error: error });
   }
 };
 

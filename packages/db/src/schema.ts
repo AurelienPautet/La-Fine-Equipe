@@ -25,6 +25,7 @@ export const events = pgTable("LaFineEquipe-events", {
   location: text("location").notNull(),
   maxAttendees: integer("max_attendees"),
   thumbnailUrl: text("thumbnail_url"),
+  memorable: boolean("memorable").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

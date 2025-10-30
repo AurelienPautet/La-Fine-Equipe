@@ -6,6 +6,8 @@ import {
   getEvents,
   editEventsMutation,
   deleteEventMutation,
+  getMemorableEvents,
+  changeEventMemorabilityMutation,
 } from "../endpoints/EventsEnpoints";
 import type { EventsWithTags } from "@lafineequipe/types";
 
@@ -27,6 +29,25 @@ export const useLatestsEvents = () => {
   return useQuery<EventsWithTags[], Error>({
     queryKey: ["latests-events"],
     queryFn: () => getLatestsEvents(),
+  });
+};
+
+export const useMemorableEvents = () => {
+  return useQuery<EventsWithTags[], Error>({
+    queryKey: ["memorable-events"],
+    queryFn: () => getMemorableEvents(),
+  });
+};
+
+export const useChangeEventMemorability = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: changeEventMemorabilityMutation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["latests-events"] });
+      queryClient.invalidateQueries({ queryKey: ["memorable-events"] });
+    },
   });
 };
 

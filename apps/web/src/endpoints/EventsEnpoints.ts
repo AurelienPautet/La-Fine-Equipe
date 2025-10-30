@@ -45,6 +45,37 @@ export async function getLatestsEvents(): Promise<EventsWithTags[]> {
   return events.data;
 }
 
+export async function getMemorableEvents(): Promise<EventsWithTags[]> {
+  const response = await fetch(`${API_URL}/api/events/memorable`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch memorable events");
+  }
+  const events = await response.json();
+  return events.data;
+}
+
+export async function changeEventMemorabilityMutation({
+  id,
+  memorable,
+}: {
+  id: number;
+  memorable: boolean;
+}): Promise<EventsWithTags> {
+  const response = await fetch(`${API_URL}/api/events/${id}/memorable`, {
+    method: "PUT",
+    headers: {
+      ...getAuthHeaders(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ memorable }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to change event memorability");
+  }
+  const events = await response.json();
+  return events.data;
+}
+
 export async function postEventsMutation(
   eventsData: CreateEventsRequest
 ): Promise<EventsWithTags> {

@@ -9,12 +9,17 @@ import {
   FaHandsHelping,
 } from "react-icons/fa";
 import EventsCard from "../components/EventCard";
-import { useLatestsEvents } from "../hooks/EventHooks";
+import { useLatestsEvents, useMemorableEvents } from "../hooks/EventHooks";
 import FigureCard from "../components/FigureCard";
 import { MdEvent } from "react-icons/md";
 
 const HomePage: React.FC = () => {
   const { data: latestsEvents, error, isLoading } = useLatestsEvents();
+  const {
+    data: memorableEvents,
+    error: memorableError,
+    isLoading: memorableLoading,
+  } = useMemorableEvents();
 
   return (
     <div className="min-h-screen">
@@ -66,7 +71,7 @@ const HomePage: React.FC = () => {
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
           </div>
-          <div className="flex flex-col md:flex-row justify-center gap-3 md:gap-10">
+          <div className="ml-auto grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 md:px-20 md:gap-10">
             {isLoading && (
               <>
                 <EventsCard
@@ -89,9 +94,7 @@ const HomePage: React.FC = () => {
               <p className="text-gray-500">Aucun événement à venir.</p>
             ) : (
               latestsEvents?.map((event) =>
-                event ? (
-                  <EventsCard className="w-1/3" key={event.id} events={event} />
-                ) : null
+                event ? <EventsCard key={event.id} events={event} /> : null
               )
             )}
           </div>
@@ -236,7 +239,19 @@ DOCUMENTAIRE (75% des sièges)"
             <MdEvent className="w-10 h-10" />
             Nos Événements Marquants
           </h2>
-          <div></div>
+          {memorableLoading && (
+            <div className="loading loading-spinner text-primary mx-auto"></div>
+          )}
+          {memorableError && (
+            <p className="text-red-500">
+              Erreur de chargement des événements marquants.
+            </p>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {memorableEvents?.map((event) => (
+              <EventsCard key={event.id} events={event} />
+            ))}
+          </div>
         </div>
       </section>
     </div>
