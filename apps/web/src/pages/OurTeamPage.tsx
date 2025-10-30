@@ -42,35 +42,41 @@ const OurTeamPage: React.FC = () => {
                 </h2>
               </div>
 
-              <div className="prose lg:prose-lg max-w-none">
-                <p className="text-lg text-base-content leading-relaxed mb-6">
-                  <strong>La Fine Équipe</strong> est une association étudiante
-                  de l'université Lyon 3 dynamique et passionnée, dédiée à la
-                  promotion de l'esprit d'équipe et à l'organisation
-                  d'événements mémorables pour la communauté universitaire.
-                </p>
-                <p className="text-lg text-base-content leading-relaxed mb-6">
-                  Fondée sur des valeurs de{" "}
-                  <span className="text-primary font-semibold">
-                    collaboration
+              <div className="space-y-6 text-base-content leading-relaxed text-lg">
+                <p>
+                  <span className="font-bold text-primary">
+                    Créée en novembre 2023
                   </span>
-                  , d'
-                  <span className="text-primary font-semibold">
-                    innovation
+                  , au en vue des élections au Conseil de la faculté de Droit,
+                  la liste de La Fine Équipe a rapidement évolué, pour devenir
+                  dès la rentrée 2024 une des
+                  <span className="font-semibold text-secondary">
+                    {" "}
+                    principales associations étudiantes{" "}
+                  </span>
+                  de l'Université Lyon III. De portée
+                  <span className="font-bold text-primary"> généraliste</span>,
+                  nous organisons des
+                  <span className="font-semibold text-secondary">
+                    {" "}
+                    conférences, des ateliers de conversation
+                  </span>
+                  , et agissons au travers de notre
+                  <span className="font-semibold text-secondary">
+                    {" "}
+                    pôle handicap
+                  </span>
+                  .
+                </p>
+                <p>
+                  Nous travaillons aussi à faire{" "}
+                  <span className="font-bold text-primary">
+                    participer directement
                   </span>{" "}
-                  et de{" "}
-                  <span className="text-primary font-semibold">
-                    convivialité
-                  </span>
-                  , notre équipe s'efforce de créer un environnement stimulant
-                  où chacun peut s'épanouir et contribuer à des projets
-                  enrichissants.
-                </p>
-                <p className="text-lg text-base-content leading-relaxed">
-                  Que ce soit à travers des tournois sportifs, des soirées
-                  thématiques, des ateliers créatifs ou des actions solidaires,
-                  nous mettons tout en œuvre pour offrir des expériences uniques
-                  et fédératrices à nos membres.
+                  les étudiants à la vie de l'Université , en proposant des
+                  listes d'étudiants ordinaires, sur une ligne apolitique et
+                  apartisane , aux élections des différents organes
+                  représentatifs des usagers .
                 </p>
               </div>
             </div>
@@ -78,65 +84,6 @@ const OurTeamPage: React.FC = () => {
 
           {/* Team Members Section */}
           <DivisionsDisplay />
-
-          {/* Activities Section 
-          
-                    <div className="card bg-base-100 shadow-2xl border-2 border-primary/20">
-            <div className="card-body p-8">
-              <h2 className="text-4xl font-bold text-secondary mb-6 text-center">
-                <FaBullseye className="inline w-8 h-8 mr-3" />
-                Nos Activités
-              </h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-primary rounded-full"></div>
-                    <span className="text-lg">
-                      <FaChess className="inline w-4 h-4 mr-2" />
-                      Tournois d'échecs
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-primary rounded-full"></div>
-                    <span className="text-lg">
-                      <FaHeart className="inline w-4 h-4 mr-2" />
-                      Soirées thématiques
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-primary rounded-full"></div>
-                    <span className="text-lg">
-                      <FaPalette className="inline w-4 h-4 mr-2" />
-                      Ateliers créatifs
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-primary rounded-full"></div>
-                    <span className="text-lg">
-                      <FaHandshake className="inline w-4 h-4 mr-2" />
-                      Actions solidaires
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-primary rounded-full"></div>
-                    <span className="text-lg">
-                      <FaTrophy className="inline w-4 h-4 mr-2" />
-                      Compétitions sportives
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-primary rounded-full"></div>
-                    <span className="text-lg">
-                      <FaBookOpen className="inline w-4 h-4 mr-2" />
-                      Événements culturels
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>*/}
         </div>
       </div>
     </div>
