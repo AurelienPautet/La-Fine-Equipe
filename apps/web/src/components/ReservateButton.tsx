@@ -9,6 +9,8 @@ interface ReservateButtonProps {
   eventStartDate?: Date;
   eventEndDate?: Date;
   eventLocation?: string;
+  color?: "primary" | "secondary";
+  size?: "sm" | "md" | "lg";
 }
 
 const ReservateButton: React.FC<ReservateButtonProps> = ({
@@ -17,6 +19,8 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
   eventStartDate,
   eventEndDate,
   eventLocation,
+  color = "primary",
+  size = "lg",
 }) => {
   const createReservationMutation = useCreateReservation();
 
@@ -93,10 +97,14 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
     );
   };
 
+  if (eventEndDate && new Date(eventStartDate!) < new Date()) {
+    return null;
+  }
+
   return (
     <div>
       <button
-        className="btn btn-primarybtn btn-primary btn-lg text-primary-content shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2"
+        className={`btn btn-${color} btn-${size} text-primary-content shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2`}
         onClick={openModal}
       >
         Réserver ma place

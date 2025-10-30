@@ -7,6 +7,7 @@ import datesToString from "../utils/datesToString";
 
 import { useChangeEventMemorability } from "../hooks/EventHooks";
 import { useAuth } from "./AuthProvider";
+import ReservateButton from "./ReservateButton";
 
 const EventsCard: React.FC<{
   events: EventsWithTags | undefined;
@@ -29,7 +30,7 @@ const EventsCard: React.FC<{
             {/* Title skeleton */}
             <div className="skeleton h-6 w-3/4 rounded"></div>
 
-            {/* Metadata skeleton */}
+            {/* events skeleton */}
             <div className="space-y-2">
               <div className="skeleton h-4 w-1/2 rounded"></div>
               <div className="skeleton h-4 w-2/3 rounded"></div>
@@ -103,7 +104,7 @@ const EventsCard: React.FC<{
           </h2>
         </div>
 
-        {/* Metadata Section */}
+        {/* events Section */}
         <div className="flex-1 space-y-1 sm:space-y-1.5 text-xs sm:text-sm">
           {/* Author */}
           {events.author && (
@@ -150,14 +151,23 @@ const EventsCard: React.FC<{
         )}
 
         {/* Button */}
-        <div className="card-actions mt-2 sm:mt-3">
+        <div className="card-actions flex flex-row flex-nowrap mt-2 sm:mt-3">
           <Link
             to={`/events/${events.slug}`}
-            className="btn btn-primary btn-sm w-full sm:w-auto gap-2 shadow-md hover:shadow-lg transition-all"
+            className="btn btn-primary btn-sm gap-2 shadow-md hover:shadow-lg transition-all"
           >
             <span>Voir l&apos;événement</span>
             <FaArrowRight className="w-3 h-3" />
           </Link>
+          <ReservateButton
+            eventId={events.id}
+            eventTitle={events.title}
+            eventStartDate={events.startDate}
+            eventEndDate={events.endDate}
+            eventLocation={events.location}
+            color="secondary"
+            size="sm"
+          />
         </div>
       </div>
     </div>

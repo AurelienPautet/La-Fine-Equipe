@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { FaBook, FaPlus, FaSpinner } from "react-icons/fa";
+import { FaCalendarCheck, FaPlus, FaSpinner } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import EventsCard from "../components/EventCard";
 import type { EventsWithTags } from "@lafineequipe/types";
@@ -39,7 +39,7 @@ const EventsPage: React.FC = () => {
         <PageHeader
           title="Nos Events"
           subtitle="Découvrez nos derniers events, événements et aventures de La Fine Équipe"
-          icon={<FaBook className="w-12 h-12" />}
+          icon={<FaCalendarCheck className="w-12 h-12" />}
           className="py-20 w-full"
         />
         <div className="flex flex-col items-center gap-4">
@@ -54,7 +54,7 @@ const EventsPage: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="alert alert-error max-w-md">
-          <FaBook className="w-6 h-6" />
+          <FaCalendarCheck className="w-6 h-6" />
           <span>
             Erreur lors du chargement des événements: {error?.message}
           </span>
@@ -69,7 +69,7 @@ const EventsPage: React.FC = () => {
       <PageHeader
         title="Événements"
         subtitle="Découvrez les derniers événements de La Fine Équipe"
-        icon={<FaBook className="w-12 h-12" />}
+        icon={<FaCalendarCheck className="w-12 h-12" />}
         className="py-20"
       >
         {/* Create New Events Button */}
@@ -132,7 +132,7 @@ const EventsPage: React.FC = () => {
             {upcomingEvents.length === 0 && pastEvents.length === 0 && (
               <div className="text-center">
                 <div className="bg-base-100 rounded-xl p-12 shadow-lg">
-                  <FaBook className="w-16 h-16 mx-auto mb-6 text-primary/50" />
+                  <FaCalendarCheck className="w-16 h-16 mx-auto mb-6 text-primary/50" />
                   <h3 className="text-2xl font-bold mb-4 text-base-content">
                     Aucun événement pour le moment
                   </h3>
@@ -157,7 +157,7 @@ const EventsPage: React.FC = () => {
         ) : (
           <div className="text-center">
             <div className="bg-base-100 rounded-xl p-12 shadow-lg">
-              <FaBook className="w-16 h-16 mx-auto mb-6 text-primary/50" />
+              <FaCalendarCheck className="w-16 h-16 mx-auto mb-6 text-primary/50" />
               <h3 className="text-2xl font-bold mb-4 text-base-content">
                 Aucun événement pour le moment
               </h3>

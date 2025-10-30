@@ -2,9 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
+  FaCalendarCheck,
   FaHandsHelping,
   FaHome,
-  FaNewspaper,
   FaScroll,
   FaSignOutAlt,
   FaUsers,
@@ -93,7 +93,7 @@ const Header: React.FC = () => {
               to="/events"
               className="hover:bg-primary hover:text-primary-content transition-all duration-300 rounded-lg mx-1 flex items-center gap-2"
             >
-              <FaNewspaper className="w-4 h-4" />
+              <FaCalendarCheck className="w-4 h-4" />
               <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap md:max-w-none">
                 Événements
               </span>
@@ -106,7 +106,7 @@ const Header: React.FC = () => {
             >
               <FaScroll className="w-4 h-4" />
               <span className="md:block overflow-hidden max-w-0 group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap md:max-w-none">
-                Règlementations
+                Règlements
               </span>
             </Link>
           </li>
