@@ -113,7 +113,7 @@ const Header: React.FC = () => {
         </ul>
       </div>
       <LoginModal
-        isOpen={logoClicked >= 5}
+        isOpen={logoClicked >= 5 && !isAuthenticated}
         onClose={() => {
           setLogoClicked(0);
         }}
