@@ -51,8 +51,8 @@ const RegulationPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-accent to-base-200">
       {/* Header */}
       <PageHeader
-        title="Règlements"
-        subtitle="Consultez les règlements de La Fine Équipe"
+        title="Règlement"
+        subtitle={` ${regulation.title}`}
         icon={<FaEdit className="w-10 h-10" />}
       />
 

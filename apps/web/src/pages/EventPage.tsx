@@ -68,8 +68,8 @@ const EventsPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-accent to-base-200">
       {/* Header */}
       <PageHeader
-        title="Events"
-        subtitle="Découvrez les dernières nouvelles de La Fine Équipe"
+        title="Événement"
+        subtitle={` ${Events.title}`}
         icon={<FaEdit className="w-10 h-10" />}
       />
 

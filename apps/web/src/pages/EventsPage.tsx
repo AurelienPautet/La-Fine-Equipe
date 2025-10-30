@@ -67,8 +67,8 @@ const EventsPage: React.FC = () => {
     <div className="min-h-screen">
       {/* Header Section */}
       <PageHeader
-        title="Nos Events"
-        subtitle="Découvrez nos derniers events, événements et aventures de La Fine Équipe"
+        title="Événements"
+        subtitle="Découvrez les derniers événements de La Fine Équipe"
         icon={<FaBook className="w-12 h-12" />}
         className="py-20"
       >

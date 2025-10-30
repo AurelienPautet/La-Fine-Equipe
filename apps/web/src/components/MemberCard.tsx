@@ -36,7 +36,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       />
       <div className="card-body p-0 items-center text-center">
         <div className="flex w-full items-start mt-2 flex-row">
-          <Tie className="flex-none w-12 h-32" color={division.color} />
+          <Tie className="flex-none w-12 h-24" color={division.color} />
           <div className="flex items-start flex-col">
             <h3 className="text-xl flex font-bold text-left text-base-content mt-2 uppercase ">
               {member.firstName} <br /> {member.lastName}

@@ -36,7 +36,7 @@ const HomePage: React.FC = () => {
                 />
               </div>
             </div>
-            <p className="text-xl mb-8 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+            <p className="text-xl mb-8 max-w-2xl text-secondary opacity-90 mx-auto leading-relaxed drop-shadow-md">
               Bienvenue sur le site de La Fine Équipe ! Nous sommes un groupe
               passionné et dévoué, travaillant ensemble pour atteindre nos
               objectifs. Découvrez notre univers unique et nos aventures.

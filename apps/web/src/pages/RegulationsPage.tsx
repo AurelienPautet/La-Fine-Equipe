@@ -36,7 +36,7 @@ const RegulationsPage: React.FC = () => {
     <div className="min-h-screen">
       <PageHeader
         title="Règlements"
-        subtitle="Consultez tous les règlements de La Fine Équipe"
+        subtitle="Vous retrouverez ici les statuts de l’Association et l’ensemble des textes de droit interne en découlant. Pour toute demande de copie, merci de vous adresser au secrétaire ou de nous contacter à l’adresse courriel indiquée en pied de page."
         icon={<FaFileAlt className="w-12 h-12" />}
         className="py-20"
       >
