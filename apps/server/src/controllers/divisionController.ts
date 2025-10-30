@@ -60,8 +60,8 @@ export const reorderDivisions = async (req: Request, res: Response) => {
         .set({ order })
         .where(eq(divisions.id, id))
         .returning();
-      res.status(200).json({ success: true });
     }
+    res.status(200).json({ success: true });
   } catch (error: unknown) {
     const err = error as { name?: string; errors?: unknown };
     if (err.name === "ZodError") {
@@ -97,7 +97,11 @@ export const deleteDivision = async (req: Request, res: Response) => {
         .status(400)
         .json({ success: false, error: "Invalid division ID" });
     }
-    await db.delete(divisions).where(eq(divisions.id, divisionId)).execute();
+    await db
+      .update(divisions)
+      .set({ deletedAt: new Date() })
+      .where(eq(divisions.id, divisionId))
+      .returning();
     res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error deleting division:", error);

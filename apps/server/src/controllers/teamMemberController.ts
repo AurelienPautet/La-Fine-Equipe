@@ -12,10 +12,12 @@ import { teamMembers } from "@lafineequipe/db/src/schema";
 export const createTeamMember = async (req: Request, res: Response) => {
   try {
     const validatedData = createTeamMemberRequestSchema.parse(req.body);
-    const { name, role, email, photoUrl, divisionId, isActive } = validatedData;
+    const { firstName, lastName, role, photoUrl, divisionId, isActive } =
+      validatedData;
+    const email = validatedData.email ?? null;
     const result = await db.execute(sql`
-        INSERT INTO ${teamMembers} (name, role, email, photo_url, division_id, "order", is_active)
-        VALUES (${name}, ${role}, ${email}, ${photoUrl}, ${divisionId}, (SELECT COALESCE(MAX("order"), 0) + 1 FROM ${teamMembers}), ${isActive})
+        INSERT INTO ${teamMembers} (first_name, last_name, role, email, photo_url, division_id, "order", is_active)
+        VALUES (${firstName}, ${lastName}, ${role}, ${email}, ${photoUrl}, ${divisionId}, (SELECT COALESCE(MAX("order"), 0) + 1 FROM ${teamMembers}), ${isActive})
         RETURNING *
       `);
     const teamMember = result.rows[0];
@@ -34,15 +36,34 @@ export const createTeamMember = async (req: Request, res: Response) => {
 export const editTeamMember = async (req: Request, res: Response) => {
   try {
     const validatedData = editTeamMemberRequestSchema.parse(req.body);
-    const { id, name, role, email, photoUrl, divisionId, isActive } =
-      validatedData;
+    const {
+      id,
+      firstName,
+      lastName,
+      role,
+      email,
+      photoUrl,
+      divisionId,
+      isActive,
+    } = validatedData;
+
+    const updateData = {
+      firstName,
+      lastName,
+      role,
+      email: email ?? null,
+      photoUrl,
+      divisionId,
+      isActive,
+    };
     const [teamMember] = await db
       .update(teamMembers)
-      .set({ name, role, email, photoUrl, divisionId, isActive })
+      .set(updateData)
       .where(eq(teamMembers.id, id))
       .returning();
     res.status(200).json({ success: true, data: teamMember });
   } catch (error: unknown) {
+    console.error("Error editing team member:", error);
     const err = error as { name?: string; errors?: unknown };
     if (err.name === "ZodError") {
       return res.status(400).json({ success: false, errors: err.errors });
@@ -62,8 +83,8 @@ export const reorderTeamMembers = async (req: Request, res: Response) => {
         .set({ order })
         .where(eq(teamMembers.id, id))
         .execute();
-      res.status(200).json({ success: true });
     }
+    res.status(200).json({ success: true });
   } catch (error: unknown) {
     const err = error as { name?: string; errors?: unknown };
     if (err.name === "ZodError") {

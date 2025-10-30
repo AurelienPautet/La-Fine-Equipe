@@ -20,7 +20,8 @@ export async function getAllDivisions(): Promise<Division[]> {
   if (!response.ok) {
     throw new Error("Failed to fetch divisions");
   }
-  return response.json();
+  const result = await response.json();
+  return result.data;
 }
 
 export async function postDivision(

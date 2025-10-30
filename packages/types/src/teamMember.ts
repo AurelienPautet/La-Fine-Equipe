@@ -5,10 +5,15 @@ import { teamMembers } from "@lafineequipe/db/src/schema";
 export type TeamMember = InferSelectModel<typeof teamMembers>;
 
 export const createTeamMemberRequestSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   divisionId: z.number().min(1, "Division ID is required"),
   role: z.string().min(1, "Role is required"),
-  email: z.string().email("Invalid email address").optional(),
+  email: z
+    .string()
+    .email("Invalid email address")
+    .optional()
+    .transform((val) => (val === "" ? undefined : val)),
   photoUrl: z.string().url("Invalid URL"),
   isActive: z.boolean().default(true),
 });

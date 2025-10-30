@@ -79,8 +79,9 @@ const OurTeamPage: React.FC = () => {
           {/* Team Members Section */}
           <DivisionsDisplay />
 
-          {/* Activities Section */}
-          <div className="card bg-base-100 shadow-2xl border-2 border-primary/20">
+          {/* Activities Section 
+          
+                    <div className="card bg-base-100 shadow-2xl border-2 border-primary/20">
             <div className="card-body p-8">
               <h2 className="text-4xl font-bold text-secondary mb-6 text-center">
                 <FaBullseye className="inline w-8 h-8 mr-3" />
@@ -135,7 +136,7 @@ const OurTeamPage: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div>*/}
         </div>
       </div>
     </div>

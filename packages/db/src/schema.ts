@@ -120,7 +120,8 @@ export const teamMembers = pgTable("LaFineEquipe-team_members", {
   divisionId: integer("division_id")
     .references(() => divisions.id)
     .notNull(),
-  name: text("name").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
   role: text("role").notNull(),
   email: text("email"),
   photoUrl: text("photo_url"),

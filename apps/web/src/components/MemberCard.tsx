@@ -1,106 +1,90 @@
 import React from "react";
-import { FaInstagram, FaUser } from "react-icons/fa";
-
-interface Member {
-  id: number;
-  name: string;
-  role: string;
-  photo: string;
-  instagram?: string;
-}
+import { FaEdit, FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import type { Division, TeamMember } from "@lafineequipe/types";
+import Tie from "./Tie";
+import DeleteButton from "./DeleteButton";
 
 interface MemberCardProps {
-  student: Member;
-  size?: "small" | "medium" | "large";
-  showSocial?: boolean;
+  member: TeamMember;
+  isAdmin?: boolean;
+  division: Division;
+  onEdit?: (m: TeamMember) => void;
+  onDelete?: (id: number) => Promise<void>;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 }
 
 const MemberCard: React.FC<MemberCardProps> = ({
-  student,
-  size = "medium",
-  showSocial = true,
+  member,
+  isAdmin = false,
+  division,
+  onEdit,
+  onDelete,
+  onMoveUp,
+  onMoveDown,
 }) => {
-  // Size configurations
-  const sizeConfig = {
-    small: {
-      cardClass:
-        "card bg-base-100 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300",
-      avatarSize: "w-16 h-16",
-      titleSize: "text-lg",
-      roleSize: "text-sm",
-      padding: "px-4 pt-4",
-    },
-    medium: {
-      cardClass:
-        "card bg-base-100 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-primary",
-      avatarSize: "w-24 h-24",
-      titleSize: "text-xl",
-      roleSize: "text-base",
-      padding: "px-6 pt-6",
-    },
-    large: {
-      cardClass:
-        "card bg-base-100 shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-primary",
-      avatarSize: "w-32 h-32",
-      titleSize: "text-2xl",
-      roleSize: "text-lg",
-      padding: "px-8 pt-8",
-    },
-  };
-
-  const config = sizeConfig[size];
+  const title = division.titleSchema
+    ?.replace("[role]", member.role)
+    .replace("[pole]", division.name);
 
   return (
-    <div className={config.cardClass}>
-      <figure className={config.padding}>
-        <div className="avatar">
-          <div
-            className={`${config.avatarSize} rounded-full ring ring-primary ring-offset-base-100 ring-offset-4`}
-          >
-            <img
-              src={student.photo}
-              alt={student.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "/logo.png";
-              }}
-            />
-          </div>
-        </div>
-      </figure>
-
-      <div className="card-body text-center">
-        <h3
-          className={`card-title ${config.titleSize} text-secondary justify-center`}
-        >
-          {student.name}
-        </h3>
-        <p className={`${config.roleSize} text-primary font-medium`}>
-          {student.role}
-        </p>
-
-        {/* Role Badge */}
-        <div className="card-actions justify-center mt-2">
-          <div className="badge badge-primary badge-outline flex items-center gap-1">
-            <FaUser className="w-3 h-3" />
-            {student.role}
+    <div className="flex p-8 items-center w-64 card bg-base-100 shadow-xl hover:shadow-2xl border-2 border-transparent hover:border-primary transition-all duration-300">
+      <img
+        className="w-20 h-20 rounded-full object-contain "
+        src={member.photoUrl ?? "/logo.png"}
+        alt={member.firstName}
+      />
+      <div className="card-body p-0 items-center text-center">
+        <div className="flex w-full items-start mt-2 flex-row">
+          <Tie className="flex-none w-12 h-32" color={division.color} />
+          <div className="flex items-start flex-col">
+            <h3 className="text-xl flex font-bold text-left text-base-content mt-2 uppercase ">
+              {member.firstName} <br /> {member.lastName}
+            </h3>
+            <p className="text-primary font-semibold text-left text-base">
+              {title}
+            </p>
+            {member.email && (
+              <a
+                href={`mailto:${member.email}`}
+                className="link no-underline text-sm opacity-70"
+              >
+                {member.email}
+              </a>
+            )}
           </div>
         </div>
 
-        {/* Social Links */}
-        {showSocial && student.instagram && (
-          <div className="card-actions justify-center mt-2">
-            <a
-              href={student.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex justify-center items-center   hover:scale-110 transition-all duration-300"
-              aria-label={`Instagram de ${student.name}`}
+        {isAdmin && (
+          <div className="flex gap-2 mt-2">
+            <button
+              className="btn btn-sm btn-outline btn-info"
+              onClick={() => onEdit?.(member)}
+              title="Éditer"
             >
-              <FaInstagram className="w-4 h-4" />
-              <span className="">@{student.instagram.split("/").pop()}</span>
-            </a>
+              <FaEdit />
+            </button>
+            <DeleteButton
+              id={member.id}
+              entityName={`${member.firstName} ${member.lastName}`}
+              deleteMutation={onDelete ? onDelete : () => Promise.resolve()}
+              className="btn-sm"
+              confirmMessage={`Êtes-vous sûr de vouloir supprimer le membre "${member.firstName} ${member.lastName}" ? Cette action est irréversible.`}
+            />
+            <button
+              className="btn btn-sm btn-ghost"
+              onClick={() => onMoveUp?.()}
+              title="Monter"
+            >
+              <FaArrowLeft />
+            </button>
+            <button
+              className="btn btn-sm btn-ghost"
+              onClick={() => onMoveDown?.()}
+              title="Descendre"
+            >
+              <FaArrowRight />
+            </button>
           </div>
         )}
       </div>

@@ -67,7 +67,8 @@ export async function getAllTeamMembers(): Promise<TeamMember[]> {
   if (!response.ok) {
     throw new Error("Failed to fetch team members");
   }
-  return response.json();
+  const result = await response.json();
+  return result.data;
 }
 
 export async function reorderTeamMembers(

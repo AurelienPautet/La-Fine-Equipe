@@ -1,16 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDropzone, type FileWithPath } from "react-dropzone";
 import { useUploadFile, useDeleteFile } from "../hooks/FileHooks";
-import {
-  FaEdit,
-  FaSave,
-  FaEye,
-  FaUser,
-  FaFileUpload,
-  FaImage,
-} from "react-icons/fa";
+import { FaEdit, FaSave, FaEye, FaUser, FaImage } from "react-icons/fa";
 import EventsDisplay from "./EventDisplay";
 import DateTimePicker from "./DateTimePicker";
+import UploadFileButton from "./UploadFileButton";
 import "cally";
 import type {
   EventsWithTags,
@@ -294,36 +288,28 @@ const EventsForm: React.FC<EventsFormProps> = ({
                   <label className="label">
                     <span className="label-text text-sm font-semibold flex items-center gap-2">
                       <FaImage className="w-4 h-4" />
-                      URL de la miniature de l'évenemnt (optionnel)
+                      URL de la miniature de l'évènement (optionnel)
                     </span>
                   </label>
-                  <div className="flex flex-row items-center gap-2 ">
+                  <div className="flex flex-row items-center gap-2">
+                    <UploadFileButton
+                      folder="events"
+                      onFileUploaded={(url) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          thumbnailUrl: url,
+                        }))
+                      }
+                      buttonText="Télécharger une miniature"
+                    />
                     <input
                       type="text"
                       name="thumbnailUrl"
                       value={formData.thumbnailUrl || ""}
                       onChange={handleInputChange}
-                      className="input input-bordered input-primary text-sm "
-                      placeholder="Entrez l'URL de la miniature de votre événement..."
+                      className="input input-bordered input-primary text-sm flex-1"
+                      placeholder="Ou collez une URL de miniature..."
                     />
-                    <div className="">
-                      <label className="btn btn-outline btn-primary">
-                        <input
-                          type="file"
-                          className="hidden"
-                          onChange={(e) => {
-                            if (e.target.files) {
-                              handleDrop(
-                                Array.from(e.target.files),
-                                "thumbnail"
-                              );
-                            }
-                          }}
-                        />
-                        <FaFileUpload className="w-4 h-4 mr-2" />
-                        Télécharger un fichier
-                      </label>
-                    </div>
                   </div>
                 </div>
 
