@@ -9,25 +9,10 @@ import {
   FaTrophy,
   FaBookOpen,
 } from "react-icons/fa";
-import MemberCard from "../components/MemberCard";
 import PageHeader from "../components/PageHeader";
-import { useEffect, useState } from "react";
-interface Member {
-  id: number;
-  name: string;
-  role: string;
-  photo: string;
-  instagram?: string;
-}
+import DivisionsDisplay from "../components/DivisionsDisplay";
 
 const OurTeamPage: React.FC = () => {
-  const [students, setMembers] = useState<Member[]>([]);
-  useEffect(() => {
-    fetch("/members.json")
-      .then((response) => response.json())
-      .then((data) => setMembers(data))
-      .catch((error) => console.error("Error fetching students:", error));
-  }, []);
   return (
     <div className="min-h-screen ">
       {/* Hero Section */}
@@ -92,30 +77,7 @@ const OurTeamPage: React.FC = () => {
           </div>
 
           {/* Team Members Section */}
-          <section className="py-20 bg-gradient-to-br from-accent to-base-200">
-            <div className="container mx-auto px-4">
-              <div className="text-center mb-12">
-                <h2 className="text-5xl font-bold text-secondary mb-4 flex items-center justify-center gap-4">
-                  <FaUsers className="w-10 h-10" />
-                  Nos Membres
-                </h2>
-                <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-6"></div>
-                <p className="text-xl text-base-content max-w-2xl mx-auto">
-                  Rencontrez les membres passionnés qui composent La Fine Équipe
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-                {students.map((student) => (
-                  <MemberCard
-                    key={student.id}
-                    student={student}
-                    size="medium"
-                    showSocial={true}
-                  />
-                ))}
-              </div>
-            </div>
-          </section>
+          <DivisionsDisplay />
 
           {/* Activities Section */}
           <div className="card bg-base-100 shadow-2xl border-2 border-primary/20">
