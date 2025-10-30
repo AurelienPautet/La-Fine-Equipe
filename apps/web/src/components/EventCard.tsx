@@ -18,7 +18,7 @@ const EventsCard: React.FC<{
   if (loading) {
     return (
       <div
-        className={`card bg-base-100 shadow-md hover:shadow-lg transition-shadow duration-300 border border-base-300/50 h-fit overflow-hidden ${className}`}
+        className={`card bg-base-100 shadow-md hover:shadow-xl transition-all duration-300 border border-base-300/50 hover:border-primary/50 overflow-hidden h-full flex flex-col ${className}`}
       >
         <div className="card-body flex flex-col justify-between h-full p-4 sm:p-6">
           {/* Image skeleton */}
