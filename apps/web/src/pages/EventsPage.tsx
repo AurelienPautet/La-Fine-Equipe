@@ -80,7 +80,7 @@ const EventsPage: React.FC = () => {
               className="btn btn-secondary btn-lg gap-2 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <FaPlus className="w-5 h-5" />
-              Créer un nouvel events
+              Créer un nouvel événement
             </Link>
           </div>
         )}

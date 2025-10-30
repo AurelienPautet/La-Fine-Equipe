@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { db } from "@lafineequipe/db";
 import { events, tags, eventsTags } from "@lafineequipe/db/src/schema";
 import { EventsWithTags, createEventsRequestSchema } from "@lafineequipe/types";
-import { eq, desc, SQL, and, not, isNull } from "drizzle-orm";
+import { eq, desc, SQL, and, not, isNull, gte } from "drizzle-orm";
 
 const getEventsWithTags = async (
   whereCondition?: SQL,
@@ -108,12 +108,15 @@ export const getEventsBySlug = async (req: Request, res: Response) => {
 export const getLatestsEvents = async (req: Request, res: Response) => {
   try {
     const allEvents = await getEventsWithTags(
-      undefined,
+      and(isNull(events.deletedAt), gte(events.startDate, new Date())),
       desc(events.startDate)
     );
 
     if (allEvents.length === 0) {
-      return res.status(404).json({ success: false, error: "No events found" });
+      return res.status(200).json({ success: true, data: [] });
+    }
+    if (allEvents.length === 1) {
+      return res.status(200).json({ success: true, data: [allEvents[0]] });
     }
 
     res.json({ success: true, data: [allEvents[0], allEvents[1]] });

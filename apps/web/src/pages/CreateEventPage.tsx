@@ -44,7 +44,7 @@ const CreateEventsPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-accent to-base-200">
       {/* Header */}
       <PageHeader
-        title="Créer un Events"
+        title="Créer un événement"
         subtitle="Partagez vos idées et expériences avec La Fine Équipe"
         icon={<FaEdit className="w-10 h-10" />}
       />

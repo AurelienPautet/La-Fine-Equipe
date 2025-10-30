@@ -71,6 +71,23 @@ const HomePage: React.FC = () => {
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
           </div>
+          {error && (
+            <p className="text-red-500 w-full text-center">
+              Erreur de chargement des events.
+            </p>
+          )}
+
+          {latestsEvents?.length === 0 && !isLoading ? (
+            <p className="text-gray-500 w-full text-center">
+              Aucun événement à venir.
+              <br />
+              Revenez bientôt pour découvrir nos prochains événements !
+            </p>
+          ) : (
+            latestsEvents?.map((event) =>
+              event ? <EventsCard key={event.id} events={event} /> : null
+            )
+          )}
           <div className="ml-auto grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 md:px-20 md:gap-10">
             {isLoading && (
               <>
@@ -85,17 +102,6 @@ const HomePage: React.FC = () => {
                   events={undefined}
                 />
               </>
-            )}
-            {error && (
-              <p className="text-red-500">Erreur de chargement des events.</p>
-            )}
-
-            {latestsEvents?.length === 0 && !isLoading ? (
-              <p className="text-gray-500">Aucun événement à venir.</p>
-            ) : (
-              latestsEvents?.map((event) =>
-                event ? <EventsCard key={event.id} events={event} /> : null
-              )
             )}
           </div>
           <div className="text-center mt-8">
