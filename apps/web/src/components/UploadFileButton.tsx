@@ -4,7 +4,7 @@ import { useUploadFile } from "../hooks/FileHooks";
 import { FaFileUpload } from "react-icons/fa";
 
 interface UploadFileButtonProps {
-  onFileUploaded: (url: string) => void;
+  onFileUploaded: (url: string, type: string, name: string) => void;
   folder?: string;
   className?: string;
   buttonText?: string;
@@ -25,7 +25,7 @@ const UploadFileButton: React.FC<UploadFileButtonProps> = ({
       try {
         const result = await uploadMutation.mutateAsync(acceptedFiles[0]);
         if (result?.url) {
-          onFileUploaded(result.url);
+          onFileUploaded(result.url, result.type, result.name);
         }
       } catch (error) {
         console.error("Error uploading file:", error);

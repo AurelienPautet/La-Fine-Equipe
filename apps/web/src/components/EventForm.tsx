@@ -76,21 +76,24 @@ const EventsForm: React.FC<EventsFormProps> = ({
       return;
     }
 
-    setUploadedFiles((prev) => [...prev, ...result.map((res) => res.url)]);
-
     for (const res of result) {
-      let stringToInsert = "";
-      if (res.type.startsWith("image/")) {
-        stringToInsert = `\n<img src="${res.url}" alt="${res.name}" />\n`;
-      } else if (res.type === "application/pdf") {
-        stringToInsert = `\n<embed src="${res.url}" type="application/pdf" width="100%" height="600px" />\n`;
-      }
-
-      setFormData((prev) => ({
-        ...prev,
-        content: prev.content + stringToInsert,
-      }));
+      handleFileUpload(res.url, res.type, res.name);
     }
+  };
+
+  const handleFileUpload = (url: string, type: string, name: string) => {
+    setUploadedFiles((prev) => [...prev, url]);
+    let stringToInsert = "";
+    if (type.startsWith("image/")) {
+      stringToInsert = `\n<img src="${url}" alt="${name}" />\n`;
+    } else if (type === "application/pdf") {
+      stringToInsert = `\n<embed src="${url}" type="application/pdf" width="100%" height="600px" />\n`;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      content: prev.content + stringToInsert,
+    }));
   };
 
   const uploadMutation = useUploadFile("events");
@@ -325,6 +328,14 @@ const EventsForm: React.FC<EventsFormProps> = ({
                         Contenu (écrit en Markdown)
                       </span>
                     </label>
+
+                    <UploadFileButton
+                      onFileUploaded={handleFileUpload}
+                      folder="events"
+                      className="mb-4 self-start"
+                      buttonText="Ajouter un fichier au contenu"
+                    />
+
                     <input {...getInputProps()} />
 
                     <textarea
