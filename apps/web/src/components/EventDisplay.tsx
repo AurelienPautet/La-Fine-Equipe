@@ -92,8 +92,9 @@ const EventsDisplay: React.FC<EventsDisplayProps> = ({
           )}
         </div>
       </header>
+
       {/* Reservation Button */}
-      <div className="w-full flex items-center justify-center sticky left-0 top-20 p-2">
+      <div className="w-full flex items-center justify-center sticky left-0 top-20 z-10 p-2">
         <ReservateButton
           eventId={metadata.id}
           eventTitle={metadata.title}
@@ -103,6 +104,16 @@ const EventsDisplay: React.FC<EventsDisplayProps> = ({
         />
       </div>
 
+      {/* Thumbnail */}
+      {metadata.thumbnailUrl && (
+        <figure className="mb-8 max-w-fit rounded-box overflow-hidden shadow-lg mx-auto flex items-center justify-center bg-transparent">
+          <img
+            src={metadata.thumbnailUrl}
+            alt={metadata.title}
+            className="max-w-full rounded-box max-h-96 object-contain hover:scale-105 transition-transform duration-300"
+          />
+        </figure>
+      )}
       {/* Events Content */}
       <div
         className={`prose max-w-none prose-headings:text-secondary prose-a:text-primary hover:prose-a:text-primary-focus prose-strong:text-secondary prose-code:bg-primary/10 prose-code:text-primary prose-code:px-2 prose-code:py-1 prose-code:rounded ${
