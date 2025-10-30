@@ -30,7 +30,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
   return (
     <div className="flex p-8 items-center w-64 card bg-base-100 shadow-xl hover:shadow-2xl border-2 border-transparent hover:border-primary transition-all duration-300">
       <img
-        className="w-20 h-20 rounded-full object-contain "
+        className="w-40 h-40 object-cover rounded-sm "
         src={member.photoUrl ?? "/logo.png"}
         alt={member.firstName}
       />
