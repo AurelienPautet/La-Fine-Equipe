@@ -54,14 +54,14 @@ const FiguresManager: React.FC<FiguresManagerProps> = ({ editingFigure }) => {
   });
 
   useEffect(() => {
-    if (editingFigure) {
+    if (editingFigure && editingFigure.id !== 0) {
       setFormData({
         figure: editingFigure.figure,
         description: editingFigure.description,
         icon: editingFigure.icon,
       });
-      setIsModalOpen(true);
     }
+    setIsModalOpen(true);
   }, [editingFigure]);
 
   if (!isAuthenticated) return null;
@@ -90,18 +90,6 @@ const FiguresManager: React.FC<FiguresManagerProps> = ({ editingFigure }) => {
 
   return (
     <div className="mb-8">
-      <div className="flex justify-center mb-4">
-        <button
-          onClick={() => {
-            resetForm();
-            setIsModalOpen(true);
-          }}
-          className="btn btn-primary"
-        >
-          Ajouter un chiffre clé
-        </button>
-      </div>
-
       {/* Modal */}
       {isModalOpen && (
         <dialog open className="modal">

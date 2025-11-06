@@ -26,7 +26,14 @@ const HomePage: React.FC = () => {
   const deleteFigure = useDeleteFigure();
   const reorderFigures = useReorderFigures();
 
-  const [editingFigure, setEditingFigure] = useState<Figure | null>(null);
+  const [editingFigure, setEditingFigure] = useState<Figure | null>({
+    id: 0,
+    figure: "",
+    description: "",
+    icon: "",
+    order: 0,
+    deletedAt: null,
+  });
 
   const bgColors = [
     "bg-primary",
@@ -227,8 +234,20 @@ const HomePage: React.FC = () => {
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
-        {isAuthenticated && <FiguresManager editingFigure={editingFigure} />}
-        <div className="grid md:grid-cols-3 gap-6">
+        {isAuthenticated && (
+          <>
+            <div className="flex justify-center mb-4">
+              <button
+                className="btn btn-primary"
+                onClick={() => setEditingFigure(null)}
+              >
+                Ajouter un chiffre clé
+              </button>
+            </div>
+            <FiguresManager editingFigure={editingFigure} />
+          </>
+        )}
+        <div className="grid p-3 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {figuresLoading && (
             <div className="loading loading-spinner text-primary mx-auto"></div>
           )}
