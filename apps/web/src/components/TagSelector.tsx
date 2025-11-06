@@ -49,7 +49,6 @@ const TagSelector: React.FC<TagSelectorProps> = ({ setTags, initialTags }) => {
       .filter((tag) => tag.isSelected)
       .map((tag) => ({ id: tag.id, name: tag.name }));
     setTags(selectedTags);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tagsWithState]);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -129,10 +128,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({ setTags, initialTags }) => {
           ))}
           <Popover
             trigger={
-              <div
-                className="btn btn-circle btn-sm btn-primary"
-                onClick={() => console.log("fgf")}
-              >
+              <div className="btn btn-circle btn-sm btn-primary">
                 <FaPlus />
               </div>
             }

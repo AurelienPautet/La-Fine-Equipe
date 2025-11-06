@@ -70,3 +70,15 @@ export {
   editDivisionRequestSchema,
   reorderDivisionsRequestSchema,
 } from "./division";
+
+export type {
+  Figure,
+  CreateFigureRequest,
+  EditFigureRequest,
+  ReorderFiguresRequest,
+} from "./figure";
+export {
+  createFigureRequestSchema,
+  editFigureRequestSchema,
+  reorderFiguresRequestSchema,
+} from "./figure";

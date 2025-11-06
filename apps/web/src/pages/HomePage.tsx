@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  FaUsers,
-  FaBook,
-  FaHeart,
-  FaLightbulb,
-  FaHandshake,
-  FaHandsHelping,
-} from "react-icons/fa";
+import { FaUsers, FaBook, FaHandsHelping } from "react-icons/fa";
 import EventsCard from "../components/EventCard";
 import { useLatestsEvents, useMemorableEvents } from "../hooks/EventHooks";
 import FigureCard from "../components/FigureCard";
 import { MdEvent } from "react-icons/md";
+import {
+  useFigures,
+  useDeleteFigure,
+  useReorderFigures,
+} from "../hooks/FiguresHooks";
+import FiguresManager from "../components/FiguresManager";
+import { useAuth } from "../components/AuthProvider";
+import type { Figure } from "@lafineequipe/types";
 
 const HomePage: React.FC = () => {
   const { data: latestsEvents, error, isLoading } = useLatestsEvents();
@@ -20,6 +21,42 @@ const HomePage: React.FC = () => {
     error: memorableError,
     isLoading: memorableLoading,
   } = useMemorableEvents();
+  const { data: figures, isLoading: figuresLoading } = useFigures();
+  const { isAuthenticated } = useAuth();
+  const deleteFigure = useDeleteFigure();
+  const reorderFigures = useReorderFigures();
+
+  const [editingFigure, setEditingFigure] = useState<Figure | null>(null);
+
+  const bgColors = [
+    "bg-primary",
+    "bg-secondary",
+    "bg-warning",
+    "bg-error",
+  ] as const;
+
+  const handleDeleteFigure = async (id: number) => {
+    await deleteFigure.mutateAsync(id);
+  };
+
+  const handleMoveFigure = async (figure: Figure, direction: "up" | "down") => {
+    if (!figures) return;
+    const currentIndex = figures.findIndex((f) => f.id === figure.id);
+    if (currentIndex === -1) return;
+    if (direction === "up" && currentIndex === 0) return;
+    if (direction === "down" && currentIndex === figures.length - 1) return;
+
+    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    const newOrder = [...figures];
+    [newOrder[currentIndex], newOrder[newIndex]] = [
+      newOrder[newIndex],
+      newOrder[currentIndex],
+    ];
+
+    await reorderFigures.mutateAsync(
+      newOrder.map((f, idx) => ({ id: f.id, order: idx }))
+    );
+  };
 
   return (
     <div className="min-h-screen">
@@ -190,51 +227,23 @@ const HomePage: React.FC = () => {
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </div>
+        {isAuthenticated && <FiguresManager editingFigure={editingFigure} />}
         <div className="grid md:grid-cols-3 gap-6">
-          <FigureCard
-            icon={<FaHandshake />}
-            figure="38"
-            description="MEMBRES"
-            bgColor="bg-primary"
-          />
-
-          <FigureCard
-            figure="61"
-            description="PASSAGES EN AMPHI"
-            bgColor="bg-secondary"
-            icon={<FaLightbulb />}
-          />
-
-          <FigureCard
-            figure="2"
-            description="ÉLUS AU CONSEIL DE LA
-FORMATION ET DE LA VIE
-UNIVERSITAIRE (CFVU)"
-            bgColor="bg-warning"
-            icon={<FaHeart />}
-          />
-
-          <FigureCard
-            figure="2"
-            description="ÉLUS À LA
-SECTION
-DISCIPLINAIRE"
-            bgColor="bg-warning"
-            icon={<FaHeart />}
-          />
-          <FigureCard
-            figure="6"
-            description="ÉLUS AU CONSEIL
-DOCUMENTAIRE (75% des sièges)"
-            bgColor="bg-primary"
-            icon={<FaHeart />}
-          />
-          <FigureCard
-            figure="25 000"
-            description="VUES SUR LES RÉSEAUX SOCIAUX"
-            bgColor="bg-secondary"
-            icon={<FaHeart />}
-          />
+          {figuresLoading && (
+            <div className="loading loading-spinner text-primary mx-auto"></div>
+          )}
+          {figures?.map((figure, index) => (
+            <FigureCard
+              key={figure.id}
+              figure={figure}
+              bgColor={bgColors[index % bgColors.length]}
+              isAdmin={isAuthenticated}
+              onEdit={(fig) => setEditingFigure(fig)}
+              onDelete={() => handleDeleteFigure(figure.id)}
+              onMoveUp={() => handleMoveFigure(figure, "up")}
+              onMoveDown={() => handleMoveFigure(figure, "down")}
+            />
+          ))}
         </div>
       </section>
 

@@ -130,3 +130,12 @@ export const teamMembers = pgTable("LaFineEquipe-team_members", {
   isActive: boolean("is_active").notNull().default(true),
   deletedAt: timestamp("deleted_at"),
 });
+
+export const figures = pgTable("LaFineEquipe-figures", {
+  id: serial("id").primaryKey(),
+  figure: text("figure").notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull(),
+  order: integer("order").notNull().default(0),
+  deletedAt: timestamp("deleted_at"),
+});
