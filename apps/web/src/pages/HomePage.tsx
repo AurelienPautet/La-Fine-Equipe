@@ -135,16 +135,8 @@ const HomePage: React.FC = () => {
           <div className="ml-auto grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 md:px-20 md:gap-10">
             {isLoading && (
               <>
-                <EventsCard
-                  className="w-1/3"
-                  loading={true}
-                  events={undefined}
-                />
-                <EventsCard
-                  className="w-1/3"
-                  loading={true}
-                  events={undefined}
-                />
+                <EventsCard loading={true} events={undefined} />
+                <EventsCard loading={true} events={undefined} />
               </>
             )}
           </div>
