@@ -9,6 +9,7 @@ interface ReservateButtonProps {
   eventStartDate?: Date;
   eventEndDate?: Date;
   eventLocation?: string;
+  reservationUrl?: string | null;
   color?: "primary" | "secondary";
   size?: "sm" | "md" | "lg";
 }
@@ -19,6 +20,7 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
   eventStartDate,
   eventEndDate,
   eventLocation,
+  reservationUrl,
   color = "primary",
   size = "lg",
 }) => {
@@ -99,6 +101,20 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
 
   if (eventEndDate && new Date(eventStartDate!) < new Date()) {
     return null;
+  }
+
+  // If reservationUrl is provided, render a link button instead
+  if (reservationUrl) {
+    return (
+      <a
+        href={reservationUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`btn btn-${color} btn-${size} text-primary-content shadow-lg hover:shadow-xl transform hover:scale-105 transition-all flex items-center gap-2`}
+      >
+        Réserver ma place
+      </a>
+    );
   }
 
   return (

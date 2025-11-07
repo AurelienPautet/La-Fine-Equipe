@@ -16,6 +16,7 @@ interface EventsMetadata {
   location: string;
   maxAttendees?: number | null;
   thumbnailUrl?: string | null;
+  reservationUrl?: string | null;
   tags: Tag[];
   id?: number;
 }
@@ -101,6 +102,7 @@ const EventsDisplay: React.FC<EventsDisplayProps> = ({
           eventStartDate={metadata.startDate}
           eventEndDate={metadata.endDate}
           eventLocation={metadata.location}
+          reservationUrl={metadata.reservationUrl}
         />
       </div>
 

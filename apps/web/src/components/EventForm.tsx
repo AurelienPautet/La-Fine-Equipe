@@ -37,6 +37,7 @@ const EventsForm: React.FC<EventsFormProps> = ({
     tags: initialData.tags || [],
     maxAttendees: initialData.maxAttendees ?? undefined,
     thumbnailUrl: initialData.thumbnailUrl ?? undefined,
+    reservationUrl: initialData.reservationUrl ?? undefined,
   });
 
   const ensureValidDate = (date: Date | undefined | null): Date => {
@@ -316,6 +317,30 @@ const EventsForm: React.FC<EventsFormProps> = ({
                   </div>
                 </div>
 
+                {/* Reservation URL */}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text text-sm font-semibold flex items-center gap-2">
+                      <FaUserGroup className="w-4 h-4" />
+                      URL de réservation externe (optionnel)
+                    </span>
+                  </label>
+                  <input
+                    type="url"
+                    name="reservationUrl"
+                    value={formData.reservationUrl || ""}
+                    onChange={handleInputChange}
+                    className="input input-bordered input-primary text-sm"
+                    placeholder="Laissez vide pour utiliser le système de réservation interne"
+                  />
+                  <label className="label">
+                    <span className="label-text-alt text-xs">
+                      Si rempli, le bouton de réservation redirigera vers ce
+                      site au lieu d'utiliser le système interne
+                    </span>
+                  </label>
+                </div>
+
                 <div className="flex-1 flex flex-col min-h-0">
                   {/* Content */}
                   <div
@@ -405,6 +430,7 @@ Deposé des fichiers (pdf et images) pour les insérer directement dans le conte
                     location: formData.location,
                     maxAttendees: formData.maxAttendees,
                     thumbnailUrl: formData.thumbnailUrl,
+                    reservationUrl: formData.reservationUrl,
                     tags: formData.tags || [],
                   }}
                   content={formData.content}

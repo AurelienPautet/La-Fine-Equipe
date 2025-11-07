@@ -28,6 +28,7 @@ export const createEventsRequestSchema = z.object({
     .min(1, "Max attendees must be at least 1")
     .optional(),
   thumbnailUrl: z.string().url().optional(),
+  reservationUrl: z.string().url().optional(),
 });
 
 export const editEventsRequestSchema = createEventsRequestSchema.extend({

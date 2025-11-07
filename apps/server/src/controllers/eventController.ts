@@ -20,6 +20,7 @@ const getEventsWithTags = async (
       location: events.location,
       maxAttendees: events.maxAttendees,
       thumbnailUrl: events.thumbnailUrl,
+      reservationUrl: events.reservationUrl,
       createdAt: events.createdAt,
       updatedAt: events.updatedAt,
       memorable: events.memorable,
@@ -60,6 +61,7 @@ const getEventsWithTags = async (
         location: row.location,
         maxAttendees: row.maxAttendees,
         thumbnailUrl: row.thumbnailUrl,
+        reservationUrl: row.reservationUrl,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         memorable: row.memorable,
@@ -172,6 +174,7 @@ export const createEvents = async (req: Request, res: Response) => {
       location,
       maxAttendees,
       thumbnailUrl,
+      reservationUrl,
       tags,
     } = validatedData;
     const slug = title
@@ -214,6 +217,7 @@ export const createEvents = async (req: Request, res: Response) => {
         location,
         maxAttendees,
         thumbnailUrl,
+        reservationUrl,
       })
       .returning()
       .execute();
@@ -251,6 +255,7 @@ export const editEvents = async (req: Request, res: Response) => {
       location,
       maxAttendees,
       thumbnailUrl,
+      reservationUrl,
       tags,
     } = validatedData;
     const slug = title
@@ -285,6 +290,7 @@ export const editEvents = async (req: Request, res: Response) => {
         location,
         maxAttendees,
         thumbnailUrl,
+        reservationUrl,
       })
       .where(eq(events.id, Number(id)))
       .returning()

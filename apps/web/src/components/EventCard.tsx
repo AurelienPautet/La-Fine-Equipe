@@ -165,6 +165,7 @@ const EventsCard: React.FC<{
             eventStartDate={events.startDate}
             eventEndDate={events.endDate}
             eventLocation={events.location}
+            reservationUrl={events.reservationUrl}
             color="secondary"
             size="sm"
           />

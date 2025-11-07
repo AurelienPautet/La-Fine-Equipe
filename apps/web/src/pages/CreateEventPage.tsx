@@ -21,6 +21,7 @@ const CreateEventsPage: React.FC = () => {
     date: new Date().toISOString().split("T")[0],
     tags: "",
     content: "",
+    reservationUrl: undefined,
   };
 
   const handleSubmit = async (formData: any) => {
