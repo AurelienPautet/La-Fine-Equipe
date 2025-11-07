@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaUsers, FaBook, FaHandsHelping } from "react-icons/fa";
+import { FaUsers, FaBook, FaHandsHelping, FaPlus } from "react-icons/fa";
 import EventsCard from "../components/EventCard";
 import { useLatestsEvents, useMemorableEvents } from "../hooks/EventHooks";
 import FigureCard from "../components/FigureCard";
@@ -10,9 +10,18 @@ import {
   useDeleteFigure,
   useReorderFigures,
 } from "../hooks/FiguresHooks";
+import {
+  useVisibleHomeSections,
+  useHomeSections,
+  useDeleteHomeSection,
+  useEditHomeSection,
+  useReorderHomeSections,
+} from "../hooks/HomeSectionHooks";
 import FiguresManager from "../components/FiguresManager";
+import HomeSectionManager from "../components/HomeSectionManager";
+import HomeSectionDisplay from "../components/HomeSectionDisplay";
 import { useAuth } from "../components/AuthProvider";
-import type { Figure } from "@lafineequipe/types";
+import type { Figure, HomeSection } from "@lafineequipe/types";
 
 const HomePage: React.FC = () => {
   const { data: latestsEvents, error, isLoading } = useLatestsEvents();
@@ -26,14 +35,22 @@ const HomePage: React.FC = () => {
   const deleteFigure = useDeleteFigure();
   const reorderFigures = useReorderFigures();
 
-  const [editingFigure, setEditingFigure] = useState<Figure | null>({
-    id: 0,
-    figure: "",
-    description: "",
-    icon: "",
-    order: 0,
-    deletedAt: null,
-  });
+  // Home sections hooks
+  const { data: visibleHomeSections } = useVisibleHomeSections();
+  const { data: allHomeSections } = useHomeSections();
+  const deleteHomeSection = useDeleteHomeSection();
+  const editHomeSection = useEditHomeSection();
+  const reorderHomeSections = useReorderHomeSections();
+
+  const homeSectionsToDisplay = isAuthenticated
+    ? allHomeSections
+    : visibleHomeSections;
+
+  const [editingFigure, setEditingFigure] = useState<Figure | null>(null);
+
+  const [editingHomeSection, setEditingHomeSection] =
+    useState<HomeSection | null>(null);
+  const [showHomeSectionModal, setShowHomeSectionModal] = useState(false);
 
   const bgColors = [
     "bg-primary",
@@ -62,6 +79,52 @@ const HomePage: React.FC = () => {
 
     await reorderFigures.mutateAsync(
       newOrder.map((f, idx) => ({ id: f.id, order: idx }))
+    );
+  };
+
+  const handleDeleteHomeSection = async (id: number) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette section ?")) {
+      await deleteHomeSection.mutateAsync(id);
+    }
+  };
+
+  const handleToggleHomeSectionVisibility = async (section: HomeSection) => {
+    await editHomeSection.mutateAsync({
+      id: section.id,
+      title: section.title,
+      content: section.content,
+      buttonLabel: section.buttonLabel,
+      buttonLink: section.buttonLink,
+      imageUrl: section.imageUrl || undefined,
+      isVisible: !section.isVisible,
+    });
+  };
+
+  const handleMoveHomeSection = async (
+    section: HomeSection,
+    direction: "up" | "down"
+  ) => {
+    if (!homeSectionsToDisplay) return;
+    const currentIndex = homeSectionsToDisplay.findIndex(
+      (s) => s.id === section.id
+    );
+    if (currentIndex === -1) return;
+    if (direction === "up" && currentIndex === 0) return;
+    if (
+      direction === "down" &&
+      currentIndex === homeSectionsToDisplay.length - 1
+    )
+      return;
+
+    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    const newOrder = [...homeSectionsToDisplay];
+    [newOrder[currentIndex], newOrder[newIndex]] = [
+      newOrder[newIndex],
+      newOrder[currentIndex],
+    ];
+
+    await reorderHomeSections.mutateAsync(
+      newOrder.map((s, idx) => ({ id: s.id, order: idx }))
     );
   };
 
@@ -153,6 +216,72 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Custom Home Sections */}
+      <section className="py-10 bg-white">
+        <div className="container mx-auto px-4">
+          {isAuthenticated && (
+            <div className="flex justify-center">
+              <button
+                onClick={() => {
+                  setEditingHomeSection(null);
+                  setShowHomeSectionModal(true);
+                }}
+                className="btn btn-secondary btn-lg"
+              >
+                <FaPlus className="w-5 h-5" />
+                Ajouter une section personnalisée
+              </button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Home Section Modal */}
+      {showHomeSectionModal && (
+        <dialog open className="modal z-50">
+          <div className="modal-box mt-10 max-h-[80vh]">
+            <h3 className="font-bold text-lg mb-4">
+              {editingHomeSection
+                ? "Modifier la section"
+                : "Ajouter une section"}
+            </h3>
+            <HomeSectionManager
+              editingSection={editingHomeSection}
+              onClose={() => {
+                setShowHomeSectionModal(false);
+                setEditingHomeSection(null);
+              }}
+            />
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button
+              onClick={() => {
+                setShowHomeSectionModal(false);
+                setEditingHomeSection(null);
+              }}
+            />
+          </form>
+        </dialog>
+      )}
+
+      {homeSectionsToDisplay?.map((section, index) => (
+        <HomeSectionDisplay
+          key={section.id}
+          section={section}
+          isAdmin={isAuthenticated}
+          onEdit={() => {
+            setEditingHomeSection(section);
+            setShowHomeSectionModal(true);
+          }}
+          onDelete={() => handleDeleteHomeSection(section.id)}
+          onToggleVisibility={() => handleToggleHomeSectionVisibility(section)}
+          onMoveUp={() => handleMoveHomeSection(section, "up")}
+          onMoveDown={() => handleMoveHomeSection(section, "down")}
+          isFirst={index === 0}
+          isLast={index === (homeSectionsToDisplay?.length || 0) - 1}
+        />
+      ))}
 
       {/* Presentation Section */}
       <div className="min-h-[calc(100vh-2.5rem)] h-full flex flex-col  items-center">

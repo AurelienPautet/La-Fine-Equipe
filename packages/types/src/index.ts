@@ -82,3 +82,15 @@ export {
   editFigureRequestSchema,
   reorderFiguresRequestSchema,
 } from "./figure";
+
+export type {
+  HomeSection,
+  CreateHomeSectionRequest,
+  EditHomeSectionRequest,
+  ReorderHomeSectionsRequest,
+} from "./homeSection";
+export {
+  createHomeSectionRequestSchema,
+  editHomeSectionRequestSchema,
+  reorderHomeSectionsRequestSchema,
+} from "./homeSection";

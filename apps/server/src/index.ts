@@ -17,6 +17,7 @@ import membersSettingsRoutes from "./routes/membersSettingsRoutes";
 import divisionRoutes from "./routes/divisionRoutes";
 import teamMemberRoutes from "./routes/teamMemberRoutes";
 import figureRoutes from "./routes/figureRoutes";
+import homeSectionRoutes from "./routes/homeSectionRoutes";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -55,6 +56,7 @@ app.use("/api/members-settings", membersSettingsRoutes);
 app.use("/api/divisions", divisionRoutes);
 app.use("/api/team-members", teamMemberRoutes);
 app.use("/api/figures", figureRoutes);
+app.use("/api/home-sections", homeSectionRoutes);
 
 const PORT = process.env.PORT || 4000;
 
