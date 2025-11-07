@@ -156,7 +156,7 @@ const EventsCard: React.FC<{
             to={`/events/${events.slug}`}
             className="btn btn-primary btn-sm gap-2 shadow-md hover:shadow-lg transition-all"
           >
-            <span>Voir l&apos;événement</span>
+            <span>Voir </span>
             <FaArrowRight className="w-3 h-3" />
           </Link>
           <ReservateButton

@@ -132,6 +132,7 @@ const EventsPage: React.FC = () => {
                   location: Events.location,
                   maxAttendees: Events.maxAttendees,
                   thumbnailUrl: Events.thumbnailUrl,
+                  reservationUrl: Events.reservationUrl,
                   tags: Events.tags || [],
                   id: Events.id,
                 }}

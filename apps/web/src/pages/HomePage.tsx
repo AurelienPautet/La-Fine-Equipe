@@ -128,9 +128,11 @@ const HomePage: React.FC = () => {
               Revenez bientôt pour découvrir nos prochains événements !
             </p>
           ) : (
-            latestsEvents?.map((event) =>
-              event ? <EventsCard key={event.id} events={event} /> : null
-            )
+            <div className="ml-auto grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 md:px-20 md:gap-10">
+              {latestsEvents?.map((event) =>
+                event ? <EventsCard key={event.id} events={event} /> : null
+              )}
+            </div>
           )}
           <div className="ml-auto grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 md:px-20 md:gap-10">
             {isLoading && (
