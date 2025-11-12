@@ -94,3 +94,5 @@ export {
   editHomeSectionRequestSchema,
   reorderHomeSectionsRequestSchema,
 } from "./homeSection";
+
+export type { Message } from "./message";

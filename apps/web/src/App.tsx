@@ -20,6 +20,7 @@ import RegulationPage from "./pages/RegulationPage";
 import CreateRegulationPage from "./pages/CreateRegulationPage";
 import EditRegulationPage from "./pages/EditRegulationPage";
 import EventReservationsPage from "./pages/EventReservationsPage";
+import ChatButton from "./components/ChatButton";
 
 function App() {
   return (
@@ -36,6 +37,8 @@ function App() {
 
             {/* Main Content */}
             <main className="min-h-screen">
+              <ChatButton />
+
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/events" element={<EventsPage />} />
