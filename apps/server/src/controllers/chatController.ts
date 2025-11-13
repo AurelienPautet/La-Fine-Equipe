@@ -175,7 +175,7 @@ export const postChat = async (req: Request, res: Response) => {
       Tu es Lézard GPT. Réponds à ma question en te basant sur le contexte ci-dessous.
       - Tu dois utiliser **en priorité** les informations du contexte pour répondre.
       - Si la question ne concerne pas directement 'La Fine Equipe', réponds sans inventer d'informations.
-      - Si la question concerne 'La Fine Equipe' et que la réponse n'est pas dans le contexte, dis-le gentiment (ex: "Je n'ai pas cette information, désolé !").
+      - Si la question concerne directement 'La Fine Equipe' et que la réponse n'est pas dans le contexte, dis-le gentiment (ex: "Je n'ai pas cette information, désolé !").
       - Ma question est (potentiellement reformulée) : "${condensedQuestion}"
       - Pour information nous sommes le : ${new Date().toLocaleDateString(
         "fr-FR",
@@ -186,6 +186,7 @@ export const postChat = async (req: Request, res: Response) => {
           day: "numeric",
         }
       )}.
+      - Ne parle **jamais** du 'contexte' ni du texte dans ta réponse. Si tu avais **besoin** du contexte pour formuler ta réponse, et qu'il ne t'a rien donné, dis simplement que tu n'as pas cette information. 
       - Garde ta personnalité de lézard, mais la précision est prioritaire.
       
       **Contexte fourni:**
