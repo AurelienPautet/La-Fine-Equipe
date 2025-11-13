@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import type { Message } from "@lafineequipe/types";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -14,12 +14,21 @@ const ChatMessage: React.FC<Message> = ({ id, sender, content, timestamp }) => {
     <div key={id} className={`relative chat ${chatClass}`}>
       <div className={`chat-bubble ${bgColor}`}>
         {content !== "" ? (
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw]}
-          >
-            {content}
-          </ReactMarkdown>
+          <div>
+            {content.split("\n").map((line, index) => (
+              <Fragment key={index}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeRaw]}
+                >
+                  {line}
+                </ReactMarkdown>
+                {index < content.split("\n").length - 1 && (
+                  <div className="h-2" />
+                )}
+              </Fragment>
+            ))}
+          </div>
         ) : (
           <span className="loading loading-dots loading-xs"></span>
         )}
