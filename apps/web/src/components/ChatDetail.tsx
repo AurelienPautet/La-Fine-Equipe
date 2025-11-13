@@ -85,6 +85,7 @@ const ChatDetail: React.FC = () => {
       onError: (error) => {
         console.error("Error posting chat message:", error);
         setWaitingForResponse(false);
+        setInputValue(messages[messages.length - 2].content);
         setMessages((prevMessages) => {
           const errorContent =
             "Désolé, une erreur est survenue lors de l'envoi du message. Veuillez réessayer.";

@@ -136,11 +136,23 @@ const HomePage: React.FC = () => {
           <div className="max-w-4xl">
             <div className="flex justify-center mb-8">
               <div className="w-64 h-64 rounded-full shadow-2xl">
-                <img
-                  src="/logo_texte.png"
-                  alt="La Fine Équipe"
-                  className="w-full h-full object-cover"
-                />
+                <div className="hover-3d">
+                  {/* content */}
+                  <img
+                    src="/logo_texte.png"
+                    alt="La Fine Équipe"
+                    className="w-full h-full object-cover"
+                  />
+                  {/* 8 empty divs needed for the 3D effect */}
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                  <div></div>
+                </div>
               </div>
             </div>
             <p className="text-xl mb-8 max-w-2xl text-secondary opacity-90 mx-auto leading-relaxed drop-shadow-md">
