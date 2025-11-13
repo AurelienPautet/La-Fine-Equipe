@@ -35,10 +35,18 @@ export async function postChatMessage(
     for (const line of lines) {
       try {
         const data = JSON.parse(line.trim());
+        if (data.error) {
+          throw new Error(data.error);
+        }
         if (data.chunk) onChunk(data.chunk);
         if (data.done) done = true;
       } catch (error) {
-        console.error("Error parsing SSE data:", error);
+        if (
+          error instanceof Error &&
+          error.message !== "Unexpected end of JSON input"
+        ) {
+          throw error;
+        }
       }
     }
   }

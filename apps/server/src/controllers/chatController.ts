@@ -4,6 +4,7 @@ import { Message } from "@lafineequipe/types";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
 import { getPool } from "@lafineequipe/db";
+import { retryWithBackoff, RetryPresets } from "../utils/retryUtils";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
@@ -102,10 +103,22 @@ export const postChat = async (req: Request, res: Response) => {
         Question autonome:
       `;
 
-      const condensationResult = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: [{ role: "user", parts: [{ text: condensationPrompt }] }],
-      });
+      const condensationResult = await retryWithBackoff(
+        () =>
+          ai.models.generateContent({
+            model: "gemini-2.5-flash-lite",
+            contents: [{ role: "user", parts: [{ text: condensationPrompt }] }],
+          }),
+        {
+          ...RetryPresets.apiCall,
+          onRetry: (attempt, error) => {
+            console.warn(
+              `Retry attempt ${attempt} for question condensation:`,
+              error.message
+            );
+          },
+        }
+      );
 
       if (condensationResult.text) {
         condensedQuestion = condensationResult.text.trim();
@@ -118,12 +131,28 @@ export const postChat = async (req: Request, res: Response) => {
     let relevantDocs;
     try {
       const store = await getVectorStore();
-      relevantDocs = await store.similaritySearch(condensedQuestion, 4);
+      relevantDocs = await retryWithBackoff(
+        () => store.similaritySearch(condensedQuestion, 4),
+        {
+          ...RetryPresets.vectorStore,
+          onRetry: (attempt, error) => {
+            console.warn(
+              `Retry attempt ${attempt} for vector store search:`,
+              error.message
+            );
+          },
+        }
+      );
     } catch (error) {
       console.error("Error during vector search:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to retrieve relevant documents";
       res.write(
         `${JSON.stringify({
-          error: "Failed to retrieve relevant documents",
+          error: errorMessage,
+          done: true,
         })}\n\n`
       );
       res.end();
@@ -148,6 +177,15 @@ export const postChat = async (req: Request, res: Response) => {
       - Si la question ne concerne pas directement 'La Fine Equipe', réponds sans inventer d'informations.
       - Si la question concerne 'La Fine Equipe' et que la réponse n'est pas dans le contexte, dis-le gentiment (ex: "Je n'ai pas cette information, désolé !").
       - Ma question est (potentiellement reformulée) : "${condensedQuestion}"
+      - Pour information nous sommes le : ${new Date().toLocaleDateString(
+        "fr-FR",
+        {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }
+      )}.
       - Garde ta personnalité de lézard, mais la précision est prioritaire.
       
       **Contexte fourni:**
@@ -164,9 +202,20 @@ export const postChat = async (req: Request, res: Response) => {
     });
 
     try {
-      const response = await ai.models.generateContentStream({
-        model: "gemini-2.5-flash",
-        contents: finalConversationHistory,
+      const generateContent = () =>
+        ai.models.generateContentStream({
+          model: "gemini-2.5-flash",
+          contents: finalConversationHistory,
+        });
+
+      const response = await retryWithBackoff(generateContent, {
+        ...RetryPresets.apiCall,
+        onRetry: (attempt, error) => {
+          console.warn(
+            `Retry attempt ${attempt} for content generation:`,
+            error.message
+          );
+        },
       });
 
       for await (const chunk of response) {
@@ -180,7 +229,10 @@ export const postChat = async (req: Request, res: Response) => {
     } catch (error) {
       console.error("Error during content generation:", error);
       res.write(
-        `${JSON.stringify({ error: "Failed to generate response" })}\n\n`
+        `${JSON.stringify({
+          error: "Failed to generate response",
+          done: true,
+        })}\n\n`
       );
       res.end();
     }
@@ -192,9 +244,9 @@ export const postChat = async (req: Request, res: Response) => {
         error instanceof Error ? error.message : "Internal server error";
       res.status(500).json({ error: errorMessage });
     } else {
-      res.write(
-        `${JSON.stringify({ error: "An unexpected error occurred" })}\n\n`
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : "An unexpected error occurred";
+      res.write(`${JSON.stringify({ error: errorMessage, done: true })}\n\n`);
       res.end();
     }
   }

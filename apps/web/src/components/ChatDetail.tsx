@@ -75,6 +75,27 @@ const ChatDetail: React.FC = () => {
     postChatMessageMutation.mutate([...messages, userMessage], {
       onSuccess: () => {
         setWaitingForResponse(false);
+        if (
+          messages[messages.length - 1].sender === "bot" &&
+          messages[messages.length - 1].content === ""
+        ) {
+          setMessages((prevMessages) => prevMessages.slice(0, -1));
+        }
+      },
+      onError: (error) => {
+        console.error("Error posting chat message:", error);
+        setWaitingForResponse(false);
+        setMessages((prevMessages) => {
+          const errorContent =
+            "Désolé, une erreur est survenue lors de l'envoi du message. Veuillez réessayer.";
+          const errorMessage: Message = {
+            id: (prevMessages.length + 1).toString(),
+            sender: "bot",
+            content: errorContent,
+            timestamp: Date.now(),
+          };
+          return [...prevMessages.slice(0, -1), errorMessage];
+        });
       },
     });
     setInputValue("");
@@ -82,6 +103,11 @@ const ChatDetail: React.FC = () => {
 
   return (
     <div className="mb-2 card w-screen translate-x-5  md:w-96 bg-base-200 shadow-lg p-4">
+      <img
+        src="/LFE_lézard_nu_2.png"
+        alt=""
+        className="absolute -top-11 left-10 w-15 object-cover transition-all duration-100 hover:animate-bounce"
+      />
       <div className="card-body p-2">
         <h2 className="card-title">LézardGPT</h2>
         <div

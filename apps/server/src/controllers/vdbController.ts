@@ -7,6 +7,7 @@ import {
   divisions,
   figures,
   documentChunks,
+  regulationsCategories,
 } from "@lafineequipe/db/schema";
 import { eq, isNull, count } from "drizzle-orm";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
@@ -75,7 +76,29 @@ export async function initializeVectorStore() {
   const allRegulations = await db
     .select()
     .from(regulations)
+    .leftJoin(
+      regulationsCategories,
+      eq(regulations.categoryId, regulationsCategories.id)
+    )
     .where(isNull(regulations.deletedAt));
+
+  const StringlistOfAllEvents = allEvents
+    .map(
+      (event) =>
+        `- ${event.title} qui se déroule à ${event.location} du ${event.startDate} au ${event.endDate}`
+    )
+    .join("\n");
+
+  const StringlistOfAllRegulations = allRegulations
+    .map(
+      (reg) =>
+        `-${reg["LaFineEquipe-regulations_categories"]?.name || "N/A"} : ${
+          reg["LaFineEquipe-regulations"].title
+        } : ${reg["LaFineEquipe-regulations"].description} du ${
+          reg["LaFineEquipe-regulations"].date
+        }`
+    )
+    .join("\n");
 
   const documentsToSplit = [
     { pageContent: descriptionFineEquipe, metadata: { sourceType: "info" } },
@@ -129,6 +152,14 @@ export async function initializeVectorStore() {
     {
       pageContent: `Chiffres clés de la Fine Equipe:\n${figuresList}`,
       metadata: { sourceType: "figures" },
+    },
+    {
+      pageContent: `Liste des événements:\n${StringlistOfAllEvents}`,
+      metadata: { sourceType: "events_list" },
+    },
+    {
+      pageContent: `Liste des règlements:\n${StringlistOfAllRegulations}`,
+      metadata: { sourceType: "regulations_list" },
     },
   ];
 
