@@ -38,7 +38,7 @@ Créée en novembre 2023, au en vue des élections au Conseil de la faculté de 
 Nous travaillons aussi à faire participer directement les étudiants à la vie de l'Université , en proposant des listes d'étudiants ordinaires, sur une ligne apolitique et apartisane , aux élections des différents organes représentatifs des usagers .`;
 
 const clarificationFineEquipe = `
-Le président de la fine equipe est le président du bureau
+Le président de la fine equipe est le président de la division Bureau
 `;
 
 const pool = getPool();

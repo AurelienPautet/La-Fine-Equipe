@@ -13,7 +13,7 @@ export function getPool() {
         process.env.NODE_ENV === "production"
           ? { rejectUnauthorized: false }
           : false,
-      max: 3,
+      max: 2,
       idleTimeoutMillis: 10000,
       connectionTimeoutMillis: 10000,
     });
