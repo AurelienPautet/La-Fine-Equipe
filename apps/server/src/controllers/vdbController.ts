@@ -23,6 +23,20 @@ const textSplitter = new RecursiveCharacterTextSplitter({
   chunkOverlap: 200,
 });
 
+const descriptionFineEquipe = `La Qui Sommes-Nous ?
+La Fine Équipe est une association de l’Université Jean Moulin Lyon III, prônant l’entraide et l’engagement, et comptant huit élus au sein de ses membres.
+Apolitiques et apartisans, nous sommes indépendants et ne recevons aucun financement extérieur à l’Université.
+Inclusif, nous avons également la particularité d’être la seule association de l’Université dotée d’un pôle handicap.
+Présentation La Fine Équipe
+Les membres et les élus de La Fine Équipe se donnent pour mission d’incarner et de porter les revendications des étudiants de Lyon III auprès des instances décisionnelles.
+Pour cela, nous avons mis en place un cahier de doléances anonyme sur notre Linktree, et réalisons régulièrement sur nos réseaux sociaux et sur les campus, des sondages pour connaître les attentes, les opinions et les problèmes auxquels les étudiants sont confrontés dans leur vie quotidienne。
+`;
+
+const historyFineEquipe = `Notre Histoire
+Créée en novembre 2023, au en vue des élections au Conseil de la faculté de Droit, la liste de La Fine Équipe a rapidement évolué, pour devenir dès la rentrée 2024 une des principales associations étudiantes de l'Université Lyon III. De portée généraliste, nous organisons des conférences, des ateliers de conversation, et agissons au travers de notre pôle handicap.
+
+Nous travaillons aussi à faire participer directement les étudiants à la vie de l'Université , en proposant des listes d'étudiants ordinaires, sur une ligne apolitique et apartisane , aux élections des différents organes représentatifs des usagers .`;
+
 const pool = getPool();
 
 export const config = {
@@ -54,6 +68,8 @@ export async function initializeVectorStore() {
     .where(isNull(events.deletedAt));
 
   const documentsToSplit = [
+    { pageContent: descriptionFineEquipe, metadata: { sourceType: "info" } },
+    { pageContent: historyFineEquipe, metadata: { sourceType: "info" } },
     ...allEvents.map((event) => ({
       pageContent: `Événement: ${event.title}. Lieu: ${event.location}. Du ${event.startDate} au ${event.endDate}. Content: ${event.content}. Nb max participants: ${event.maxAttendees}.`,
       metadata: {
