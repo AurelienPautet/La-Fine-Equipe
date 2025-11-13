@@ -20,6 +20,8 @@ import figureRoutes from "./routes/figureRoutes";
 import homeSectionRoutes from "./routes/homeSectionRoutes";
 import chatRoutes from "./routes/chatRoutes";
 
+import { initializeVectorStore } from "./controllers/vdbController";
+
 const app = express();
 app.set("trust proxy", 1);
 app.use(cors());
@@ -40,6 +42,9 @@ app.use(
 // });
 
 // app.use("/api/auth/login", loginLimiter);
+
+// Initialize vector database
+initializeVectorStore();
 
 app.get("/", (_, res) => {
   res.send("Welcome to La Fine Equipe API!");

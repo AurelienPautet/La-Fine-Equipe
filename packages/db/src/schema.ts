@@ -6,6 +6,7 @@ import {
   integer,
   boolean,
   real,
+  vector,
 } from "drizzle-orm/pg-core";
 
 export const tags = pgTable("LaFineEquipe-tags", {
@@ -155,4 +156,12 @@ export const homeSections = pgTable("LaFineEquipe-home_sections", {
     .defaultNow()
     .$onUpdateFn(() => new Date()),
   deletedAt: timestamp("deleted_at"),
+});
+
+export const documentChunks = pgTable("LaFineEquipe-document_chunks", {
+  id: serial("id").primaryKey(),
+  text: text("text").notNull(),
+  embedding: vector("embedding", { dimensions: 768 }),
+  metadata: text("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
