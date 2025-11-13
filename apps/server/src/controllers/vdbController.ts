@@ -37,6 +37,10 @@ Créée en novembre 2023, au en vue des élections au Conseil de la faculté de 
 
 Nous travaillons aussi à faire participer directement les étudiants à la vie de l'Université , en proposant des listes d'étudiants ordinaires, sur une ligne apolitique et apartisane , aux élections des différents organes représentatifs des usagers .`;
 
+const clarificationFineEquipe = `
+Le président de la fine equipe est le président du bureau
+`;
+
 const pool = getPool();
 
 export const config = {
@@ -70,6 +74,7 @@ export async function initializeVectorStore() {
   const documentsToSplit = [
     { pageContent: descriptionFineEquipe, metadata: { sourceType: "info" } },
     { pageContent: historyFineEquipe, metadata: { sourceType: "info" } },
+    { pageContent: clarificationFineEquipe, metadata: { sourceType: "info" } },
     ...allEvents.map((event) => ({
       pageContent: `Événement: ${event.title}. Lieu: ${event.location}. Du ${event.startDate} au ${event.endDate}. Content: ${event.content}. Nb max participants: ${event.maxAttendees}.`,
       metadata: {

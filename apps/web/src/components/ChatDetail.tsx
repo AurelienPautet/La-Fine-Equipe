@@ -81,7 +81,7 @@ const ChatDetail: React.FC = () => {
   };
 
   return (
-    <div className="mb-2 card w-96 bg-base-200 shadow-lg p-4">
+    <div className="mb-2 card w-screen  md:w-96 bg-base-200 shadow-lg p-4">
       <div className="card-body p-2">
         <h2 className="card-title">LézardGPT</h2>
         <div
