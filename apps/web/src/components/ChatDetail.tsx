@@ -40,7 +40,7 @@ const ChatDetail: React.FC = () => {
 
   const createNewBotMessage = () => {
     const newBotMessage: Message = {
-      id: (messages.length + 1).toString(),
+      id: (messages.length + 2).toString(),
       sender: "bot",
       content: "",
       timestamp: Date.now(),
@@ -89,7 +89,7 @@ const ChatDetail: React.FC = () => {
           const errorContent =
             "Désolé, une erreur est survenue lors de l'envoi du message. Veuillez réessayer.";
           const errorMessage: Message = {
-            id: (prevMessages.length + 1).toString(),
+            id: prevMessages.length.toString(),
             sender: "bot",
             content: errorContent,
             timestamp: Date.now(),
@@ -126,7 +126,7 @@ const ChatDetail: React.FC = () => {
           }}
         >
           <textarea
-            className="textarea textarea-bordered w-full"
+            className="textarea textarea-bordered w-full text-base resize-none"
             placeholder="Type your message..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}

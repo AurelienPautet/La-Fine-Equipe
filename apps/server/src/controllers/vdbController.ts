@@ -8,6 +8,8 @@ import {
   figures,
   documentChunks,
   regulationsCategories,
+  simpleMembersSettings,
+  actifMembersSettings,
 } from "@lafineequipe/db/schema";
 import { eq, isNull, count } from "drizzle-orm";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
@@ -100,9 +102,44 @@ export async function initializeVectorStore() {
     )
     .join("\n");
 
+  const simpleMembersSettingsResult = await db
+    .select()
+    .from(simpleMembersSettings);
+  const actifMembersSettingsResult = await db
+    .select()
+    .from(actifMembersSettings);
+
+  const becomingMemberFineEquipe = `Devenir Membre de La Fine Equipe
+Nous sommes toujours à la recherche de nouveaux membres ! Si tu souhaites t’investir à La Fine Équipe, nous soutenir ou simplement te tenir informé de nos prochains évènements, devenir membre est exactement ce qui nous aide le plus. Pour cela, deux choix s’offrent à toi : l’adhésion simple, ou l’adhésion en tant que membre actif.
+
+L’adhésion simple est valable à vie. Celle-ci permet :
+
+D’être informé de l’actualité de La Fine Équipe
+D’être prioritaire pour les places à nos évènements
+D’intégrer, voire de créer un pôle pour faire vivre l’Association et réaliser tes projets
+D’être candidat sur l’une de nos listes.
+L'adhésion en tant que membre actif confère tous les avantages de l'adhésion simple, et permet, pour l'année scolaire en cours, moyennant une contribution de ${
+    actifMembersSettingsResult[0]?.price || "XX"
+  } euros :
+
+De voter aux réunions de l’Assemblée générale
+D’intégrer le Conseil d’administration ou le bureau le cas échéant
+D’être candidat en bonne place
+Et de nous soutenir financièrement !
+
+Voici les liens pour adhérer :
+- Adhésion simple ${simpleMembersSettingsResult[0]?.url || "URL_N_A"}
+
+- Adhésion active (${actifMembersSettingsResult[0]?.price || "XX"} euros) : ${
+    actifMembersSettingsResult[0]?.url || "URL_N_A"
+  }
+
+Si tu as des questions, n’hésite pas à nous contacter, par mail ou sur nos réseaux. Merci d’avance !`;
+
   const documentsToSplit = [
     { pageContent: descriptionFineEquipe, metadata: { sourceType: "info" } },
     { pageContent: historyFineEquipe, metadata: { sourceType: "info" } },
+    { pageContent: becomingMemberFineEquipe, metadata: { sourceType: "info" } },
     ...allEvents.map((event) => ({
       pageContent: `Événement: ${event.title}. Lieu: ${event.location}. Du ${event.startDate} au ${event.endDate}. Content: ${event.content}. Nb max participants: ${event.maxAttendees}.`,
       metadata: {

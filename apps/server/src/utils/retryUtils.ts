@@ -81,7 +81,7 @@ export const RetryPresets = {
   apiCall: {
     maxAttempts: 6,
     initialDelayMs: 1000,
-    maxDelayMs: 15000,
+    maxDelayMs: 50000,
     backoffMultiplier: 2,
   },
   database: {
