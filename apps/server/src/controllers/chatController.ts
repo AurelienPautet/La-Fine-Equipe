@@ -201,10 +201,12 @@ export const postChat = async (req: Request, res: Response) => {
       parts: [{ text: finalRagPrompt }],
     });
 
+    let model = "gemini-2.5-flash";
+
     try {
       const generateContent = () =>
         ai.models.generateContentStream({
-          model: "gemini-2.5-flash",
+          model: model,
           contents: finalConversationHistory,
         });
 
@@ -215,6 +217,14 @@ export const postChat = async (req: Request, res: Response) => {
             `Retry attempt ${attempt} for content generation:`,
             error.message
           );
+          if (error.message.includes("You exceeded your current quota")) {
+            console.log(
+              "Quota exceeded for model",
+              model,
+              "- switching to a lighter model."
+            );
+            model = "gemini-2.5-flash-lite";
+          }
         },
       });
 
