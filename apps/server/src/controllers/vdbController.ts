@@ -6,8 +6,9 @@ import {
   teamMembers,
   divisions,
   figures,
+  documentChunks,
 } from "@lafineequipe/db/schema";
-import { eq, isNull } from "drizzle-orm";
+import { eq, isNull, count } from "drizzle-orm";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
@@ -38,31 +39,31 @@ Créée en novembre 2023, au en vue des élections au Conseil de la faculté de 
 Nous travaillons aussi à faire participer directement les étudiants à la vie de l'Université , en proposant des listes d'étudiants ordinaires, sur une ligne apolitique et apartisane , aux élections des différents organes représentatifs des usagers .`;
 
 const clarificationFineEquipe = `
-Le président de la fine equipe est le président de la division Bureau
+Le président de la fine equipe est le président du pôle Bureau
 `;
 
-const pool = getPool();
-
-export const config = {
-  pool,
-  tableName: '"LaFineEquipe-document_chunks"',
-  vectorColumnName: "embedding",
-  contentColumnName: "text",
-  metadataColumnName: "metadata",
-  dimensions: 768,
-};
-
 export async function initializeVectorStore() {
-  const nbChunks = await pool.query(
-    `SELECT COUNT(*) FROM "LaFineEquipe-document_chunks"`
-  );
-  const count = parseInt(nbChunks.rows[0].count, 10);
-  if (count > 0) {
+  const nbChunks = await db
+    .select({ count: count(documentChunks.id) })
+    .from(documentChunks);
+  const nbChunckCount = nbChunks[0]?.count || 0;
+  if (nbChunckCount > 0) {
     console.log(
-      `Vector store already initialized with ${count} chunks. Skipping initialization.`
+      `Vector store already initialized with ${nbChunckCount} chunks. Skipping initialization.`
     );
     return;
   }
+
+  const pool = getPool();
+
+  const config = {
+    pool,
+    tableName: '"LaFineEquipe-document_chunks"',
+    vectorColumnName: "embedding",
+    contentColumnName: "text",
+    metadataColumnName: "metadata",
+    dimensions: 768,
+  };
 
   const vectorStore = await PGVectorStore.initialize(embeddings, config);
 
@@ -71,10 +72,14 @@ export async function initializeVectorStore() {
     .from(events)
     .where(isNull(events.deletedAt));
 
+  const allRegulations = await db
+    .select()
+    .from(regulations)
+    .where(isNull(regulations.deletedAt));
+
   const documentsToSplit = [
     { pageContent: descriptionFineEquipe, metadata: { sourceType: "info" } },
     { pageContent: historyFineEquipe, metadata: { sourceType: "info" } },
-    { pageContent: clarificationFineEquipe, metadata: { sourceType: "info" } },
     ...allEvents.map((event) => ({
       pageContent: `Événement: ${event.title}. Lieu: ${event.location}. Du ${event.startDate} au ${event.endDate}. Content: ${event.content}. Nb max participants: ${event.maxAttendees}.`,
       metadata: {
@@ -101,22 +106,30 @@ export async function initializeVectorStore() {
     .from(figures)
     .where(isNull(figures.deletedAt));
 
+  const membersList = allMembers
+    .map(
+      (m) =>
+        `- ${m["LaFineEquipe-team_members"].firstName} ${
+          m["LaFineEquipe-team_members"].lastName
+        } est ${m["LaFineEquipe-team_members"].role} au sein du pôle ${
+          m["LaFineEquipe-divisions"]?.name || "N/A"
+        }`
+    )
+    .join("\n");
+
+  const figuresList = allFigures
+    .map((f) => `- ${f.figure}: ${f.description}`)
+    .join("\n");
+
   const factChunks = [
-    ...allMembers.map((m) => ({
-      pageContent: `${m["LaFineEquipe-team_members"].firstName} ${
-        m["LaFineEquipe-team_members"].lastName
-      } est ${m["LaFineEquipe-team_members"].role} au sein de la division ${
-        m["LaFineEquipe-divisions"]?.name || "N/A"
-      }.`,
-      metadata: {
-        sourceType: "member",
-        sourceId: m["LaFineEquipe-team_members"].id.toString(),
-      },
-    })),
-    ...allFigures.map((f) => ({
-      pageContent: `Chiffre clé: ${f.figure} - ${f.description}.`,
-      metadata: { sourceType: "figure", sourceId: f.id.toString() },
-    })),
+    {
+      pageContent: `Membres de la Fine Equipe (${clarificationFineEquipe}):\n${membersList}`,
+      metadata: { sourceType: "members" },
+    },
+    {
+      pageContent: `Chiffres clés de la Fine Equipe:\n${figuresList}`,
+      metadata: { sourceType: "figures" },
+    },
   ];
 
   console.log(

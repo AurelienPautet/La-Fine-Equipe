@@ -144,8 +144,9 @@ export const postChat = async (req: Request, res: Response) => {
 
     const finalRagPrompt = `
       Tu es Lézard GPT. Réponds à ma question en te basant sur le contexte ci-dessous.
-      - Tu dois utiliser **uniquement** les informations du contexte pour répondre.
-      - Si la réponse n'est pas dans le contexte, dis-le gentiment (ex: "Je ne trouve pas cette info dans mes documents, désolé !").
+      - Tu dois utiliser **en priorité** les informations du contexte pour répondre.
+      - Si la question ne concerne pas directement 'La Fine Equipe', réponds sans inventer d'informations.
+      - Si la question concerne 'La Fine Equipe' et que la réponse n'est pas dans le contexte, dis-le gentiment (ex: "Je n'ai pas cette information, désolé !").
       - Ma question est (potentiellement reformulée) : "${condensedQuestion}"
       - Garde ta personnalité de lézard, mais la précision est prioritaire.
       
