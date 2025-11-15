@@ -95,8 +95,12 @@ export const postChat = async (req: Request, res: Response) => {
 
     try {
       const condensationPrompt = `
-        Étant donné l'historique de chat suivant et la dernière question de l'utilisateur, 
+        Étant donné l'historique de chat suivant et SURTOUT la dernière question de l'utilisateur, 
         reformule la dernière question pour qu'elle soit une question autonome et complète.
+        Si l'utilisateur te remerci ou fait une remarque, la question autonome doit refléter cela.
+
+        Considère les questions ambiguë comme si elles concernaient directement 'La Fine Equipe'.
+        Ex : "Quelle est sa mission ?" => "Quelle est la mission de La Fine Equipe ?"
         
         Historique:
         ${historyForCondensation
@@ -107,10 +111,10 @@ export const postChat = async (req: Request, res: Response) => {
         Dernière question: ${lastUserMessageContent}
 
         Tu indiquera aussi si des informations du contexte sont nécessaires pour répondre à la question, si la question ne te semble pas concerner **directement** LaFineEquipe alors false. (true/false)
+        A l'inverse si la question concerne directement LaFineEquipe, alors true.
 
-        Si t'as besoin de contexte pour répondre, reformule la question en conséquence.
-
-        Si la résponse ne nécessite pas de contexte, répond simplement à la question. Sinon laisse le champ 'answer' vide.
+        Si la réponse ne nécessite pas de contexte, répond simplement à la question. 
+        Sinon laisse le champ 'answer' vide.
         
         Shéma de la réponse:
         {
@@ -118,6 +122,8 @@ export const postChat = async (req: Request, res: Response) => {
         needsContext: true/false
         answer: "la réponse ici (si besoin)"
         }
+
+        Avoir needsContext mis à false signifie que tu DOIS répondre !
       `;
 
       const condensationResult = await retryWithBackoff(
