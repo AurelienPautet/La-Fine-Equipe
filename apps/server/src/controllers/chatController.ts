@@ -77,7 +77,7 @@ export const postChat = async (req: Request, res: Response) => {
     const historyForCondensation = [
       { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
       ...messages.slice(0, -1).map((msg: Message) => ({
-        role: msg.sender === "user" ? "user" : "model",
+        role: msg.role,
         parts: [{ text: msg.content }],
       })),
     ];
@@ -92,10 +92,7 @@ export const postChat = async (req: Request, res: Response) => {
         Historique:
         ${historyForCondensation
           .slice(1)
-          .map(
-            (msg) =>
-              `${msg.role === "user" ? "User" : "Model"}: ${msg.parts[0].text}`
-          )
+          .map((msg) => `${msg.role}: ${msg.parts[0].text}`)
           .join("\n")}
         
         Dernière question: ${lastUserMessageContent}
@@ -122,10 +119,10 @@ export const postChat = async (req: Request, res: Response) => {
 
       if (condensationResult.text) {
         condensedQuestion = condensationResult.text.trim();
+        console.log("Condensed Question:", condensedQuestion);
       }
     } catch (error) {
       console.error("Error condensing question:", error);
-      condensedQuestion = lastUserMessageContent;
     }
 
     let relevantDocs;
@@ -166,13 +163,13 @@ export const postChat = async (req: Request, res: Response) => {
     const finalConversationHistory = [
       { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
       ...messages.slice(0, -1).map((msg: Message) => ({
-        role: msg.sender === "user" ? "user" : "model",
+        role: msg.role,
         parts: [{ text: msg.content }],
       })),
     ];
 
     const finalRagPrompt = `
-      Tu es Lézard GPT. Réponds à ma question en te basant sur le contexte ci-dessous.
+      Tu es Lézard GPT. Réponds à ma question de manière précise mais concise en te basant sur le contexte ci-dessous.
       - Tu dois utiliser **en priorité** les informations du contexte pour répondre.
       - Si la question ne concerne pas directement 'La Fine Equipe', réponds sans inventer d'informations.
       - Si la question concerne directement 'La Fine Equipe' et que la réponse n'est pas dans le contexte, dis-le gentiment (ex: "Je n'ai pas cette information, désolé !").
@@ -218,7 +215,12 @@ export const postChat = async (req: Request, res: Response) => {
             `Retry attempt ${attempt} for content generation:`,
             error.message
           );
-          if (error.message.includes("You exceeded your current quota")) {
+          if (attempt > 4) {
+            console.log("Switching to lighter model due to repeated failures.");
+            model = "gemini-2.5-flash-lite";
+          } else if (
+            error.message.includes("You exceeded your current quota")
+          ) {
             console.log(
               "Quota exceeded for model",
               model,

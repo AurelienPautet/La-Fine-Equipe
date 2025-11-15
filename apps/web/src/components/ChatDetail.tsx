@@ -9,7 +9,7 @@ const ChatDetail: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      sender: "bot",
+      role: "model",
       content:
         "Bonjour je suis le lézardGPT de la fine équipe, comment puis je vous aider ? ",
       timestamp: Date.now(),
@@ -21,7 +21,7 @@ const ChatDetail: React.FC = () => {
   const postChatMessageMutation = usePostChatMessage((chunk: string) => {
     setMessages((prevMessages) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
-      if (lastMessage && lastMessage.sender === "bot") {
+      if (lastMessage && lastMessage.role === "model") {
         const updatedLastMessage = {
           ...lastMessage,
           content: lastMessage.content + chunk,
@@ -41,7 +41,7 @@ const ChatDetail: React.FC = () => {
   const createNewBotMessage = () => {
     const newBotMessage: Message = {
       id: (messages.length + 2).toString(),
-      sender: "bot",
+      role: "model",
       content: "",
       timestamp: Date.now(),
     };
@@ -50,7 +50,7 @@ const ChatDetail: React.FC = () => {
 
   useEffect(() => {
     if (
-      messages[messages.length - 1].sender === "user" ||
+      messages[messages.length - 1].role === "user" ||
       messages[messages.length - 1].content === ""
     ) {
       scrollToBottom();
@@ -65,7 +65,7 @@ const ChatDetail: React.FC = () => {
     setWaitingForResponse(true);
     const userMessage: Message = {
       id: (messages.length + 1).toString(),
-      sender: "user",
+      role: "user",
       content: inputValue,
       timestamp: Date.now(),
     };
@@ -76,7 +76,7 @@ const ChatDetail: React.FC = () => {
       onSuccess: () => {
         setWaitingForResponse(false);
         if (
-          messages[messages.length - 1].sender === "bot" &&
+          messages[messages.length - 1].role === "model" &&
           messages[messages.length - 1].content === ""
         ) {
           setMessages((prevMessages) => prevMessages.slice(0, -1));
@@ -91,7 +91,7 @@ const ChatDetail: React.FC = () => {
             "Désolé, une erreur est survenue lors de l'envoi du message. Veuillez réessayer.";
           const errorMessage: Message = {
             id: prevMessages.length.toString(),
-            sender: "bot",
+            role: "model",
             content: errorContent,
             timestamp: Date.now(),
           };
