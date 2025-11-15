@@ -18,19 +18,25 @@ const ChatDetail: React.FC = () => {
 
   const [waitingForResponse, setWaitingForResponse] = useState(false);
 
-  const postChatMessageMutation = usePostChatMessage((chunk: string) => {
-    setMessages((prevMessages) => {
-      const lastMessage = prevMessages[prevMessages.length - 1];
-      if (lastMessage && lastMessage.role === "model") {
-        const updatedLastMessage = {
-          ...lastMessage,
-          content: lastMessage.content + chunk,
-        };
-        return [...prevMessages.slice(0, -1), updatedLastMessage];
-      }
-      return prevMessages;
-    });
-  });
+  const postChatMessageMutation = usePostChatMessage(
+    (chunk: string, type: string) => {
+      setMessages((prevMessages) => {
+        const lastMessage = prevMessages[prevMessages.length - 1];
+        if (lastMessage && lastMessage.role === "model") {
+          const updatedLastMessage = {
+            ...lastMessage,
+
+            content: lastMessage.content + (type === "content" ? chunk : ""),
+            reasoningContent:
+              lastMessage.reasoningContent +
+              (type === "reasoningContent" ? chunk : ""),
+          };
+          return [...prevMessages.slice(0, -1), updatedLastMessage];
+        }
+        return prevMessages;
+      });
+    }
+  );
 
   const scrollToBottom = () => {
     if (messagesDivRef.current) {
@@ -43,6 +49,7 @@ const ChatDetail: React.FC = () => {
       id: (messages.length + 2).toString(),
       role: "model",
       content: "",
+      reasoningContent: "",
       timestamp: Date.now(),
     };
     setMessages((prevMessages) => [...prevMessages, newBotMessage]);

@@ -5,9 +5,17 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
 import { getPool } from "@lafineequipe/db";
 import { retryWithBackoff, RetryPresets } from "../utils/retryUtils";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+const responseSchema = z.object({
+  question: z.string(),
+  needsContext: z.boolean(),
+  answer: z.string().optional(),
+});
 
 const SYSTEM_PROMPT =
   "Tu es Lézard GPT, un assistant IA pour l'association 'La Fine Equipe'. Fais quelques blagues en rapport avec les lézards quand c'est approprié, mais sois toujours factuel.";
@@ -83,6 +91,7 @@ export const postChat = async (req: Request, res: Response) => {
     ];
 
     let condensedQuestion = lastUserMessageContent;
+    let needsContext = true;
 
     try {
       const condensationPrompt = `
@@ -96,8 +105,19 @@ export const postChat = async (req: Request, res: Response) => {
           .join("\n")}
         
         Dernière question: ${lastUserMessageContent}
+
+        Tu indiquera aussi si des informations du contexte sont nécessaires pour répondre à la question, si la question ne te semble pas concerner **directement** LaFineEquipe alors false. (true/false)
+
+        Si t'as besoin de contexte pour répondre, reformule la question en conséquence.
+
+        Si la résponse ne nécessite pas de contexte, répond simplement à la question. Sinon laisse le champ 'answer' vide.
         
-        Question autonome:
+        Shéma de la réponse:
+        {
+        question: "la question reformulée ici",
+        needsContext: true/false
+        answer: "la réponse ici (si besoin)"
+        }
       `;
 
       const condensationResult = await retryWithBackoff(
@@ -105,6 +125,10 @@ export const postChat = async (req: Request, res: Response) => {
           ai.models.generateContent({
             model: "gemini-2.5-flash-lite",
             contents: [{ role: "user", parts: [{ text: condensationPrompt }] }],
+            config: {
+              responseMimeType: "application/json",
+              responseJsonSchema: zodToJsonSchema(responseSchema),
+            },
           }),
         {
           ...RetryPresets.apiCall,
@@ -118,57 +142,99 @@ export const postChat = async (req: Request, res: Response) => {
       );
 
       if (condensationResult.text) {
-        condensedQuestion = condensationResult.text.trim();
+        const condensationResultParsed = responseSchema.parse(
+          JSON.parse(condensationResult.text)
+        );
+        condensedQuestion = condensationResultParsed.question.trim();
+        needsContext = condensationResultParsed.needsContext;
         console.log("Condensed Question:", condensedQuestion);
+        res.write(
+          `${JSON.stringify({
+            chunk: "** Question reformulée: **\n" + condensedQuestion + "\n",
+            type: "reasoningContent",
+          })}\n\n`
+        );
+        res.write(
+          `${JSON.stringify({
+            chunk: "** Besoin de contexte: **\n" + needsContext + "\n",
+            type: "reasoningContent",
+          })}\n\n`
+        );
+        console.log("res", condensationResultParsed);
+        if (
+          !needsContext &&
+          condensationResultParsed.answer &&
+          condensationResultParsed.answer !== ""
+        ) {
+          console.log("Answered without context.");
+          res.write(
+            `${JSON.stringify({
+              chunk: condensationResultParsed.answer,
+              type: "content",
+            })}\n\n`
+          );
+          res.write(`${JSON.stringify({ done: true })}\n\n`);
+          res.end();
+          console.log("Answered without context.");
+          return;
+        }
       }
     } catch (error) {
       console.error("Error condensing question:", error);
     }
 
-    let relevantDocs;
-    try {
-      const store = await getVectorStore();
-      relevantDocs = await retryWithBackoff(
-        () => store.similaritySearch(condensedQuestion, 4),
-        {
-          ...RetryPresets.vectorStore,
-          onRetry: (attempt, error) => {
-            console.warn(
-              `Retry attempt ${attempt} for vector store search:`,
-              error.message
-            );
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Error during vector search:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to retrieve relevant documents";
+    let relevantDocs = [];
+    if (needsContext) {
+      try {
+        const store = await getVectorStore();
+        relevantDocs = await retryWithBackoff(
+          () => store.similaritySearch(condensedQuestion, 4),
+          {
+            ...RetryPresets.vectorStore,
+            onRetry: (attempt, error) => {
+              console.warn(
+                `Retry attempt ${attempt} for vector store search:`,
+                error.message
+              );
+            },
+          }
+        );
+      } catch (error) {
+        console.error("Error during vector search:", error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Failed to retrieve relevant documents";
+        res.write(
+          `${JSON.stringify({
+            error: errorMessage,
+            done: true,
+          })}\n\n`
+        );
+        res.end();
+        return;
+      }
+
       res.write(
         `${JSON.stringify({
-          error: errorMessage,
-          done: true,
+          chunk: "** Nombre de documents analysés: **\n" + relevantDocs.length,
+          type: "reasoningContent",
         })}\n\n`
       );
-      res.end();
-      return;
-    }
 
-    const context = relevantDocs
-      .map((doc) => doc.pageContent)
-      .join("\n\n---\n\n");
+      const context = relevantDocs
+        .map((doc) => doc.pageContent)
+        .join("\n\n---\n\n");
 
-    const finalConversationHistory = [
-      { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-      ...messages.slice(0, -1).map((msg: Message) => ({
-        role: msg.role,
-        parts: [{ text: msg.content }],
-      })),
-    ];
+      const finalConversationHistory = [
+        { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+        ...messages.slice(0, -1).map((msg: Message) => ({
+          role: msg.role,
+          parts: [{ text: msg.content }],
+        })),
+      ];
 
-    const finalRagPrompt = `
+      const finalRagPrompt = `
       Tu es Lézard GPT. Réponds à ma question de manière précise mais concise en te basant sur le contexte ci-dessous.
       - Tu dois utiliser **en priorité** les informations du contexte pour répondre.
       - Si la question ne concerne pas directement 'La Fine Equipe', réponds sans inventer d'informations.
@@ -194,60 +260,65 @@ export const postChat = async (req: Request, res: Response) => {
       **Ma question originale était:** "${lastUserMessageContent}"
     `;
 
-    finalConversationHistory.push({
-      role: "user",
-      parts: [{ text: finalRagPrompt }],
-    });
-
-    let model = "gemini-2.5-flash";
-
-    try {
-      const generateContent = () =>
-        ai.models.generateContentStream({
-          model: model,
-          contents: finalConversationHistory,
-        });
-
-      const response = await retryWithBackoff(generateContent, {
-        ...RetryPresets.apiCall,
-        onRetry: (attempt, error) => {
-          console.warn(
-            `Retry attempt ${attempt} for content generation:`,
-            error.message
-          );
-          if (attempt > 4) {
-            console.log("Switching to lighter model due to repeated failures.");
-            model = "gemini-2.5-flash-lite";
-          } else if (
-            error.message.includes("You exceeded your current quota")
-          ) {
-            console.log(
-              "Quota exceeded for model",
-              model,
-              "- switching to a lighter model."
-            );
-            model = "gemini-2.5-flash-lite";
-          }
-        },
+      finalConversationHistory.push({
+        role: "user",
+        parts: [{ text: finalRagPrompt }],
       });
 
-      for await (const chunk of response) {
-        if (chunk.text) {
-          res.write(`${JSON.stringify({ chunk: chunk.text })}\n\n`);
-        }
-      }
+      let model = "gemini-2.5-flash";
 
-      res.write(`${JSON.stringify({ done: true })}\n\n`);
-      res.end();
-    } catch (error) {
-      console.error("Error during content generation:", error);
-      res.write(
-        `${JSON.stringify({
-          error: "Failed to generate response",
-          done: true,
-        })}\n\n`
-      );
-      res.end();
+      try {
+        const generateContent = () =>
+          ai.models.generateContentStream({
+            model: model,
+            contents: finalConversationHistory,
+          });
+
+        const response = await retryWithBackoff(generateContent, {
+          ...RetryPresets.apiCall,
+          onRetry: (attempt, error) => {
+            console.warn(
+              `Retry attempt ${attempt} for content generation:`,
+              error.message
+            );
+            if (attempt > 4) {
+              console.log(
+                "Switching to lighter model due to repeated failures."
+              );
+              model = "gemini-2.5-flash-lite";
+            } else if (
+              error.message.includes("You exceeded your current quota")
+            ) {
+              console.log(
+                "Quota exceeded for model",
+                model,
+                "- switching to a lighter model."
+              );
+              model = "gemini-2.5-flash-lite";
+            }
+          },
+        });
+
+        for await (const chunk of response) {
+          if (chunk.text) {
+            res.write(
+              `${JSON.stringify({ chunk: chunk.text, type: "content" })}\n\n`
+            );
+          }
+        }
+
+        res.write(`${JSON.stringify({ done: true })}\n\n`);
+        res.end();
+      } catch (error) {
+        console.error("Error during content generation:", error);
+        res.write(
+          `${JSON.stringify({
+            error: "Failed to generate response",
+            done: true,
+          })}\n\n`
+        );
+        res.end();
+      }
     }
   } catch (error) {
     console.error("Error processing chat message:", error);
