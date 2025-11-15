@@ -26,7 +26,7 @@ const ChatMessage: React.FC<Message> = ({
     <div key={id} className={`relative chat ${chatClass}`}>
       <div className={`chat-bubble ${bgColor}`}>
         {reasoningContent && reasoningContent !== "" && (
-          <div className="collapse ">
+          <div className="collapse rounded-none ">
             <input type="checkbox" onChange={handleReasoningToggle} />
             <div
               className={`collapse-title pl-0 pb-1 ${
@@ -40,7 +40,7 @@ const ChatMessage: React.FC<Message> = ({
                 <FaArrowUp className="inline ml-2" />
               )}
             </div>
-            <div className="collapse-content border-l-2 border-gray-300  pl-2">
+            <div className="collapse-content border-l-2  border-gray-300  pl-2">
               {reasoningContent.split("\n").map((line, index) => (
                 <Fragment key={index}>
                   <ReactMarkdown
