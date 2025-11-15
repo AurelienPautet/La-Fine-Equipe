@@ -99,9 +99,10 @@ export const postChat = async (req: Request, res: Response) => {
         reformule la dernière question pour qu'elle soit une question autonome et complète.
         Si l'utilisateur te remerci ou fait une remarque, la question autonome doit refléter cela.
 
-        Considère les questions ambiguë comme si elles concernaient directement 'La Fine Equipe'.
+        Considère les questions ambiguë ou vagues comme si elles concernaient directement 'La Fine Equipe'.
         Ex : "Quelle est sa mission ?" => "Quelle est la mission de La Fine Equipe ?"
-        
+        Ex : "Qui est Esteban ?" => "Qui est Esteban dans le contexte de La Fine Equipe ?"
+
         Historique:
         ${historyForCondensation
           .slice(1)
@@ -110,10 +111,10 @@ export const postChat = async (req: Request, res: Response) => {
         
         Dernière question: ${lastUserMessageContent}
 
-        Tu indiquera aussi si des informations du contexte sont nécessaires pour répondre à la question, si la question ne te semble pas concerner **directement** LaFineEquipe alors false. (true/false)
-        A l'inverse si la question concerne directement LaFineEquipe, alors true.
+        Tu indiquera aussi si des informations du contexte sont nécessaires pour répondre à la question, si la question ne te semble pas concerner La Fine Equipe et que tu n'as pas besoin d'informations supplémentaires alors false. (true/false)
+        A l'inverse si la question concerne La Fine Equipe ou que des informations supplémentaires sont nécessaires , alors true.
 
-        Si la réponse ne nécessite pas de contexte, répond simplement à la question. 
+        Si la réponse ne nécessite pas de contexte (needsContext = false), répond simplement à la question. 
         Sinon laisse le champ 'answer' vide.
         
         Shéma de la réponse:
@@ -256,7 +257,7 @@ export const postChat = async (req: Request, res: Response) => {
         }
       )}.
       - Ne parle **jamais** du 'contexte' ni du texte dans ta réponse. Si tu avais **besoin** du contexte pour formuler ta réponse, et qu'il ne t'a rien donné, dis simplement que tu n'as pas cette information. 
-      - Garde ta personnalité de lézard, mais la précision est prioritaire.
+      - Garde ta personnalité de lézard, mais la précision est prioritaire. Fais des blagues SEULEMENT si c'est pertinent.
       
       **Contexte fourni:**
       """
