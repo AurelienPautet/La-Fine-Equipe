@@ -5,9 +5,17 @@ import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
 import { getPool } from "@lafineequipe/db";
 import { retryWithBackoff, RetryPresets } from "../utils/retryUtils";
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+const responseSchema = z.object({
+  question: z.string(),
+  needsContext: z.boolean(),
+  answer: z.string().optional(),
+});
 
 const SYSTEM_PROMPT =
   "Tu es Lézard GPT, un assistant IA pour l'association 'La Fine Equipe'. Fais quelques blagues en rapport avec les lézards quand c'est approprié, mais sois toujours factuel.";
@@ -77,30 +85,46 @@ export const postChat = async (req: Request, res: Response) => {
     const historyForCondensation = [
       { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
       ...messages.slice(0, -1).map((msg: Message) => ({
-        role: msg.sender === "user" ? "user" : "model",
+        role: msg.role,
         parts: [{ text: msg.content }],
       })),
     ];
 
     let condensedQuestion = lastUserMessageContent;
+    let needsContext = true;
 
     try {
       const condensationPrompt = `
-        Étant donné l'historique de chat suivant et la dernière question de l'utilisateur, 
-        reformule la dernière question pour qu'elle soit une question autonome et complète.
-        
+        Étant donné l'historique de chat suivant et SURTOUT la dernière question de l'utilisateur, 
+        reformule la dernière question pour qu'elle soit une question autonome et complète. Elle doit être fidéle au sens original.
+        Ne reformul pas si la question est un simple remerciement ou une salutation.
+
+        Considère les questions ambiguë ou vagues comme si elles concernaient directement 'La Fine Equipe'.
+        Ex : "Quelle est sa mission ?" => "Quelle est la mission de La Fine Equipe ?"
+        Ex : "Qui est Esteban ?" => "Qui est Esteban dans le contexte de La Fine Equipe ?"
+
         Historique:
         ${historyForCondensation
           .slice(1)
-          .map(
-            (msg) =>
-              `${msg.role === "user" ? "User" : "Model"}: ${msg.parts[0].text}`
-          )
+          .map((msg) => `${msg.role}: ${msg.parts[0].text}`)
           .join("\n")}
         
         Dernière question: ${lastUserMessageContent}
+
+        Tu indiquera aussi si des informations du contexte sont nécessaires pour répondre à la question, si la question ne te semble pas concerner La Fine Equipe et que tu n'as pas besoin d'informations supplémentaires alors false. (true/false)
+        A l'inverse si la question concerne La Fine Equipe ou que des informations supplémentaires sont nécessaires , alors true.
+
+        Si la réponse ne nécessite pas de contexte (needsContext = false), répond simplement à la question. 
+        Sinon laisse le champ 'answer' vide.
         
-        Question autonome:
+        Shéma de la réponse:
+        {
+        question: "la question reformulée ici",
+        needsContext: true/false
+        answer: "la réponse ici (si besoin)"
+        }
+
+        Avoir needsContext mis à false signifie que tu DOIS répondre !
       `;
 
       const condensationResult = await retryWithBackoff(
@@ -108,6 +132,10 @@ export const postChat = async (req: Request, res: Response) => {
           ai.models.generateContent({
             model: "gemini-2.5-flash-lite",
             contents: [{ role: "user", parts: [{ text: condensationPrompt }] }],
+            config: {
+              responseMimeType: "application/json",
+              responseJsonSchema: zodToJsonSchema(responseSchema),
+            },
           }),
         {
           ...RetryPresets.apiCall,
@@ -121,58 +149,100 @@ export const postChat = async (req: Request, res: Response) => {
       );
 
       if (condensationResult.text) {
-        condensedQuestion = condensationResult.text.trim();
+        const condensationResultParsed = responseSchema.parse(
+          JSON.parse(condensationResult.text)
+        );
+        condensedQuestion = condensationResultParsed.question.trim();
+        needsContext = condensationResultParsed.needsContext;
+        console.log("Condensed Question:", condensedQuestion);
+        res.write(
+          `${JSON.stringify({
+            chunk: "** Question reformulée: **\n" + condensedQuestion + "\n",
+            type: "reasoningContent",
+          })}\n\n`
+        );
+        res.write(
+          `${JSON.stringify({
+            chunk: "** Besoin de contexte: **\n" + needsContext + "\n",
+            type: "reasoningContent",
+          })}\n\n`
+        );
+        console.log("res", condensationResultParsed);
+        if (
+          !needsContext &&
+          condensationResultParsed.answer &&
+          condensationResultParsed.answer !== ""
+        ) {
+          console.log("Answered without context.");
+          res.write(
+            `${JSON.stringify({
+              chunk: condensationResultParsed.answer,
+              type: "content",
+            })}\n\n`
+          );
+          res.write(`${JSON.stringify({ done: true })}\n\n`);
+          res.end();
+          console.log("Answered without context.");
+          return;
+        }
       }
     } catch (error) {
       console.error("Error condensing question:", error);
-      condensedQuestion = lastUserMessageContent;
     }
 
-    let relevantDocs;
-    try {
-      const store = await getVectorStore();
-      relevantDocs = await retryWithBackoff(
-        () => store.similaritySearch(condensedQuestion, 4),
-        {
-          ...RetryPresets.vectorStore,
-          onRetry: (attempt, error) => {
-            console.warn(
-              `Retry attempt ${attempt} for vector store search:`,
-              error.message
-            );
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Error during vector search:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to retrieve relevant documents";
+    let relevantDocs = [];
+    if (needsContext) {
+      try {
+        const store = await getVectorStore();
+        relevantDocs = await retryWithBackoff(
+          () => store.similaritySearch(condensedQuestion, 4),
+          {
+            ...RetryPresets.vectorStore,
+            onRetry: (attempt, error) => {
+              console.warn(
+                `Retry attempt ${attempt} for vector store search:`,
+                error.message
+              );
+            },
+          }
+        );
+      } catch (error) {
+        console.error("Error during vector search:", error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Failed to retrieve relevant documents";
+        res.write(
+          `${JSON.stringify({
+            error: errorMessage,
+            done: true,
+          })}\n\n`
+        );
+        res.end();
+        return;
+      }
+
       res.write(
         `${JSON.stringify({
-          error: errorMessage,
-          done: true,
+          chunk: "** Nombre de documents analysés: **\n" + relevantDocs.length,
+          type: "reasoningContent",
         })}\n\n`
       );
-      res.end();
-      return;
-    }
 
-    const context = relevantDocs
-      .map((doc) => doc.pageContent)
-      .join("\n\n---\n\n");
+      const context = relevantDocs
+        .map((doc) => doc.pageContent)
+        .join("\n\n---\n\n");
 
-    const finalConversationHistory = [
-      { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-      ...messages.slice(0, -1).map((msg: Message) => ({
-        role: msg.sender === "user" ? "user" : "model",
-        parts: [{ text: msg.content }],
-      })),
-    ];
+      const finalConversationHistory = [
+        { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+        ...messages.slice(0, -1).map((msg: Message) => ({
+          role: msg.role,
+          parts: [{ text: msg.content }],
+        })),
+      ];
 
-    const finalRagPrompt = `
-      Tu es Lézard GPT. Réponds à ma question en te basant sur le contexte ci-dessous.
+      const finalRagPrompt = `
+      Tu es Lézard GPT. Réponds à ma question de manière précise mais concise en te basant sur le contexte ci-dessous.
       - Tu dois utiliser **en priorité** les informations du contexte pour répondre.
       - Si la question ne concerne pas directement 'La Fine Equipe', réponds sans inventer d'informations.
       - Si la question concerne directement 'La Fine Equipe' et que la réponse n'est pas dans le contexte, dis-le gentiment (ex: "Je n'ai pas cette information, désolé !").
@@ -187,7 +257,7 @@ export const postChat = async (req: Request, res: Response) => {
         }
       )}.
       - Ne parle **jamais** du 'contexte' ni du texte dans ta réponse. Si tu avais **besoin** du contexte pour formuler ta réponse, et qu'il ne t'a rien donné, dis simplement que tu n'as pas cette information. 
-      - Garde ta personnalité de lézard, mais la précision est prioritaire.
+      - Garde ta personnalité de lézard, mais la précision est prioritaire. Fais des blagues SEULEMENT si c'est pertinent.
       
       **Contexte fourni:**
       """
@@ -197,55 +267,65 @@ export const postChat = async (req: Request, res: Response) => {
       **Ma question originale était:** "${lastUserMessageContent}"
     `;
 
-    finalConversationHistory.push({
-      role: "user",
-      parts: [{ text: finalRagPrompt }],
-    });
-
-    let model = "gemini-2.5-flash";
-
-    try {
-      const generateContent = () =>
-        ai.models.generateContentStream({
-          model: model,
-          contents: finalConversationHistory,
-        });
-
-      const response = await retryWithBackoff(generateContent, {
-        ...RetryPresets.apiCall,
-        onRetry: (attempt, error) => {
-          console.warn(
-            `Retry attempt ${attempt} for content generation:`,
-            error.message
-          );
-          if (error.message.includes("You exceeded your current quota")) {
-            console.log(
-              "Quota exceeded for model",
-              model,
-              "- switching to a lighter model."
-            );
-            model = "gemini-2.5-flash-lite";
-          }
-        },
+      finalConversationHistory.push({
+        role: "user",
+        parts: [{ text: finalRagPrompt }],
       });
 
-      for await (const chunk of response) {
-        if (chunk.text) {
-          res.write(`${JSON.stringify({ chunk: chunk.text })}\n\n`);
-        }
-      }
+      let model = "gemini-2.5-flash";
 
-      res.write(`${JSON.stringify({ done: true })}\n\n`);
-      res.end();
-    } catch (error) {
-      console.error("Error during content generation:", error);
-      res.write(
-        `${JSON.stringify({
-          error: "Failed to generate response",
-          done: true,
-        })}\n\n`
-      );
-      res.end();
+      try {
+        const generateContent = () =>
+          ai.models.generateContentStream({
+            model: model,
+            contents: finalConversationHistory,
+          });
+
+        const response = await retryWithBackoff(generateContent, {
+          ...RetryPresets.apiCall,
+          onRetry: (attempt, error) => {
+            console.warn(
+              `Retry attempt ${attempt} for content generation:`,
+              error.message
+            );
+            if (attempt > 4) {
+              console.log(
+                "Switching to lighter model due to repeated failures."
+              );
+              model = "gemini-2.5-flash-lite";
+            } else if (
+              error.message.includes("You exceeded your current quota")
+            ) {
+              console.log(
+                "Quota exceeded for model",
+                model,
+                "- switching to a lighter model."
+              );
+              model = "gemini-2.5-flash-lite";
+            }
+          },
+        });
+
+        for await (const chunk of response) {
+          if (chunk.text) {
+            res.write(
+              `${JSON.stringify({ chunk: chunk.text, type: "content" })}\n\n`
+            );
+          }
+        }
+
+        res.write(`${JSON.stringify({ done: true })}\n\n`);
+        res.end();
+      } catch (error) {
+        console.error("Error during content generation:", error);
+        res.write(
+          `${JSON.stringify({
+            error: "Failed to generate response",
+            done: true,
+          })}\n\n`
+        );
+        res.end();
+      }
     }
   } catch (error) {
     console.error("Error processing chat message:", error);
