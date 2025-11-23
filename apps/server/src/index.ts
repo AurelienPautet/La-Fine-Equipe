@@ -19,8 +19,7 @@ import teamMemberRoutes from "./routes/teamMemberRoutes";
 import figureRoutes from "./routes/figureRoutes";
 import homeSectionRoutes from "./routes/homeSectionRoutes";
 import chatRoutes from "./routes/chatRoutes";
-
-import { initializeVectorStore } from "./services/vectorDbService";
+import vectorStoreRoutes from "./routes/vectorStoreRoutes";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -43,16 +42,6 @@ app.use(
 
 // app.use("/api/auth/login", loginLimiter);
 
-// Initialize vector database
-(async () => {
-  try {
-    await initializeVectorStore();
-    console.log("Vector store initialization completed successfully");
-  } catch (error) {
-    console.error("Failed to initialize vector store:", error);
-  }
-})();
-
 app.get("/", (_, res) => {
   res.send("Welcome to La Fine Equipe API!");
 });
@@ -71,6 +60,7 @@ app.use("/api/team-members", teamMemberRoutes);
 app.use("/api/figures", figureRoutes);
 app.use("/api/home-sections", homeSectionRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/vector-store", vectorStoreRoutes);
 
 const PORT = process.env.PORT || 4000;
 
