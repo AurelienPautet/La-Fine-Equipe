@@ -173,4 +173,6 @@ export const documentChunks = pgTable("LaFineEquipe-document_chunks", {
   embedding: vector("embedding", { dimensions: 768 }),
   metadata: text("metadata"),
   createdAt: timestamp("created_at").defaultNow(),
+  sourceType: text("source_type"),
+  sourceId: integer("source_id"),
 });

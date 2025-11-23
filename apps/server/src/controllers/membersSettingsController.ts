@@ -5,6 +5,7 @@ import {
   actifMembersSettings,
   simpleMembersSettings,
 } from "@lafineequipe/db/src/schema";
+import { syncMembersSettingsToVectorStore } from "../services/vectorDbService";
 
 export const getMembersSettings = async (_req: Request, res: Response) => {
   try {
@@ -36,6 +37,10 @@ export const updateActifMembersSettings = async (
       .set({ url, price })
       .where(eq(actifMembersSettings.id, 1))
       .execute();
+
+    // Sync updated settings to vector store
+    await syncMembersSettingsToVectorStore();
+
     res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error updating Actif members settings:", error);
@@ -54,6 +59,10 @@ export const updateSimpleMembersSettings = async (
       .set({ url })
       .where(eq(simpleMembersSettings.id, 1))
       .execute();
+
+    // Sync updated settings to vector store
+    await syncMembersSettingsToVectorStore();
+
     res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error updating Simple members settings:", error);

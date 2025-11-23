@@ -20,7 +20,7 @@ import figureRoutes from "./routes/figureRoutes";
 import homeSectionRoutes from "./routes/homeSectionRoutes";
 import chatRoutes from "./routes/chatRoutes";
 
-import { initializeVectorStore } from "./controllers/vdbController";
+import { initializeVectorStore } from "./services/vectorDbService";
 
 const app = express();
 app.set("trust proxy", 1);

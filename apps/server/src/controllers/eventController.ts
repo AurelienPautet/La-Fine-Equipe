@@ -3,6 +3,10 @@ import { db } from "@lafineequipe/db";
 import { events, tags, eventsTags } from "@lafineequipe/db/src/schema";
 import { EventsWithTags, createEventsRequestSchema } from "@lafineequipe/types";
 import { eq, desc, SQL, and, not, isNull, gte } from "drizzle-orm";
+import {
+  syncEventToVectorStore,
+  deleteFromVectorStore,
+} from "../services/vectorDbService";
 
 const getEventsWithTags = async (
   whereCondition?: SQL,
@@ -229,6 +233,16 @@ export const createEvents = async (req: Request, res: Response) => {
         .execute();
     }
 
+    await syncEventToVectorStore({
+      id: newEvent.id,
+      title: newEvent.title,
+      content: newEvent.content,
+      author: newEvent.author,
+      location: newEvent.location,
+      startDate: newEvent.startDate,
+      endDate: newEvent.endDate,
+    });
+
     res.status(201).json({ success: true, data: newEvent });
   } catch (error: any) {
     if (error.name === "ZodError") {
@@ -308,6 +322,16 @@ export const editEvents = async (req: Request, res: Response) => {
         .execute();
     }
 
+    await syncEventToVectorStore({
+      id: updatedEvent.id,
+      title: updatedEvent.title,
+      content: updatedEvent.content,
+      author: updatedEvent.author,
+      location: updatedEvent.location,
+      startDate: updatedEvent.startDate,
+      endDate: updatedEvent.endDate,
+    });
+
     res.json({ success: true, data: updatedEvent });
   } catch (error: any) {
     if (error.name === "ZodError") {
@@ -331,6 +355,8 @@ export const deleteEvent = async (req: Request, res: Response) => {
     if (!deletedEvent) {
       return res.status(404).json({ success: false, error: "Event not found" });
     }
+
+    await deleteFromVectorStore("events", deletedEvent.id);
 
     res.json({ success: true, data: deletedEvent });
   } catch {

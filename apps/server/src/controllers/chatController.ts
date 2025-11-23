@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import { GoogleGenAI } from "@google/genai";
 import { Message } from "@lafineequipe/types";
-import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { PGVectorStore } from "@langchain/community/vectorstores/pgvector";
 import { getPool } from "@lafineequipe/db";
 import { retryWithBackoff, RetryPresets } from "../utils/retryUtils";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { getEmbeddings } from "../services/embeddingsService";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
@@ -19,11 +19,6 @@ const responseSchema = z.object({
 
 const SYSTEM_PROMPT =
   "Tu es Lézard GPT, un assistant IA pour l'association 'La Fine Equipe'. Fais quelques blagues en rapport avec les lézards quand c'est approprié, mais sois toujours factuel.";
-
-const embeddings = new GoogleGenerativeAIEmbeddings({
-  model: "text-embedding-004",
-  apiKey: GEMINI_API_KEY,
-});
 
 const pool = getPool();
 
@@ -42,6 +37,7 @@ async function getVectorStore() {
   if (!vectorStore) {
     try {
       console.log("Initializing Vector Store...");
+      const embeddings = getEmbeddings();
       vectorStore = await PGVectorStore.initialize(
         embeddings,
         vectorStoreConfig
@@ -80,6 +76,10 @@ export const postChat = async (req: Request, res: Response) => {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
     res.setHeader("X-Accel-Buffering", "no");
+    res.flushHeaders();
+    const writeChunk = (data: Record<string, unknown>) => {
+      res.write(`${JSON.stringify(data)}\n\n`);
+    };
 
     const lastUserMessageContent = lastUserMessage.content;
     const historyForCondensation = [
@@ -95,36 +95,54 @@ export const postChat = async (req: Request, res: Response) => {
 
     try {
       const condensationPrompt = `
-        Étant donné l'historique de chat suivant et SURTOUT la dernière question de l'utilisateur, 
-        reformule la dernière question pour qu'elle soit une question autonome et complète. Elle doit être fidéle au sens original.
-        Ne reformul pas si la question est un simple remerciement ou une salutation.
+        Given the following chat history and ESPECIALLY the last user question, 
+        rephrase the last question to make it a standalone and complete question. It must be faithful to the original meaning.
+        Do not rephrase if the question is a simple thank you or greeting.
 
-        Considère les questions ambiguë ou vagues comme si elles concernaient directement 'La Fine Equipe'.
-        Ex : "Quelle est sa mission ?" => "Quelle est la mission de La Fine Equipe ?"
-        Ex : "Qui est Esteban ?" => "Qui est Esteban dans le contexte de La Fine Equipe ?"
+        Consider ambiguous or vague questions as if they directly concern 'La Fine Equipe'.
+        Ex: "Quelle est sa mission ?" => "Quelle est la mission de La Fine Equipe ?"
+        Ex: "Qui est Esteban ?" => "Qui est Esteban dans le contexte de La Fine Equipe ?"
 
-        Historique:
+        History:
         ${historyForCondensation
           .slice(1)
           .map((msg) => `${msg.role}: ${msg.parts[0].text}`)
           .join("\n")}
         
-        Dernière question: ${lastUserMessageContent}
+        Last question: ${lastUserMessageContent}
 
-        Tu indiquera aussi si des informations du contexte sont nécessaires pour répondre à la question, si la question ne te semble pas concerner La Fine Equipe et que tu n'as pas besoin d'informations supplémentaires alors false. (true/false)
-        A l'inverse si la question concerne La Fine Equipe ou que des informations supplémentaires sont nécessaires , alors true.
-
-        Si la réponse ne nécessite pas de contexte (needsContext = false), répond simplement à la question. 
-        Sinon laisse le champ 'answer' vide.
+        **IMPORTANT - Determining if context is needed (needsContext):**
+        - Set needsContext = true if the question asks about:
+          * Specific information about 'La Fine Equipe' (events, members, projects, history, mission, activities, etc.)
+          * Specific people in the context of La Fine Equipe (who is X, what does Y do, etc.)
+          * Any factual details that would require accessing the knowledge base
         
-        Shéma de la réponse:
-        {
-        question: "la question reformulée ici",
-        needsContext: true/false
-        answer: "la réponse ici (si besoin)"
-        }
+        - Set needsContext = false ONLY if the question is:
+          * A simple greeting, thank you, or farewell
+          * A general question that doesn't require specific knowledge about La Fine Equipe (e.g., "What time is it?", "How are you?")
+          * A question you can answer with general knowledge WITHOUT any specific information about La Fine Equipe
+        
+        **CRITICAL RULE:** When in doubt, ALWAYS set needsContext = true. It's better to retrieve context unnecessarily than to answer without proper information.
 
-        Avoir needsContext mis à false signifie que tu DOIS répondre !
+        If needsContext = false, you MUST provide a complete answer IN FRENCH in the 'answer' field.
+        If needsContext = true, leave the 'answer' field empty (it will be handled by the RAG system).
+
+        For information, today's date is: ${new Date().toLocaleDateString(
+          "fr-FR",
+          {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }
+        )}.
+        
+        Response schema:
+        {
+        question: "the rephrased question here (in French)",
+        needsContext: true/false
+        answer: "the answer here IN FRENCH (only if needsContext = false)"
+        }
       `;
 
       const condensationResult = await retryWithBackoff(
@@ -155,34 +173,37 @@ export const postChat = async (req: Request, res: Response) => {
         condensedQuestion = condensationResultParsed.question.trim();
         needsContext = condensationResultParsed.needsContext;
         console.log("Condensed Question:", condensedQuestion);
-        res.write(
-          `${JSON.stringify({
-            chunk: "** Question reformulée: **\n" + condensedQuestion + "\n",
-            type: "reasoningContent",
-          })}\n\n`
-        );
-        res.write(
-          `${JSON.stringify({
-            chunk: "** Besoin de contexte: **\n" + needsContext + "\n",
-            type: "reasoningContent",
-          })}\n\n`
-        );
+        writeChunk({
+          chunk: "** Question reformulée: **\n" + condensedQuestion + "\n",
+          type: "reasoningContent",
+        });
+        writeChunk({
+          chunk: "** Besoin de contexte: **\n" + needsContext + "\n",
+          type: "reasoningContent",
+        });
         console.log("res", condensationResultParsed);
-        if (
-          !needsContext &&
-          condensationResultParsed.answer &&
-          condensationResultParsed.answer !== ""
-        ) {
-          console.log("Answered without context.");
-          res.write(
-            `${JSON.stringify({
+        if (!needsContext) {
+          if (
+            condensationResultParsed.answer &&
+            condensationResultParsed.answer !== ""
+          ) {
+            console.log("Answered without context.");
+            writeChunk({
               chunk: condensationResultParsed.answer,
               type: "content",
-            })}\n\n`
-          );
-          res.write(`${JSON.stringify({ done: true })}\n\n`);
+            });
+          } else {
+            console.log(
+              "No context needed but no answer provided, using fallback."
+            );
+            writeChunk({
+              chunk:
+                "Je n'ai pas bien compris votre question. Pouvez-vous la reformuler ?",
+              type: "content",
+            });
+          }
+          writeChunk({ done: true });
           res.end();
-          console.log("Answered without context.");
           return;
         }
       }
@@ -212,22 +233,33 @@ export const postChat = async (req: Request, res: Response) => {
           error instanceof Error
             ? error.message
             : "Failed to retrieve relevant documents";
-        res.write(
-          `${JSON.stringify({
-            error: errorMessage,
-            done: true,
-          })}\n\n`
-        );
+        writeChunk({
+          error: errorMessage,
+          done: true,
+        });
         res.end();
         return;
       }
 
-      res.write(
-        `${JSON.stringify({
-          chunk: "** Nombre de documents analysés: **\n" + relevantDocs.length,
+      writeChunk({
+        chunk:
+          "** Nombre de documents analysés: **\n" +
+          relevantDocs.length +
+          relevantDocs,
+        type: "reasoningContent",
+      });
+
+      for (const [index, doc] of relevantDocs.entries()) {
+        writeChunk({
+          chunk:
+            "** Document " +
+            (index + 1) +
+            " source: **\n" +
+            doc.metadata +
+            "\n",
           type: "reasoningContent",
-        })}\n\n`
-      );
+        });
+      }
 
       const context = relevantDocs
         .map((doc) => doc.pageContent)
@@ -242,12 +274,12 @@ export const postChat = async (req: Request, res: Response) => {
       ];
 
       const finalRagPrompt = `
-      Tu es Lézard GPT. Réponds à ma question de manière précise mais concise en te basant sur le contexte ci-dessous.
-      - Tu dois utiliser **en priorité** les informations du contexte pour répondre.
-      - Si la question ne concerne pas directement 'La Fine Equipe', réponds sans inventer d'informations.
-      - Si la question concerne directement 'La Fine Equipe' et que la réponse n'est pas dans le contexte, dis-le gentiment (ex: "Je n'ai pas cette information, désolé !").
-      - Ma question est (potentiellement reformulée) : "${condensedQuestion}"
-      - Pour information nous sommes le : ${new Date().toLocaleDateString(
+      You are Lézard GPT. Answer my question precisely but concisely based on the context below. YOU MUST ANSWER IN FRENCH.
+      - You must use **priority** information from the context to answer.
+      - If the question doesn't directly concern 'La Fine Equipe', answer without making up information.
+      - If the question directly concerns 'La Fine Equipe' and the answer is not in the context, say so kindly (e.g., "Je n'ai pas cette information, désolé !").
+      - My question is (potentially rephrased): "${condensedQuestion}"
+      - For information, today's date is: ${new Date().toLocaleDateString(
         "fr-FR",
         {
           weekday: "long",
@@ -256,15 +288,17 @@ export const postChat = async (req: Request, res: Response) => {
           day: "numeric",
         }
       )}.
-      - Ne parle **jamais** du 'contexte' ni du texte dans ta réponse. Si tu avais **besoin** du contexte pour formuler ta réponse, et qu'il ne t'a rien donné, dis simplement que tu n'as pas cette information. 
-      - Garde ta personnalité de lézard, mais la précision est prioritaire. Fais des blagues SEULEMENT si c'est pertinent.
+      - **Never** talk about the 'context' or the text in your answer. If you **needed** the context to formulate your answer and it didn't provide anything, simply say you don't have this information. 
+      - Keep your lizard personality, but precision is the priority. Make jokes ONLY if relevant.
       
-      **Contexte fourni:**
+      **Provided context:**
       """
       ${context}
       """
       
-      **Ma question originale était:** "${lastUserMessageContent}"
+      **My original question was:** "${lastUserMessageContent}"
+      
+      REMEMBER: YOUR ENTIRE RESPONSE MUST BE IN FRENCH.
     `;
 
       finalConversationHistory.push({
@@ -308,22 +342,18 @@ export const postChat = async (req: Request, res: Response) => {
 
         for await (const chunk of response) {
           if (chunk.text) {
-            res.write(
-              `${JSON.stringify({ chunk: chunk.text, type: "content" })}\n\n`
-            );
+            writeChunk({ chunk: chunk.text, type: "content" });
           }
         }
 
-        res.write(`${JSON.stringify({ done: true })}\n\n`);
+        writeChunk({ done: true });
         res.end();
       } catch (error) {
         console.error("Error during content generation:", error);
-        res.write(
-          `${JSON.stringify({
-            error: "Failed to generate response",
-            done: true,
-          })}\n\n`
-        );
+        writeChunk({
+          error: "Failed to generate response",
+          done: true,
+        });
         res.end();
       }
     }

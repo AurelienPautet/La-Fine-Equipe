@@ -8,6 +8,10 @@ import {
   reorderFiguresRequestSchema,
 } from "@lafineequipe/types";
 import { figures } from "@lafineequipe/db/src/schema";
+import {
+  syncFigureToVectorStore,
+  deleteFromVectorStore,
+} from "../services/vectorDbService";
 
 export const createFigure = async (req: Request, res: Response) => {
   try {
@@ -18,7 +22,14 @@ export const createFigure = async (req: Request, res: Response) => {
         VALUES (${figure}, ${description}, ${icon}, (SELECT COALESCE(MAX("order"), 0) + 1 FROM ${figures}))
         RETURNING *
       `);
-    const figureData = result.rows[0];
+    const figureData = result.rows[0] as any;
+
+    await syncFigureToVectorStore({
+      id: figureData.id,
+      figure: figureData.figure,
+      description: figureData.description,
+    });
+
     res.status(201).json({ success: true, data: figureData });
   } catch (error: unknown) {
     const err = error as { name?: string; errors?: unknown };
@@ -44,6 +55,13 @@ export const editFigure = async (req: Request, res: Response) => {
       .set(updateData)
       .where(eq(figures.id, id))
       .returning();
+
+    await syncFigureToVectorStore({
+      id: figureData.id,
+      figure: figureData.figure,
+      description: figureData.description,
+    });
+
     res.status(200).json({ success: true, data: figureData });
   } catch (error: unknown) {
     console.error("Error editing figure:", error);
@@ -103,6 +121,9 @@ export const deleteFigure = async (req: Request, res: Response) => {
         .json({ success: false, error: "Invalid figure ID" });
     }
     await db.delete(figures).where(eq(figures.id, figureId)).execute();
+
+    await deleteFromVectorStore("figures", figureId);
+
     res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error deleting figure:", error);

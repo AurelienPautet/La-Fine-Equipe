@@ -3,6 +3,10 @@ import { db } from "@lafineequipe/db";
 import { regulations } from "@lafineequipe/db/src/schema";
 import { createRegulationRequestSchema } from "@lafineequipe/types";
 import { eq, desc, and, not, isNull } from "drizzle-orm";
+import {
+  syncRegulationToVectorStore,
+  deleteFromVectorStore,
+} from "../services/vectorDbService";
 
 export const getAllRegulations = async (_req: Request, res: Response) => {
   try {
@@ -111,6 +115,15 @@ export const createRegulation = async (req: Request, res: Response) => {
       .returning()
       .execute();
 
+    await syncRegulationToVectorStore({
+      id: newRegulation.id,
+      title: newRegulation.title,
+      description: newRegulation.description || "",
+      content: newRegulation.content,
+      date: newRegulation.date,
+      categoryId: newRegulation.categoryId,
+    });
+
     res.status(201).json({ success: true, data: newRegulation });
   } catch (error: any) {
     if (error.name === "ZodError") {
@@ -166,6 +179,15 @@ export const editRegulation = async (req: Request, res: Response) => {
       .returning()
       .execute();
 
+    await syncRegulationToVectorStore({
+      id: updatedRegulation.id,
+      title: updatedRegulation.title,
+      description: updatedRegulation.description || "",
+      content: updatedRegulation.content,
+      date: updatedRegulation.date,
+      categoryId: updatedRegulation.categoryId,
+    });
+
     res.json({ success: true, data: updatedRegulation });
   } catch (error: any) {
     if (error.name === "ZodError") {
@@ -193,6 +215,8 @@ export const deleteRegulation = async (req: Request, res: Response) => {
         .status(404)
         .json({ success: false, error: "Regulation not found" });
     }
+
+    await deleteFromVectorStore("regulations", deletedRegulation.id);
 
     res.json({ success: true, data: deletedRegulation });
   } catch {

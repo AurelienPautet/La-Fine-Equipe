@@ -8,6 +8,10 @@ import {
   reorderHomeSectionsRequestSchema,
 } from "@lafineequipe/types";
 import { homeSections, homeSectionButtons } from "@lafineequipe/db/src/schema";
+import {
+  syncHomeSectionToVectorStore,
+  deleteFromVectorStore,
+} from "../services/vectorDbService";
 
 export const createHomeSection = async (req: Request, res: Response) => {
   try {
@@ -40,6 +44,8 @@ export const createHomeSection = async (req: Request, res: Response) => {
         }))
       );
     }
+
+    await syncHomeSectionToVectorStore(homeSectionData.id);
 
     res.status(201).json({ success: true, data: homeSectionData });
   } catch (error: unknown) {
@@ -88,6 +94,8 @@ export const editHomeSection = async (req: Request, res: Response) => {
         );
       }
     }
+
+    await syncHomeSectionToVectorStore(id);
 
     res.status(200).json({ success: true, data: homeSectionData });
   } catch (error: unknown) {
@@ -196,6 +204,9 @@ export const deleteHomeSection = async (req: Request, res: Response) => {
       .delete(homeSections)
       .where(eq(homeSections.id, homeSectionId))
       .execute();
+
+    await deleteFromVectorStore("home_sections", homeSectionId);
+
     res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error deleting home section:", error);

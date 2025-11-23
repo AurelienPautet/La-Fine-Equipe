@@ -8,6 +8,10 @@ import {
   reorderTeamMembersRequestSchema,
 } from "@lafineequipe/types";
 import { teamMembers } from "@lafineequipe/db/src/schema";
+import {
+  syncTeamMemberToVectorStore,
+  deleteFromVectorStore,
+} from "../services/vectorDbService";
 
 export const createTeamMember = async (req: Request, res: Response) => {
   try {
@@ -20,7 +24,17 @@ export const createTeamMember = async (req: Request, res: Response) => {
         VALUES (${firstName}, ${lastName}, ${role}, ${email}, ${photoUrl}, ${divisionId}, (SELECT COALESCE(MAX("order"), 0) + 1 FROM ${teamMembers}), ${isActive})
         RETURNING *
       `);
-    const teamMember = result.rows[0];
+    const teamMember = result.rows[0] as any;
+
+    // Sync to vector DB
+    await syncTeamMemberToVectorStore({
+      id: teamMember.id,
+      firstName: teamMember.first_name,
+      lastName: teamMember.last_name,
+      role: teamMember.role,
+      divisionId: teamMember.division_id,
+    });
+
     res.status(201).json({ success: true, data: teamMember });
   } catch (error: unknown) {
     const err = error as { name?: string; errors?: unknown };
@@ -61,6 +75,15 @@ export const editTeamMember = async (req: Request, res: Response) => {
       .set(updateData)
       .where(eq(teamMembers.id, id))
       .returning();
+
+    await syncTeamMemberToVectorStore({
+      id: teamMember.id,
+      firstName: teamMember.firstName,
+      lastName: teamMember.lastName,
+      role: teamMember.role,
+      divisionId: teamMember.divisionId,
+    });
+
     res.status(200).json({ success: true, data: teamMember });
   } catch (error: unknown) {
     console.error("Error editing team member:", error);
@@ -124,6 +147,9 @@ export const deleteTeamMember = async (req: Request, res: Response) => {
       .delete(teamMembers)
       .where(eq(teamMembers.id, teamMemberId))
       .execute();
+
+    await deleteFromVectorStore("team_members", teamMemberId);
+
     res.status(200).json({ success: true });
   } catch (error) {
     console.error("Error deleting team member:", error);
