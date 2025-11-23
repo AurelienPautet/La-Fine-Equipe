@@ -4,7 +4,6 @@ dotenv.config();
 import express from "express";
 import fileUpload from "express-fileupload";
 import cors from "cors";
-// import rateLimit from "express-rate-limit";
 
 import eventsRoutes from "./routes/eventRoutes";
 import tagRoutes from "./routes/tagRoutes";
@@ -20,6 +19,7 @@ import figureRoutes from "./routes/figureRoutes";
 import homeSectionRoutes from "./routes/homeSectionRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import vectorStoreRoutes from "./routes/vectorStoreRoutes";
+import { closePool } from "@lafineequipe/db";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -32,21 +32,10 @@ app.use(
   })
 );
 
-// const loginLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 6,
-//   standardHeaders: true,
-//   legacyHeaders: false,
-//   message: { message: "Too many login attempts. Please try again later." },
-// });
-
-// app.use("/api/auth/login", loginLimiter);
-
 app.get("/", (_, res) => {
   res.send("Welcome to La Fine Equipe API!");
 });
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventsRoutes);
 app.use("/api/tags", tagRoutes);
@@ -63,6 +52,20 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/vector-store", vectorStoreRoutes);
 
 const PORT = process.env.PORT || 4000;
+
+const gracefulShutdown = async () => {
+  console.log("Shutting down gracefully...");
+  try {
+    await closePool();
+    console.log("Database connections closed.");
+  } catch (error) {
+    console.error("Error during shutdown:", error);
+  }
+  process.exit(0);
+};
+
+process.on("SIGTERM", gracefulShutdown);
+process.on("SIGINT", gracefulShutdown);
 
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {

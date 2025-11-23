@@ -7,15 +7,21 @@ let _db: ReturnType<typeof drizzle> | null = null;
 
 export function getPool() {
   if (!_pool) {
+    const isProduction = process.env.NODE_ENV === "production";
+
     _pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl:
-        process.env.NODE_ENV === "production"
-          ? { rejectUnauthorized: false }
-          : false,
-      max: 3,
-      idleTimeoutMillis: 10000,
-      connectionTimeoutMillis: 10000,
+      ssl: isProduction ? { rejectUnauthorized: false } : false,
+      max: 2,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 30000,
+      allowExitOnIdle: true,
+    });
+
+    _pool.on("error", (err) => {
+      console.error("Unexpected pool error:", err);
+      _pool = null;
+      _db = null;
     });
   }
   return _pool;
@@ -34,3 +40,11 @@ export const db = new Proxy({} as ReturnType<typeof drizzle>, {
     return (getDb() as any)[prop];
   },
 });
+
+export async function closePool() {
+  if (_pool) {
+    await _pool.end();
+    _pool = null;
+    _db = null;
+  }
+}
