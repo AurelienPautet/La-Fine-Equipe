@@ -44,7 +44,14 @@ app.use(
 // app.use("/api/auth/login", loginLimiter);
 
 // Initialize vector database
-initializeVectorStore();
+(async () => {
+  try {
+    await initializeVectorStore();
+    console.log("Vector store initialization completed successfully");
+  } catch (error) {
+    console.error("Failed to initialize vector store:", error);
+  }
+})();
 
 app.get("/", (_, res) => {
   res.send("Welcome to La Fine Equipe API!");

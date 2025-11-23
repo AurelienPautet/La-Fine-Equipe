@@ -74,6 +74,8 @@ async function getVectorStore() {
 }
 
 export async function initializeVectorStore() {
+  console.log("Starting vector store initialization...");
+
   const nbChunks = await db
     .select({ count: count(documentChunks.id) })
     .from(documentChunks);
@@ -84,6 +86,8 @@ export async function initializeVectorStore() {
     );
     return;
   }
+
+  console.log("No chunks found, proceeding with full initialization...");
 
   const allEvents = await db
     .select()
@@ -180,13 +184,24 @@ export async function initializeVectorStore() {
     ...SectionsTexts,
   ]);
 
+  console.log("Syncing member settings...");
   await syncMembersSettingsToVectorStore();
+
+  console.log("Updating lists...");
   await updateList("regulations");
   await updateList("team_members");
   await updateList("figures");
   await updateList("events");
   await updateList("home_sections");
-  console.log("Vector store initialized.");
+
+  const finalCount = await db
+    .select({ count: count(documentChunks.id) })
+    .from(documentChunks);
+  console.log(
+    `Vector store initialized successfully with ${
+      finalCount[0]?.count || 0
+    } chunks.`
+  );
 }
 
 export async function addDocuments(
