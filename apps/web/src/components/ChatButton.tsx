@@ -18,7 +18,7 @@ const ChatButton: React.FC = () => {
             )}
 
             <div
-              className=" btn btn-primary btn-circle "
+              className=" btn btn-primary btn-circle w-14 h-14 flex items-center justify-center text-2xl shadow-lg hover:shadow-xl transition-shadow"
               onClick={() => setHasBeenClicked(true)}
             >
               <IoChatbubble />
