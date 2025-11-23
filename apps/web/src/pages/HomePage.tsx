@@ -93,8 +93,8 @@ const HomePage: React.FC = () => {
       id: section.id,
       title: section.title,
       content: section.content,
-      buttonLabel: section.buttonLabel,
-      buttonLink: section.buttonLink,
+      buttonLabel: section.buttonLabel || undefined,
+      buttonLink: section.buttonLink || undefined,
       imageUrl: section.imageUrl || undefined,
       isVisible: !section.isVisible,
     });
@@ -250,8 +250,8 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Home Section Modal */}
-      {showHomeSectionModal && (
-        <dialog open className="modal z-50">
+      {showHomeSectionModal ? (
+        <dialog className="modal z-50">
           <div className="modal-box mt-10 max-h-[80vh]">
             <h3 className="font-bold text-lg mb-4">
               {editingHomeSection
@@ -275,7 +275,7 @@ const HomePage: React.FC = () => {
             />
           </form>
         </dialog>
-      )}
+      ) : null}
 
       {homeSectionsToDisplay?.map((section, index) => (
         <HomeSectionDisplay
@@ -374,7 +374,16 @@ const HomePage: React.FC = () => {
             <div className="flex justify-center mb-4">
               <button
                 className="btn btn-primary"
-                onClick={() => setEditingFigure(null)}
+                onClick={() =>
+                  setEditingFigure({
+                    id: 0,
+                    figure: "",
+                    description: "",
+                    icon: "",
+                    order: 0,
+                    deletedAt: null,
+                  })
+                }
               >
                 Ajouter un chiffre clé
               </button>
@@ -382,7 +391,7 @@ const HomePage: React.FC = () => {
             <FiguresManager editingFigure={editingFigure} />
           </>
         )}
-        <div className="grid p-3 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid p-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {figuresLoading && (
             <div className="loading loading-spinner text-primary mx-auto"></div>
           )}
@@ -402,27 +411,30 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Events section */}
-      <section className="p-6 py-20 bg-base-100">
-        <div className="text-center mb-12">
-          <h2 className="text-5xl font-bold text-secondary mb-4 flex items-center justify-center gap-4">
-            <MdEvent className="w-10 h-10" />
-            Nos Événements Marquants
-          </h2>
-          {memorableLoading && (
-            <div className="loading loading-spinner text-primary mx-auto"></div>
-          )}
-          {memorableError && (
-            <p className="text-red-500">
-              Erreur de chargement des événements marquants.
-            </p>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {memorableEvents?.map((event) => (
-              <EventsCard key={event.id} events={event} />
-            ))}
+
+      {memorableEvents && memorableEvents.length > 0 ? (
+        <section className="p-6 py-20 bg-base-100">
+          <div className="text-center mb-12">
+            <h2 className="text-5xl font-bold text-secondary mb-4 flex items-center justify-center gap-4">
+              <MdEvent className="w-10 h-10" />
+              Nos Événements Marquants
+            </h2>
+            {memorableLoading && (
+              <div className="loading loading-spinner text-primary mx-auto"></div>
+            )}
+            {memorableError && (
+              <p className="text-red-500">
+                Erreur de chargement des événements marquants.
+              </p>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {memorableEvents?.map((event) => (
+                <EventsCard key={event.id} events={event} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
     </div>
   );
 };

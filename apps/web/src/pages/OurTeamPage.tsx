@@ -47,9 +47,9 @@ const OurTeamPage: React.FC = () => {
                   <span className="font-bold text-primary">
                     Créée en novembre 2023
                   </span>
-                  , au en vue des élections au Conseil de la faculté de Droit,
-                  la liste de La Fine Équipe a rapidement évolué, pour devenir
-                  dès la rentrée 2024 une des
+                  , en vue des élections au Conseil de la faculté de Droit, la
+                  liste de La Fine Équipe a rapidement évolué, pour devenir dès
+                  la rentrée 2024 une des
                   <span className="font-semibold text-secondary">
                     {" "}
                     principales associations étudiantes{" "}

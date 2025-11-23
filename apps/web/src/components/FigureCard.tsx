@@ -52,7 +52,7 @@ const FigureCard: React.FC<FigureCardProps> = ({
 
   return (
     <div
-      className={`card ${bgColor} w-3/4 md:w-full text-primary-content shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300`}
+      className={`card ${bgColor}  md:w-full text-primary-content shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300`}
     >
       <div className="card-body text-center">
         <div className="text-4xl mb-4 flex justify-center">{icon}</div>

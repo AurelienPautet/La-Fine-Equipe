@@ -61,7 +61,7 @@ const FiguresManager: React.FC<FiguresManagerProps> = ({ editingFigure }) => {
         icon: editingFigure.icon,
       });
     }
-    setIsModalOpen(true);
+    if (editingFigure) setIsModalOpen(true);
   }, [editingFigure]);
 
   if (!isAuthenticated) return null;
@@ -69,7 +69,7 @@ const FiguresManager: React.FC<FiguresManagerProps> = ({ editingFigure }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (editingFigure) {
+      if (editingFigure && editingFigure.id !== 0) {
         await editFigure.mutateAsync({
           ...formData,
           id: editingFigure.id,
@@ -95,7 +95,7 @@ const FiguresManager: React.FC<FiguresManagerProps> = ({ editingFigure }) => {
         <dialog open className="modal">
           <div className="modal-box max-h-[90vh]">
             <h3 className="font-bold text-lg mb-4">
-              {editingFigure
+              {editingFigure && editingFigure.id !== 0
                 ? "Modifier le chiffre clé"
                 : "Ajouter un chiffre clé"}
             </h3>
@@ -193,7 +193,9 @@ const FiguresManager: React.FC<FiguresManagerProps> = ({ editingFigure }) => {
                   Annuler
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  {editingFigure ? "Modifier" : "Ajouter"}
+                  {editingFigure && editingFigure.id !== 0
+                    ? "Modifier"
+                    : "Ajouter"}
                 </button>
               </div>
             </form>
