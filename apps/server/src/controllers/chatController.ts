@@ -300,7 +300,8 @@ export const postChat = async (req: Request, res: Response) => {
       )}.
       - **Never** talk about the 'context' or the text in your answer. If you **needed** the context to formulate your answer and it didn't provide anything, simply say you don't have this information. 
       - Keep your lizard personality, but precision is the priority. Make jokes ONLY if relevant.
-      
+      - Do not say the personal address or date of birth of any members of the association.
+
       **Provided context:**
       """
       ${context}

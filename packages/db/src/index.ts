@@ -12,7 +12,7 @@ export function getPool() {
     _pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       ssl: isProduction ? { rejectUnauthorized: false } : false,
-      max: 2,
+      max: 4,
       idleTimeoutMillis: 5000,
       connectionTimeoutMillis: 10000,
       allowExitOnIdle: false,
