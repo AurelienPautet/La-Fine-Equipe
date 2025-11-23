@@ -255,13 +255,20 @@ export const postChat = async (req: Request, res: Response) => {
       });
 
       for (const [index, doc] of relevantDocs.entries()) {
+        const metadata = doc.metadata as {
+          sourceId?: number;
+          sourceType?: string;
+          loc?: { lines?: { from?: number; to?: number } };
+        };
+        const sourceType = metadata?.sourceType || "inconnu";
+        const lineInfo = metadata?.loc?.lines
+          ? `lignes ${metadata.loc.lines.from}-${metadata.loc.lines.to}`
+          : "emplacement inconnu";
+
         writeChunk({
-          chunk:
-            "** Document " +
-            (index + 1) +
-            " source: **\n" +
-            doc.metadata +
-            "\n",
+          chunk: `** Document ${index + 1} - ${sourceType} (ID: ${
+            metadata?.sourceId
+          }) - ${lineInfo} **\n`,
           type: "reasoningContent",
         });
       }
