@@ -1,7 +1,7 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
-import type { HomeSection } from "@lafineequipe/types";
+import type { HomeSectionWithButtons } from "@lafineequipe/types";
 import {
   FaEdit,
   FaEye,
@@ -12,7 +12,7 @@ import {
 import DeleteButton from "./DeleteButton";
 
 interface HomeSectionDisplayProps {
-  section: HomeSection;
+  section: HomeSectionWithButtons;
   isAdmin?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
@@ -118,16 +118,19 @@ const HomeSectionDisplay: React.FC<HomeSectionDisplayProps> = ({
           </div>
         </div>
 
-        {section.buttonLabel && section.buttonLink && (
-          <div className="text-center mt-8">
-            <a
-              href={section.buttonLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-            >
-              {section.buttonLabel}
-            </a>
+        {section.buttons && section.buttons.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-4 mt-8">
+            {section.buttons.map((button, index) => (
+              <a
+                key={index}
+                href={button.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary btn-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+              >
+                {button.label}
+              </a>
+            ))}
           </div>
         )}
       </div>

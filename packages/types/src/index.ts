@@ -85,6 +85,9 @@ export {
 
 export type {
   HomeSection,
+  HomeSectionWithButtons,
+  HomeSectionButton,
+  HomeSectionButtonInput,
   CreateHomeSectionRequest,
   EditHomeSectionRequest,
   ReorderHomeSectionsRequest,
@@ -93,6 +96,7 @@ export {
   createHomeSectionRequestSchema,
   editHomeSectionRequestSchema,
   reorderHomeSectionsRequestSchema,
+  homeSectionButtonSchema,
 } from "./homeSection";
 
 export type { Message } from "./message";

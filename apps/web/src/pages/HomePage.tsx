@@ -21,7 +21,11 @@ import FiguresManager from "../components/FiguresManager";
 import HomeSectionManager from "../components/HomeSectionManager";
 import HomeSectionDisplay from "../components/HomeSectionDisplay";
 import { useAuth } from "../components/AuthProvider";
-import type { Figure, HomeSection } from "@lafineequipe/types";
+import type {
+  Figure,
+  HomeSection,
+  HomeSectionWithButtons,
+} from "@lafineequipe/types";
 
 const HomePage: React.FC = () => {
   const { data: latestsEvents, error, isLoading } = useLatestsEvents();
@@ -35,7 +39,6 @@ const HomePage: React.FC = () => {
   const deleteFigure = useDeleteFigure();
   const reorderFigures = useReorderFigures();
 
-  // Home sections hooks
   const { data: visibleHomeSections } = useVisibleHomeSections();
   const { data: allHomeSections } = useHomeSections();
   const deleteHomeSection = useDeleteHomeSection();
@@ -88,13 +91,14 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const handleToggleHomeSectionVisibility = async (section: HomeSection) => {
+  const handleToggleHomeSectionVisibility = async (
+    section: HomeSectionWithButtons
+  ) => {
     await editHomeSection.mutateAsync({
       id: section.id,
       title: section.title,
       content: section.content,
-      buttonLabel: section.buttonLabel || undefined,
-      buttonLink: section.buttonLink || undefined,
+      buttons: section.buttons,
       imageUrl: section.imageUrl || undefined,
       isVisible: !section.isVisible,
     });
@@ -250,32 +254,28 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Home Section Modal */}
-      {showHomeSectionModal ? (
-        <dialog className="modal z-50">
-          <div className="modal-box mt-10 max-h-[80vh]">
-            <h3 className="font-bold text-lg mb-4">
-              {editingHomeSection
-                ? "Modifier la section"
-                : "Ajouter une section"}
-            </h3>
-            <HomeSectionManager
-              editingSection={editingHomeSection}
-              onClose={() => {
-                setShowHomeSectionModal(false);
-                setEditingHomeSection(null);
-              }}
-            />
-          </div>
-          <form method="dialog" className="modal-backdrop">
-            <button
-              onClick={() => {
-                setShowHomeSectionModal(false);
-                setEditingHomeSection(null);
-              }}
-            />
-          </form>
-        </dialog>
-      ) : null}
+      <dialog className="modal z-50" open={showHomeSectionModal}>
+        <div className="modal-box mt-10 max-h-[80vh]">
+          <h3 className="font-bold text-lg mb-4">
+            {editingHomeSection ? "Modifier la section" : "Ajouter une section"}
+          </h3>
+          <HomeSectionManager
+            editingSection={editingHomeSection}
+            onClose={() => {
+              setShowHomeSectionModal(false);
+              setEditingHomeSection(null);
+            }}
+          />
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button
+            onClick={() => {
+              setShowHomeSectionModal(false);
+              setEditingHomeSection(null);
+            }}
+          />
+        </form>
+      </dialog>
 
       {homeSectionsToDisplay?.map((section, index) => (
         <HomeSectionDisplay

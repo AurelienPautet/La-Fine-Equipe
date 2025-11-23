@@ -1,14 +1,25 @@
 import { InferSelectModel } from "drizzle-orm";
 import { z } from "zod";
-import { homeSections } from "@lafineequipe/db/src/schema";
+import { homeSections, homeSectionButtons } from "@lafineequipe/db/src/schema";
 
 export type HomeSection = InferSelectModel<typeof homeSections>;
+export type HomeSectionButton = InferSelectModel<typeof homeSectionButtons>;
+
+export interface HomeSectionWithButtons extends HomeSection {
+  buttons?: HomeSectionButton[];
+}
+
+export const homeSectionButtonSchema = z.object({
+  id: z.number().optional(),
+  label: z.string().min(1, "Button label is required"),
+  link: z.string().url("Button link must be a valid URL"),
+  order: z.number().int().default(0),
+});
 
 export const createHomeSectionRequestSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
-  buttonLabel: z.string().min(1, "Button label is required").optional(),
-  buttonLink: z.string().url("Button link must be a valid URL").optional(),
+  buttons: z.array(homeSectionButtonSchema).optional(),
   imageUrl: z.string().optional(),
   isVisible: z.boolean().default(true),
 });
@@ -25,6 +36,7 @@ export const reorderHomeSectionsRequestSchema = z.array(
   })
 );
 
+export type HomeSectionButtonInput = z.infer<typeof homeSectionButtonSchema>;
 export type CreateHomeSectionRequest = z.infer<
   typeof createHomeSectionRequestSchema
 >;

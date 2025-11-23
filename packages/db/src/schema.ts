@@ -146,8 +146,6 @@ export const homeSections = pgTable("LaFineEquipe-home_sections", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   content: text("content").notNull(),
-  buttonLabel: text("button_label"),
-  buttonLink: text("button_link"),
   imageUrl: text("image_url"),
   isVisible: boolean("is_visible").notNull().default(true),
   order: integer("order").notNull().default(0),
@@ -155,6 +153,17 @@ export const homeSections = pgTable("LaFineEquipe-home_sections", {
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdateFn(() => new Date()),
+  deletedAt: timestamp("deleted_at"),
+});
+
+export const homeSectionButtons = pgTable("LaFineEquipe-home_section_buttons", {
+  id: serial("id").primaryKey(),
+  homeSectionId: integer("home_section_id")
+    .references(() => homeSections.id, { onDelete: "cascade" })
+    .notNull(),
+  label: text("label").notNull(),
+  link: text("link").notNull(),
+  order: integer("order").notNull().default(0),
   deletedAt: timestamp("deleted_at"),
 });
 

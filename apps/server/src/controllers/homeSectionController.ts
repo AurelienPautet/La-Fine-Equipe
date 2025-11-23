@@ -7,13 +7,12 @@ import {
   editHomeSectionRequestSchema,
   reorderHomeSectionsRequestSchema,
 } from "@lafineequipe/types";
-import { homeSections } from "@lafineequipe/db/src/schema";
+import { homeSections, homeSectionButtons } from "@lafineequipe/db/src/schema";
 
 export const createHomeSection = async (req: Request, res: Response) => {
   try {
     const validatedData = createHomeSectionRequestSchema.parse(req.body);
-    const { title, content, buttonLabel, buttonLink, imageUrl, isVisible } =
-      validatedData;
+    const { title, content, buttons, imageUrl, isVisible } = validatedData;
 
     const maxOrderResult = await db
       .select({ maxOrder: sql<number>`COALESCE(MAX("order"), 0)` })
@@ -25,13 +24,22 @@ export const createHomeSection = async (req: Request, res: Response) => {
       .values({
         title,
         content,
-        buttonLabel: buttonLabel || null,
-        buttonLink: buttonLink || null,
         imageUrl: imageUrl || null,
         isVisible,
         order: nextOrder,
       })
       .returning();
+
+    if (buttons && buttons.length > 0) {
+      await db.insert(homeSectionButtons).values(
+        buttons.map((button, index) => ({
+          homeSectionId: homeSectionData.id,
+          label: button.label,
+          link: button.link,
+          order: button.order ?? index,
+        }))
+      );
+    }
 
     res.status(201).json({ success: true, data: homeSectionData });
   } catch (error: unknown) {
@@ -49,14 +57,11 @@ export const createHomeSection = async (req: Request, res: Response) => {
 export const editHomeSection = async (req: Request, res: Response) => {
   try {
     const validatedData = editHomeSectionRequestSchema.parse(req.body);
-    const { id, title, content, buttonLabel, buttonLink, imageUrl, isVisible } =
-      validatedData;
+    const { id, title, content, buttons, imageUrl, isVisible } = validatedData;
 
     const updateData = {
       title,
       content,
-      buttonLabel: buttonLabel || null,
-      buttonLink: buttonLink || null,
       imageUrl: imageUrl || null,
       isVisible,
     };
@@ -66,6 +71,23 @@ export const editHomeSection = async (req: Request, res: Response) => {
       .set(updateData)
       .where(eq(homeSections.id, id))
       .returning();
+
+    if (buttons !== undefined) {
+      await db
+        .delete(homeSectionButtons)
+        .where(eq(homeSectionButtons.homeSectionId, id));
+
+      if (buttons.length > 0) {
+        await db.insert(homeSectionButtons).values(
+          buttons.map((button, index) => ({
+            homeSectionId: id,
+            label: button.label,
+            link: button.link,
+            order: button.order ?? index,
+          }))
+        );
+      }
+    }
 
     res.status(200).json({ success: true, data: homeSectionData });
   } catch (error: unknown) {
@@ -112,7 +134,19 @@ export const getHomeSections = async (_req: Request, res: Response) => {
       .orderBy(asc(homeSections.order))
       .execute();
 
-    res.status(200).json({ success: true, data: homeSectionsData });
+    const sectionsWithButtons = await Promise.all(
+      homeSectionsData.map(async (section) => {
+        const buttons = await db
+          .select()
+          .from(homeSectionButtons)
+          .where(eq(homeSectionButtons.homeSectionId, section.id))
+          .orderBy(asc(homeSectionButtons.order))
+          .execute();
+        return { ...section, buttons };
+      })
+    );
+
+    res.status(200).json({ success: true, data: sectionsWithButtons });
   } catch (error) {
     console.error("Error fetching home sections:", error);
     res.status(500).json({ success: false, error: error });
@@ -128,7 +162,19 @@ export const getVisibleHomeSections = async (_req: Request, res: Response) => {
       .orderBy(asc(homeSections.order))
       .execute();
 
-    res.status(200).json({ success: true, data: homeSectionsData });
+    const sectionsWithButtons = await Promise.all(
+      homeSectionsData.map(async (section) => {
+        const buttons = await db
+          .select()
+          .from(homeSectionButtons)
+          .where(eq(homeSectionButtons.homeSectionId, section.id))
+          .orderBy(asc(homeSectionButtons.order))
+          .execute();
+        return { ...section, buttons };
+      })
+    );
+
+    res.status(200).json({ success: true, data: sectionsWithButtons });
   } catch (error) {
     console.error("Error fetching visible home sections:", error);
     res.status(500).json({ success: false, error: error });
