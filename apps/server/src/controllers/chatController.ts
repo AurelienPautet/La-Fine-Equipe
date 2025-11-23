@@ -216,7 +216,12 @@ export const postChat = async (req: Request, res: Response) => {
       try {
         const store = await getVectorStore();
         relevantDocs = await retryWithBackoff(
-          () => store.similaritySearch(condensedQuestion, 4),
+          () =>
+            store.maxMarginalRelevanceSearch(condensedQuestion, {
+              k: 15,
+              fetchK: 30,
+              lambda: 0.7,
+            }),
           {
             ...RetryPresets.vectorStore,
             onRetry: (attempt, error) => {
