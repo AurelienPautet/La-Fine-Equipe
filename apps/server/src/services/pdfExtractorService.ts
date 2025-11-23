@@ -50,7 +50,7 @@ async function extractTextFromPdfUrl(url: string): Promise<string> {
                     if (textItem.R) {
                       for (const run of textItem.R) {
                         if (run.T) {
-                          text += decodeURIComponent(run.T) + " ";
+                          text += decodeURIComponent(run.T) + "\n";
                         }
                       }
                     }

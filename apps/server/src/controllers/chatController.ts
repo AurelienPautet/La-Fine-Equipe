@@ -248,9 +248,7 @@ export const postChat = async (req: Request, res: Response) => {
 
       writeChunk({
         chunk:
-          "** Nombre de documents analysés: **\n" +
-          relevantDocs.length +
-          relevantDocs,
+          "** Nombre de documents analysés: **\n" + relevantDocs.length + "\n",
         type: "reasoningContent",
       });
 
@@ -263,12 +261,12 @@ export const postChat = async (req: Request, res: Response) => {
         const sourceType = metadata?.sourceType || "inconnu";
         const lineInfo = metadata?.loc?.lines
           ? `lignes ${metadata.loc.lines.from}-${metadata.loc.lines.to}`
-          : "emplacement inconnu";
+          : "";
 
         writeChunk({
-          chunk: `** Document ${index + 1} - ${sourceType} (ID: ${
+          chunk: `- Doc ${index + 1} - ${sourceType} (ID: ${
             metadata?.sourceId
-          }) - ${lineInfo} **\n`,
+          }) ${lineInfo}\n`,
           type: "reasoningContent",
         });
       }

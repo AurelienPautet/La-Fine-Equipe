@@ -76,19 +76,6 @@ async function getVectorStore() {
 export async function initializeVectorStore() {
   console.log("Starting vector store initialization...");
 
-  const nbChunks = await db
-    .select({ count: count(documentChunks.id) })
-    .from(documentChunks);
-  const nbChunckCount = nbChunks[0]?.count || 0;
-  if (nbChunckCount > 0) {
-    console.log(
-      `Vector store already initialized with ${nbChunckCount} chunks. Skipping initialization.`
-    );
-    return;
-  }
-
-  console.log("No chunks found, proceeding with full initialization...");
-
   const allEvents = await db
     .select()
     .from(events)

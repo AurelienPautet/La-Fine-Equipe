@@ -7,6 +7,7 @@ import {
   boolean,
   real,
   vector,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 export const tags = pgTable("LaFineEquipe-tags", {
@@ -171,7 +172,7 @@ export const documentChunks = pgTable("LaFineEquipe-document_chunks", {
   id: serial("id").primaryKey(),
   text: text("text").notNull(),
   embedding: vector("embedding", { dimensions: 768 }),
-  metadata: text("metadata"),
+  metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow(),
   sourceType: text("source_type"),
   sourceId: integer("source_id"),
