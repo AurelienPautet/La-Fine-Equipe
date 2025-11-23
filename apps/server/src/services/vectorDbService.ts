@@ -150,11 +150,11 @@ export async function initializeVectorStore() {
           reg["LaFineEquipe-regulations"].title
         } apartenant à la catégorie ${
           reg["LaFineEquipe-regulations_categories"]!.name
-        } \nDescription : ${
+        } 
+        Date : ${reg["LaFineEquipe-regulations"].date}\nDescription : ${
           reg["LaFineEquipe-regulations"].description
-        }\nContenu complet : ${enrichedContent}\nDate : ${
-          reg["LaFineEquipe-regulations"].date
-        }`,
+        }\nContenu complet : ${enrichedContent}\n
+        `,
         sourceId: reg["LaFineEquipe-regulations"].id,
         sourceType: "regulations",
         toSplit: true,
@@ -463,9 +463,11 @@ export async function syncRegulationToVectorStore(regulation: {
     {
       pageContent: `Règlement : ${regulation.title} apartenant à la catégorie ${
         category?.name || "N/A"
-      } \nDescription : ${
+      } 
+      Date : ${regulation.date}
+      \nDescription : ${
         regulation.description
-      }\nContenu complet : ${enrichedContent}\nDate : ${regulation.date}`,
+      }\nContenu complet : ${enrichedContent}\n`,
       sourceId: regulation.id,
       sourceType: "regulations",
       toSplit: true,

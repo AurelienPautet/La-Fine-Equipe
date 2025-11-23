@@ -1,4 +1,4 @@
-import { PDFParse } from "pdf-parse";
+import PDFParser from "pdf2json";
 
 export function extractEmbeddedPdfUrls(content: string): string[] {
   const embedRegex = /<embed\s+src="([^"]+)"\s+type="application\/pdf"[^>]*>/gi;
@@ -16,14 +16,60 @@ export function extractEmbeddedPdfUrls(content: string): string[] {
 
 async function extractTextFromPdfUrl(url: string): Promise<string> {
   try {
-    const parser = new PDFParse({ url });
-    const result = await parser.getText();
-    let text = (result.text as string) || "";
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch PDF: ${response.statusText}`);
+    }
 
-    text = text.replace(/--\s*\d+\s+of\s+\d+\s*--/gi, "");
-    text = text.replace(/\n{3,}/g, "\n\n").trim();
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    return text;
+    const pdfParser = new PDFParser();
+
+    return new Promise((resolve, reject) => {
+      pdfParser.on(
+        "pdfParser_dataError",
+        (errData: Error | { parserError: Error }) => {
+          const error =
+            errData instanceof Error ? errData : errData.parserError;
+          reject(error);
+        }
+      );
+
+      pdfParser.on(
+        "pdfParser_dataReady",
+        (pdfData: {
+          Pages?: Array<{ Texts?: Array<{ R?: Array<{ T?: string }> }> }>;
+        }) => {
+          try {
+            let text = "";
+            if (pdfData.Pages) {
+              for (const page of pdfData.Pages) {
+                if (page.Texts) {
+                  for (const textItem of page.Texts) {
+                    if (textItem.R) {
+                      for (const run of textItem.R) {
+                        if (run.T) {
+                          text += decodeURIComponent(run.T) + " ";
+                        }
+                      }
+                    }
+                  }
+                  text += "\n";
+                }
+              }
+            }
+            text = text.replace(/--\s*\d+\s+of\s+\d+\s*--/gi, "");
+            text = text.replace(/\n{3,}/g, "\n\n").trim();
+            resolve(text);
+          } catch (error) {
+            reject(error);
+          }
+        }
+      );
+
+      pdfParser.parseBuffer(buffer);
+    });
   } catch (error) {
     console.error(`Error extracting text from PDF at ${url}:`, error);
     return "";
