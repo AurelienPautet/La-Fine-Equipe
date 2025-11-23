@@ -13,15 +13,9 @@ export function getPool() {
       connectionString: process.env.DATABASE_URL,
       ssl: isProduction ? { rejectUnauthorized: false } : false,
       max: 2,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 30000,
+      idleTimeoutMillis: 5000,
+      connectionTimeoutMillis: 10000,
       allowExitOnIdle: false,
-    });
-
-    _pool.on("error", (err) => {
-      console.error("Unexpected pool error:", err);
-      _pool = null;
-      _db = null;
     });
   }
   return _pool;

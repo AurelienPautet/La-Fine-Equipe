@@ -234,17 +234,11 @@ export async function addDocuments(
   ];
   const pool = getPool();
 
-  const client = await pool.connect();
-
-  try {
-    for (let i = 0; i < allDocuments.length; i++) {
-      await client.query(
-        `DELETE FROM "LaFineEquipe-document_chunks" WHERE source_type = $1 AND source_id = $2`,
-        [allDocuments[i].metadata.sourceType, allDocuments[i].metadata.sourceId]
-      );
-    }
-  } finally {
-    client.release();
+  for (let i = 0; i < allDocuments.length; i++) {
+    await pool.query(
+      `DELETE FROM "LaFineEquipe-document_chunks" WHERE source_type = $1 AND source_id = $2`,
+      [allDocuments[i].metadata.sourceType, allDocuments[i].metadata.sourceId]
+    );
   }
 
   const vectorStore = await getVectorStore();
@@ -256,22 +250,17 @@ export async function addDocuments(
     }))
   );
 
-  const updateClient = await pool.connect();
-  try {
-    for (let i = 0; i < allDocuments.length; i++) {
-      await updateClient.query(
-        `UPDATE "LaFineEquipe-document_chunks" 
+  for (let i = 0; i < allDocuments.length; i++) {
+    await pool.query(
+      `UPDATE "LaFineEquipe-document_chunks" 
          SET source_type = $1, source_id = $2 
          WHERE text = $3 AND source_type IS NULL`,
-        [
-          allDocuments[i].metadata.sourceType,
-          allDocuments[i].metadata.sourceId,
-          allDocuments[i].pageContent,
-        ]
-      );
-    }
-  } finally {
-    updateClient.release();
+      [
+        allDocuments[i].metadata.sourceType,
+        allDocuments[i].metadata.sourceId,
+        allDocuments[i].pageContent,
+      ]
+    );
   }
 }
 
