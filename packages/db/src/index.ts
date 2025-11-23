@@ -15,7 +15,7 @@ export function getPool() {
       max: 2,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 30000,
-      allowExitOnIdle: true,
+      allowExitOnIdle: false,
     });
 
     _pool.on("error", (err) => {

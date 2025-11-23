@@ -53,20 +53,6 @@ app.use("/api/vector-store", vectorStoreRoutes);
 
 const PORT = process.env.PORT || 4000;
 
-const gracefulShutdown = async () => {
-  console.log("Shutting down gracefully...");
-  try {
-    await closePool();
-    console.log("Database connections closed.");
-  } catch (error) {
-    console.error("Error during shutdown:", error);
-  }
-  process.exit(0);
-};
-
-process.on("SIGTERM", gracefulShutdown);
-process.on("SIGINT", gracefulShutdown);
-
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
