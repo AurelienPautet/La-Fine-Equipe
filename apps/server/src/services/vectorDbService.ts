@@ -73,6 +73,13 @@ async function getVectorStore() {
   return vectorStoreInstance;
 }
 
+export async function resetVectorStore() {
+  const pool = getPool();
+  await pool.query(`TRUNCATE TABLE "LaFineEquipe-document_chunks"`);
+  await initializeVectorStore();
+  console.log("Vector store reset successfully");
+}
+
 export async function initializeVectorStore() {
   console.log("Starting vector store initialization...");
 
@@ -86,7 +93,7 @@ export async function initializeVectorStore() {
     .from(regulations)
     .leftJoin(
       regulationsCategories,
-      eq(regulations.categoryId, regulationsCategories.id)
+      eq(regulations.categoryId, regulationsCategories.id),
     )
     .where(isNull(regulations.deletedAt));
 
@@ -127,14 +134,14 @@ export async function initializeVectorStore() {
         sourceType: "events",
         toSplit: true,
       };
-    })
+    }),
   );
 
   // Process regulations with PDF extraction
   const regulationsWithPdfText = await Promise.all(
     allRegulations.map(async (reg) => {
       const enrichedContent = await enrichContentWithPdfText(
-        reg["LaFineEquipe-regulations"].content
+        reg["LaFineEquipe-regulations"].content,
       );
       return {
         pageContent: `Règlement : ${
@@ -150,7 +157,7 @@ export async function initializeVectorStore() {
         sourceType: "regulations",
         toSplit: true,
       };
-    })
+    }),
   );
 
   await addDocuments([
@@ -187,7 +194,7 @@ export async function initializeVectorStore() {
   console.log(
     `Vector store initialized successfully with ${
       finalCount[0]?.count || 0
-    } chunks.`
+    } chunks.`,
   );
 }
 
@@ -197,7 +204,7 @@ export async function addDocuments(
     sourceId: number;
     sourceType: string;
     toSplit: boolean;
-  }[]
+  }[],
 ) {
   const documentToSplit = documents.filter((d) => d.toSplit);
   const splitter = getTextSplitter();
@@ -206,7 +213,7 @@ export async function addDocuments(
     documentToSplit.map((d) => ({
       sourceId: d.sourceId,
       sourceType: d.sourceType,
-    }))
+    })),
   );
   const documentsWithoutSplit = documents.filter((d) => !d.toSplit);
   const allDocuments = [
@@ -224,7 +231,7 @@ export async function addDocuments(
   for (let i = 0; i < allDocuments.length; i++) {
     await pool.query(
       `DELETE FROM "LaFineEquipe-document_chunks" WHERE source_type = $1 AND source_id = $2`,
-      [allDocuments[i].metadata.sourceType, allDocuments[i].metadata.sourceId]
+      [allDocuments[i].metadata.sourceType, allDocuments[i].metadata.sourceId],
     );
   }
 
@@ -234,7 +241,7 @@ export async function addDocuments(
     allDocuments.map((doc) => ({
       pageContent: doc.pageContent,
       metadata: doc.metadata,
-    }))
+    })),
   );
 
   for (let i = 0; i < allDocuments.length; i++) {
@@ -246,7 +253,7 @@ export async function addDocuments(
         allDocuments[i].metadata.sourceType,
         allDocuments[i].metadata.sourceId,
         allDocuments[i].pageContent,
-      ]
+      ],
     );
   }
 }
@@ -264,8 +271,8 @@ export async function updateList(sourceType: string) {
             `- ${event.title} qui se déroule à ${
               event.location
             } du ${event.startDate.toLocaleDateString(
-              "fr-FR"
-            )} au ${event.endDate.toLocaleDateString("fr-FR")}`
+              "fr-FR",
+            )} au ${event.endDate.toLocaleDateString("fr-FR")}`,
         )
         .join("\n");
       await addDocuments([
@@ -284,7 +291,7 @@ export async function updateList(sourceType: string) {
         .from(regulations)
         .leftJoin(
           regulationsCategories,
-          eq(regulations.categoryId, regulationsCategories.id)
+          eq(regulations.categoryId, regulationsCategories.id),
         )
         .where(isNull(regulations.deletedAt));
 
@@ -295,7 +302,7 @@ export async function updateList(sourceType: string) {
               reg["LaFineEquipe-regulations"].title
             } : ${reg["LaFineEquipe-regulations"].description} du ${
               reg["LaFineEquipe-regulations"].date
-            }`
+            }`,
         )
         .join("\n");
       await addDocuments([
@@ -322,7 +329,7 @@ export async function updateList(sourceType: string) {
               m["LaFineEquipe-team_members"].lastName
             } est ${m["LaFineEquipe-team_members"].role} au sein du pôle ${
               m["LaFineEquipe-divisions"]?.name || "N/A"
-            }`
+            }`,
         )
         .join("\n");
       await addDocuments([
@@ -372,7 +379,7 @@ export async function updateList(sourceType: string) {
                   .join(", ")}]`
               : "";
           return `- ${section.title}: ${section.content}${buttonsText}`;
-        })
+        }),
       );
 
       const sectionsList = sectionsWithButtons.join("\n");
@@ -393,7 +400,7 @@ export async function updateList(sourceType: string) {
 
 export async function deleteFromVectorStore(
   sourceType: string,
-  sourceId: number
+  sourceId: number,
 ) {
   const pool = getPool();
   const client = await pool.connect();
@@ -401,7 +408,7 @@ export async function deleteFromVectorStore(
   try {
     await client.query(
       `DELETE FROM "LaFineEquipe-document_chunks" WHERE source_type = $1 AND source_id = $2`,
-      [sourceType, sourceId]
+      [sourceType, sourceId],
     );
     await updateList(sourceType);
   } finally {
