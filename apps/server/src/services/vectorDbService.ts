@@ -289,8 +289,8 @@ export async function addDocuments(
     `[VectorDB] Adding ${validDocuments.length} documents to vector store...`,
   );
   try {
-    // Process documents in smaller batches to identify problematic ones
-    const batchSize = 10;
+    // Process documents in smaller batches with delays to avoid rate limiting
+    const batchSize = 5;
     for (let i = 0; i < validDocuments.length; i += batchSize) {
       const batch = validDocuments.slice(i, i + batchSize);
       console.log(
@@ -309,14 +309,15 @@ export async function addDocuments(
         );
       } catch (batchError) {
         console.error(
-          `[VectorDB] Failed on batch ${Math.floor(i / batchSize) + 1}:`,
+          `[VectorDB] Batch ${Math.floor(i / batchSize) + 1} failed, trying documents individually:`,
           batchError,
         );
-        // Try adding documents one by one to identify the problematic one
+        // Try adding documents one by one - likely rate limiting issue
+        let failedDocs = 0;
         for (let j = 0; j < batch.length; j++) {
           const doc = batch[j];
           console.log(
-            `[VectorDB] Trying document ${i + j + 1} (${doc.pageContent.substring(0, 50)}...)`,
+            `[VectorDB] Trying document ${i + j + 1}/${validDocuments.length} (${doc.pageContent.substring(0, 50)}...)`,
           );
           try {
             await vectorStore.addDocuments([
@@ -326,14 +327,26 @@ export async function addDocuments(
               },
             ]);
             console.log(`[VectorDB] Document ${i + j + 1} succeeded`);
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 100));
           } catch (docError) {
             console.error(`[VectorDB] Document ${i + j + 1} failed:`, docError);
             console.error(
               `[VectorDB] Problematic content length: ${doc.pageContent.length}`,
             );
+            failedDocs++;
           }
         }
-        throw batchError;
+        if (failedDocs > 0) {
+          console.error(`[VectorDB] ${failedDocs} documents failed in batch ${Math.floor(i / batchSize) + 1}`);
+        } else {
+          console.log(`[VectorDB] All documents in batch ${Math.floor(i / batchSize) + 1} recovered successfully`);
+        }
+      }
+      
+      // Small delay between batches to avoid rate limiting
+      if (i + batchSize < validDocuments.length) {
+        await new Promise(resolve => setTimeout(resolve, 200));
       }
     }
   } catch (addError) {
