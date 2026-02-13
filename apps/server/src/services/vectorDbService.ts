@@ -206,6 +206,10 @@ export async function addDocuments(
     toSplit: boolean;
   }[],
 ) {
+  console.log(
+    `[VectorDB] addDocuments called with ${documents.length} documents`,
+  );
+
   const documentToSplit = documents.filter((d) => d.toSplit);
   const splitter = getTextSplitter();
   const chunks = await splitter.createDocuments(
@@ -215,6 +219,10 @@ export async function addDocuments(
       sourceType: d.sourceType,
     })),
   );
+  console.log(
+    `[VectorDB] Split ${documentToSplit.length} documents into ${chunks.length} chunks`,
+  );
+
   const documentsWithoutSplit = documents.filter((d) => !d.toSplit);
   const allDocuments = [
     ...chunks,
@@ -226,23 +234,66 @@ export async function addDocuments(
       },
     })),
   ];
+
+  console.log(`[VectorDB] Total documents to embed: ${allDocuments.length}`);
+
+  // Filter out empty documents
+  const validDocuments = allDocuments.filter(
+    (doc) => doc.pageContent && doc.pageContent.trim().length > 0,
+  );
+  if (validDocuments.length !== allDocuments.length) {
+    console.warn(
+      `[VectorDB] Filtered out ${allDocuments.length - validDocuments.length} empty documents`,
+    );
+  }
+
+  if (validDocuments.length === 0) {
+    console.warn("[VectorDB] No valid documents to add");
+    return;
+  }
+
   const pool = getPool();
 
-  for (let i = 0; i < allDocuments.length; i++) {
+  for (let i = 0; i < validDocuments.length; i++) {
     await pool.query(
       `DELETE FROM "LaFineEquipe-document_chunks" WHERE source_type = $1 AND source_id = $2`,
-      [allDocuments[i].metadata.sourceType, allDocuments[i].metadata.sourceId],
+      [
+        validDocuments[i].metadata.sourceType,
+        validDocuments[i].metadata.sourceId,
+      ],
     );
   }
 
   const vectorStore = await getVectorStore();
 
+  // Test embedding generation before bulk insert
+  console.log("[VectorDB] Testing embedding generation...");
+  const embeddings = getEmbeddings();
+  try {
+    const testVector = await embeddings.embedQuery(
+      validDocuments[0].pageContent.substring(0, 500),
+    );
+    console.log(`[VectorDB] Test embedding dimensions: ${testVector.length}`);
+    if (testVector.length === 0) {
+      throw new Error(
+        "Embedding returned 0 dimensions - check API key and model",
+      );
+    }
+  } catch (embError) {
+    console.error("[VectorDB] Embedding test failed:", embError);
+    throw embError;
+  }
+
+  console.log(
+    `[VectorDB] Adding ${validDocuments.length} documents to vector store...`,
+  );
   await vectorStore.addDocuments(
-    allDocuments.map((doc) => ({
+    validDocuments.map((doc) => ({
       pageContent: doc.pageContent,
       metadata: doc.metadata,
     })),
   );
+  console.log("[VectorDB] Documents added successfully");
 
   for (let i = 0; i < allDocuments.length; i++) {
     await pool.query(
