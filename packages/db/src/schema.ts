@@ -45,7 +45,7 @@ export const regulationsCategories = pgTable(
     titleSchema: text("title_schema").notNull(),
     order: integer("order").notNull().default(0),
     deletedAt: timestamp("deleted_at"),
-  }
+  },
 );
 
 export const regulations = pgTable("LaFineEquipe-regulations", {
@@ -96,7 +96,7 @@ export const actifMembersSettings = pgTable(
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdateFn(() => new Date()),
-  }
+  },
 );
 
 export const simpleMembersSettings = pgTable(
@@ -107,7 +107,7 @@ export const simpleMembersSettings = pgTable(
     updatedAt: timestamp("updated_at")
       .defaultNow()
       .$onUpdateFn(() => new Date()),
-  }
+  },
 );
 
 export const divisions = pgTable("LaFineEquipe-divisions", {
@@ -171,7 +171,7 @@ export const homeSectionButtons = pgTable("LaFineEquipe-home_section_buttons", {
 export const documentChunks = pgTable("LaFineEquipe-document_chunks", {
   id: serial("id").primaryKey(),
   text: text("text").notNull(),
-  embedding: vector("embedding", { dimensions: 768 }),
+  embedding: vector("embedding", { dimensions: 3072 }),
   metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow(),
   sourceType: text("source_type"),

@@ -60,7 +60,7 @@ async function getVectorStore() {
       vectorColumnName: "embedding",
       contentColumnName: "text",
       metadataColumnName: "metadata",
-      dimensions: 768,
+      dimensions: 3072,
       columns: {
         idColumnName: "id",
         vectorColumnName: "embedding",
@@ -76,6 +76,7 @@ async function getVectorStore() {
 export async function resetVectorStore() {
   const pool = getPool();
   await pool.query(`TRUNCATE TABLE "LaFineEquipe-document_chunks"`);
+  vectorStoreInstance = null;
   await initializeVectorStore();
   console.log("Vector store reset successfully");
 }
