@@ -288,12 +288,58 @@ export async function addDocuments(
   console.log(
     `[VectorDB] Adding ${validDocuments.length} documents to vector store...`,
   );
-  await vectorStore.addDocuments(
-    validDocuments.map((doc) => ({
-      pageContent: doc.pageContent,
-      metadata: doc.metadata,
-    })),
-  );
+  try {
+    // Process documents in smaller batches to identify problematic ones
+    const batchSize = 10;
+    for (let i = 0; i < validDocuments.length; i += batchSize) {
+      const batch = validDocuments.slice(i, i + batchSize);
+      console.log(
+        `[VectorDB] Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validDocuments.length / batchSize)} (${batch.length} docs)`,
+      );
+
+      try {
+        await vectorStore.addDocuments(
+          batch.map((doc) => ({
+            pageContent: doc.pageContent,
+            metadata: doc.metadata,
+          })),
+        );
+        console.log(
+          `[VectorDB] Batch ${Math.floor(i / batchSize) + 1} added successfully`,
+        );
+      } catch (batchError) {
+        console.error(
+          `[VectorDB] Failed on batch ${Math.floor(i / batchSize) + 1}:`,
+          batchError,
+        );
+        // Try adding documents one by one to identify the problematic one
+        for (let j = 0; j < batch.length; j++) {
+          const doc = batch[j];
+          console.log(
+            `[VectorDB] Trying document ${i + j + 1} (${doc.pageContent.substring(0, 50)}...)`,
+          );
+          try {
+            await vectorStore.addDocuments([
+              {
+                pageContent: doc.pageContent,
+                metadata: doc.metadata,
+              },
+            ]);
+            console.log(`[VectorDB] Document ${i + j + 1} succeeded`);
+          } catch (docError) {
+            console.error(`[VectorDB] Document ${i + j + 1} failed:`, docError);
+            console.error(
+              `[VectorDB] Problematic content length: ${doc.pageContent.length}`,
+            );
+          }
+        }
+        throw batchError;
+      }
+    }
+  } catch (addError) {
+    console.error("[VectorDB] Failed to add documents:", addError);
+    throw addError;
+  }
   console.log("[VectorDB] Documents added successfully");
 
   for (let i = 0; i < allDocuments.length; i++) {
