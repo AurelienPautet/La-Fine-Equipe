@@ -207,10 +207,6 @@ export async function addDocuments(
     toSplit: boolean;
   }[],
 ) {
-  console.log(
-    `[VectorDB] addDocuments called with ${documents.length} documents`,
-  );
-
   const documentToSplit = documents.filter((d) => d.toSplit);
   const splitter = getTextSplitter();
   const chunks = await splitter.createDocuments(
@@ -219,9 +215,6 @@ export async function addDocuments(
       sourceId: d.sourceId,
       sourceType: d.sourceType,
     })),
-  );
-  console.log(
-    `[VectorDB] Split ${documentToSplit.length} documents into ${chunks.length} chunks`,
   );
 
   const documentsWithoutSplit = documents.filter((d) => !d.toSplit);
@@ -236,20 +229,11 @@ export async function addDocuments(
     })),
   ];
 
-  console.log(`[VectorDB] Total documents to embed: ${allDocuments.length}`);
-
-  // Filter out empty documents
   const validDocuments = allDocuments.filter(
     (doc) => doc.pageContent && doc.pageContent.trim().length > 0,
   );
-  if (validDocuments.length !== allDocuments.length) {
-    console.warn(
-      `[VectorDB] Filtered out ${allDocuments.length - validDocuments.length} empty documents`,
-    );
-  }
 
   if (validDocuments.length === 0) {
-    console.warn("[VectorDB] No valid documents to add");
     return;
   }
 
@@ -267,93 +251,60 @@ export async function addDocuments(
 
   const vectorStore = await getVectorStore();
 
-  // Test embedding generation before bulk insert
-  console.log("[VectorDB] Testing embedding generation...");
-  const embeddings = getEmbeddings();
   try {
-    const testVector = await embeddings.embedQuery(
-      validDocuments[0].pageContent.substring(0, 500),
-    );
-    console.log(`[VectorDB] Test embedding dimensions: ${testVector.length}`);
-    if (testVector.length === 0) {
-      throw new Error(
-        "Embedding returned 0 dimensions - check API key and model",
-      );
-    }
-  } catch (embError) {
-    console.error("[VectorDB] Embedding test failed:", embError);
-    throw embError;
-  }
-
-  console.log(
-    `[VectorDB] Adding ${validDocuments.length} documents to vector store...`,
-  );
-  try {
-    // Process documents in smaller batches with delays to avoid rate limiting
-    const batchSize = 5;
-    for (let i = 0; i < validDocuments.length; i += batchSize) {
-      const batch = validDocuments.slice(i, i + batchSize);
-      console.log(
-        `[VectorDB] Processing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validDocuments.length / batchSize)} (${batch.length} docs)`,
-      );
-
-      try {
-        await vectorStore.addDocuments(
-          batch.map((doc) => ({
-            pageContent: doc.pageContent,
-            metadata: doc.metadata,
-          })),
-        );
-        console.log(
-          `[VectorDB] Batch ${Math.floor(i / batchSize) + 1} added successfully`,
-        );
-      } catch (batchError) {
-        console.error(
-          `[VectorDB] Batch ${Math.floor(i / batchSize) + 1} failed, trying documents individually:`,
-          batchError,
-        );
-        // Try adding documents one by one - likely rate limiting issue
-        let failedDocs = 0;
-        for (let j = 0; j < batch.length; j++) {
-          const doc = batch[j];
-          console.log(
-            `[VectorDB] Trying document ${i + j + 1}/${validDocuments.length} (${doc.pageContent.substring(0, 50)}...)`,
-          );
-          try {
-            await vectorStore.addDocuments([
-              {
-                pageContent: doc.pageContent,
-                metadata: doc.metadata,
-              },
-            ]);
-            console.log(`[VectorDB] Document ${i + j + 1} succeeded`);
-            // Small delay to avoid rate limiting
-            await new Promise(resolve => setTimeout(resolve, 100));
-          } catch (docError) {
-            console.error(`[VectorDB] Document ${i + j + 1} failed:`, docError);
-            console.error(
-              `[VectorDB] Problematic content length: ${doc.pageContent.length}`,
+    const addDocumentWithRetry = async (
+      doc: any,
+      docIndex: number,
+      maxRetries = 3,
+    ) => {
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          if (attempt > 0) {
+            await new Promise((resolve) =>
+              setTimeout(resolve, Math.pow(2, attempt) * 2000),
             );
-            failedDocs++;
+          }
+
+          await vectorStore.addDocuments([
+            {
+              pageContent: doc.pageContent,
+              metadata: doc.metadata,
+            },
+          ]);
+          return true;
+        } catch (error: any) {
+          if (attempt === maxRetries - 1) {
+            return false;
           }
         }
-        if (failedDocs > 0) {
-          console.error(`[VectorDB] ${failedDocs} documents failed in batch ${Math.floor(i / batchSize) + 1}`);
-        } else {
-          console.log(`[VectorDB] All documents in batch ${Math.floor(i / batchSize) + 1} recovered successfully`);
-        }
       }
-      
-      // Small delay between batches to avoid rate limiting
-      if (i + batchSize < validDocuments.length) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+      return false;
+    };
+
+    let failCount = 0;
+
+    for (let i = 0; i < validDocuments.length; i++) {
+      const success = await addDocumentWithRetry(validDocuments[i], i + 1);
+      if (!success) {
+        failCount++;
+      }
+
+      if ((i + 1) % 50 === 0 && i < validDocuments.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+      } else if (i < validDocuments.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
     }
+
+    if (failCount > 0) {
+      console.warn(
+        `Failed to embed ${failCount}/${validDocuments.length} documents`,
+      );
+    }
   } catch (addError) {
-    console.error("[VectorDB] Failed to add documents:", addError);
+    console.error("Failed to add documents:", addError);
     throw addError;
   }
-  console.log("[VectorDB] Documents added successfully");
 
   for (let i = 0; i < allDocuments.length; i++) {
     await pool.query(
