@@ -6,7 +6,7 @@ export function getEmbeddings() {
   if (!embeddings) {
     const apiKey = process.env.GEMINI_API_KEY || "";
     embeddings = new GoogleGenerativeAIEmbeddings({
-      model: "embedding-001",
+      model: "models/embedding-001",
       apiKey: apiKey,
     });
   }
