@@ -9,7 +9,7 @@ export function getEmbeddings() {
       `[Embeddings] Initializing with API key: ${apiKey ? "present" : "MISSING"}`,
     );
     embeddings = new GoogleGenerativeAIEmbeddings({
-      model: "models/embedding-001",
+      model: "gemini-embedding-001",
       apiKey: apiKey,
     });
   }
