@@ -11,28 +11,26 @@ import {
 } from "@lafineequipe/types";
 
 import getAuthHeaders from "../utils/getAuthHeadears";
+import { handleApiError, formatZodError } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export async function postHomeSection(
   homeSection: CreateHomeSectionRequest
 ): Promise<HomeSection> {
-  const validateData = createHomeSectionRequestSchema.parse(homeSection);
-  if (!validateData) {
-    throw new Error("Invalid home section data");
+  const result = createHomeSectionRequestSchema.safeParse(homeSection);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
   }
   const response = await fetch(`${API_URL}/api/home-sections`, {
     method: "POST",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
   if (!response.ok) {
-    console.error("Response:", response);
-    throw new Error("Failed to create home section", {
-      cause: response,
-    });
+    await handleApiError(response);
   }
   const homeSectionCreated = await response.json();
   return homeSectionCreated.data;
@@ -41,7 +39,10 @@ export async function postHomeSection(
 export async function editHomeSection(
   homeSectionData: EditHomeSectionRequest
 ): Promise<HomeSection> {
-  const validateData = editHomeSectionRequestSchema.parse(homeSectionData);
+  const result = editHomeSectionRequestSchema.safeParse(homeSectionData);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(
     `${API_URL}/api/home-sections/${homeSectionData.id}`,
     {
@@ -49,14 +50,11 @@ export async function editHomeSection(
       headers: {
         ...getAuthHeaders(),
       },
-      body: JSON.stringify(validateData),
+      body: JSON.stringify(result.data),
     }
   );
   if (!response.ok) {
-    console.error("Response:", response);
-    throw new Error("Failed to edit home section", {
-      cause: response,
-    });
+    await handleApiError(response);
   }
   const homeSectionEdited = await response.json();
   return homeSectionEdited.data;
@@ -65,26 +63,26 @@ export async function editHomeSection(
 export async function reorderHomeSections(
   reorderData: ReorderHomeSectionsRequest
 ): Promise<void> {
-  const validateData = reorderHomeSectionsRequestSchema.parse(reorderData);
+  const result = reorderHomeSectionsRequestSchema.safeParse(reorderData);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/home-sections/reorder`, {
     method: "PUT",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
   if (!response.ok) {
-    console.error("Response:", response);
-    throw new Error("Failed to reorder home sections", {
-      cause: response,
-    });
+    await handleApiError(response);
   }
 }
 
 export async function getAllHomeSections(): Promise<HomeSection[]> {
   const response = await fetch(`${API_URL}/api/home-sections`);
   if (!response.ok) {
-    throw new Error("Failed to fetch home sections");
+    await handleApiError(response);
   }
   const result = await response.json();
   return result.data;
@@ -93,7 +91,7 @@ export async function getAllHomeSections(): Promise<HomeSection[]> {
 export async function getVisibleHomeSections(): Promise<HomeSection[]> {
   const response = await fetch(`${API_URL}/api/home-sections/visible`);
   if (!response.ok) {
-    throw new Error("Failed to fetch visible home sections");
+    await handleApiError(response);
   }
   const result = await response.json();
   return result.data;
@@ -107,6 +105,6 @@ export async function deleteHomeSection(id: number): Promise<void> {
     },
   });
   if (!response.ok) {
-    throw new Error("Failed to delete home section");
+    await handleApiError(response);
   }
 }

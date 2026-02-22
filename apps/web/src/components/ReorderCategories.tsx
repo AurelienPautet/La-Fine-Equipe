@@ -14,6 +14,7 @@ const ReorderCategories: React.FC = () => {
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
+  const [errorText, setErrorText] = useState<string>("");
 
   const modalId = "reorder_categories_modal";
 
@@ -72,7 +73,9 @@ const ReorderCategories: React.FC = () => {
         }, 1500);
       },
       onError: (error) => {
-        console.error("Error reordering categories:", error);
+        setErrorText(
+          error instanceof Error ? error.message : "Erreur lors de la réorganisation des catégories"
+        );
         setStatus("error");
       },
     });
@@ -142,7 +145,7 @@ const ReorderCategories: React.FC = () => {
 
           {status === "error" && (
             <div className="alert alert-error my-4">
-              <p>Erreur lors de la réorganisation des catégories.</p>
+              <p>{errorText || "Erreur lors de la réorganisation des catégories."}</p>
             </div>
           )}
 

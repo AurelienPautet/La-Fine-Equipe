@@ -14,6 +14,7 @@ import type {
   Categories,
 } from "@lafineequipe/types";
 import UploadFileButton from "./UploadFileButton";
+import { useToast } from "./Toaster";
 
 interface RegulationFormProps {
   initialData: CreateRegulationRequest | EditRegulationRequest | Regulation;
@@ -32,6 +33,7 @@ const RegulationForm: React.FC<RegulationFormProps> = ({
   submitButtonText,
   submitButtonLoadingText,
 }) => {
+  const { toast } = useToast();
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Categories | null>(
     null
@@ -122,7 +124,7 @@ const RegulationForm: React.FC<RegulationFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCategory) {
-      alert("Veuillez sélectionner une catégorie");
+      toast.error("Veuillez sélectionner une catégorie");
       return;
     }
     for (const fileUrl of uploadedFiles) {

@@ -9,6 +9,7 @@ import {
   editEventsRequestSchema,
 } from "@lafineequipe/types";
 import getAuthHeaders from "../utils/getAuthHeadears";
+import { handleApiError, formatZodError } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
@@ -16,7 +17,7 @@ export async function getEvents(): Promise<EventsWithTags[]> {
   const response = await fetch(`${API_URL}/api/events`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch events");
+    await handleApiError(response);
   }
 
   const events = await response.json();
@@ -27,7 +28,7 @@ export async function getEvent(slug: string): Promise<EventsWithTags> {
   const response = await fetch(`${API_URL}/api/events/${slug}`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch events");
+    await handleApiError(response);
   }
 
   const events = await response.json();
@@ -38,7 +39,7 @@ export async function getLatestsEvents(): Promise<EventsWithTags[]> {
   const response = await fetch(`${API_URL}/api/events/latests`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch latests events");
+    await handleApiError(response);
   }
 
   const events = await response.json();
@@ -48,7 +49,7 @@ export async function getLatestsEvents(): Promise<EventsWithTags[]> {
 export async function getMemorableEvents(): Promise<EventsWithTags[]> {
   const response = await fetch(`${API_URL}/api/events/memorable`);
   if (!response.ok) {
-    throw new Error("Failed to fetch memorable events");
+    await handleApiError(response);
   }
   const events = await response.json();
   return events.data;
@@ -65,12 +66,11 @@ export async function changeEventMemorabilityMutation({
     method: "PUT",
     headers: {
       ...getAuthHeaders(),
-      "Content-Type": "application/json",
     },
     body: JSON.stringify({ memorable }),
   });
   if (!response.ok) {
-    throw new Error("Failed to change event memorability");
+    await handleApiError(response);
   }
   const events = await response.json();
   return events.data;
@@ -79,18 +79,20 @@ export async function changeEventMemorabilityMutation({
 export async function postEventsMutation(
   eventsData: CreateEventsRequest
 ): Promise<EventsWithTags> {
-  const validateData = createEventsRequestSchema.parse(eventsData);
+  const result = createEventsRequestSchema.safeParse(eventsData);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/events`, {
     method: "POST",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
 
   if (!response.ok) {
-    console.error("Response:", response);
-    throw new Error("Failed to create events" + response, { cause: response });
+    await handleApiError(response);
   }
 
   const events = await response.json();
@@ -102,17 +104,20 @@ export async function editEventsMutation({
 }: {
   eventsData: EditEventsRequest;
 }): Promise<EventsWithTags> {
-  const validateData = editEventsRequestSchema.parse(eventsData);
+  const result = editEventsRequestSchema.safeParse(eventsData);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/events/${eventsData.id}`, {
     method: "PUT",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to edit events");
+    await handleApiError(response);
   }
 
   const events = await response.json();
@@ -128,6 +133,7 @@ export async function deleteEventMutation(id: number): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to delete event");
+    await handleApiError(response);
   }
 }
+

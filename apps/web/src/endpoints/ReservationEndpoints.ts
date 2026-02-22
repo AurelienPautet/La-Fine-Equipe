@@ -7,20 +7,24 @@ import type {
 
 import { createReservationSchema } from "@lafineequipe/types";
 import getAuthHeaders from "../utils/getAuthHeadears";
+import { handleApiError, formatZodError } from "../utils/apiError";
 
 export async function postReservation(
   data: CreateReservationRequest
 ): Promise<Reservation> {
-  const validateData = createReservationSchema.parse(data);
+  const result = createReservationSchema.safeParse(data);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/reservations`, {
     method: "POST",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
   if (!response.ok) {
-    throw new Error("Failed to create reservation");
+    await handleApiError(response);
   }
   const reservation = await response.json();
   return reservation;
@@ -31,7 +35,7 @@ export async function getReservationsForEvent(
 ): Promise<Reservation[]> {
   const response = await fetch(`${API_URL}/api/reservations/event/${slug}`);
   if (!response.ok) {
-    throw new Error("Failed to fetch reservations");
+    await handleApiError(response);
   }
   const reservations = await response.json();
   return reservations;
@@ -46,6 +50,6 @@ export async function deleteReservationMutation(id: number): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to delete reservation");
+    await handleApiError(response);
   }
 }

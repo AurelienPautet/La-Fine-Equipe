@@ -9,6 +9,7 @@ import {
   reorderCategoriesRequestSchema,
 } from "@lafineequipe/types";
 import getAuthHeaders from "../utils/getAuthHeadears";
+import { handleApiError, formatZodError } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
@@ -16,7 +17,7 @@ export async function getAllCategories(): Promise<Categories[]> {
   const response = await fetch(`${API_URL}/api/categories`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch categories");
+    await handleApiError(response);
   }
 
   const categories = await response.json();
@@ -27,7 +28,7 @@ export async function getCategoriesFromId(id: number): Promise<Categories> {
   const response = await fetch(`${API_URL}/api/categories/${id}`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch category");
+    await handleApiError(response);
   }
 
   const category = await response.json();
@@ -37,20 +38,20 @@ export async function getCategoriesFromId(id: number): Promise<Categories> {
 export async function postCategories(
   categoryData: CreateCategoryRequest
 ): Promise<Categories> {
-  const validateData = createCategoryRequestSchema.parse(categoryData);
+  const result = createCategoryRequestSchema.safeParse(categoryData);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/categories`, {
     method: "POST",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
 
   if (!response.ok) {
-    console.error("Response:", response);
-    throw new Error("Failed to create category", {
-      cause: response,
-    });
+    await handleApiError(response);
   }
 
   const category = await response.json();
@@ -61,20 +62,20 @@ export async function editCategories(
   id: number,
   categoryData: CreateCategoryRequest
 ): Promise<Categories> {
-  const validateData = createCategoryRequestSchema.parse(categoryData);
+  const result = createCategoryRequestSchema.safeParse(categoryData);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/categories/${id}`, {
     method: "PUT",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
 
   if (!response.ok) {
-    console.error("Response:", response);
-    throw new Error("Failed to edit category", {
-      cause: response,
-    });
+    await handleApiError(response);
   }
 
   const category = await response.json();
@@ -84,19 +85,23 @@ export async function editCategories(
 export async function reorderCategories(
   reorderData: ReorderCategoriesRequest[]
 ): Promise<Categories[]> {
-  const validateData = reorderData.map((item) =>
-    reorderCategoriesRequestSchema.parse(item)
-  );
+  const validated = reorderData.map((item) => {
+    const result = reorderCategoriesRequestSchema.safeParse(item);
+    if (!result.success) {
+      throw new Error(formatZodError(result.error));
+    }
+    return result.data;
+  });
   const response = await fetch(`${API_URL}/api/categories/reorder`, {
     method: "PUT",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(validated),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to reorder categories");
+    await handleApiError(response);
   }
 
   const categories = await response.json();
@@ -112,6 +117,6 @@ export async function deleteCategoryMutation(id: number): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to delete category");
+    await handleApiError(response);
   }
 }

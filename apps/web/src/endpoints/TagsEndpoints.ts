@@ -2,12 +2,13 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 import type { Tag } from "@lafineequipe/types";
 import getAuthHeaders from "../utils/getAuthHeadears";
+import { handleApiError } from "../utils/apiError";
 
 export async function getTags(): Promise<Tag[]> {
   const response = await fetch(`${API_URL}/api/tags`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch tags");
+    await handleApiError(response);
   }
 
   const tags = await response.json();
@@ -23,7 +24,7 @@ export async function postTag(name: string): Promise<Tag> {
     body: JSON.stringify({ name }),
   });
   if (!response.ok) {
-    throw new Error("Failed to create tag");
+    await handleApiError(response);
   }
 
   const tag = await response.json();
@@ -39,6 +40,6 @@ export async function deleteTagMutation(id: number): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to delete tag");
+    await handleApiError(response);
   }
 }

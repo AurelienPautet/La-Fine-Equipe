@@ -8,12 +8,14 @@ import type { CreateEventsRequest } from "@lafineequipe/types";
 import { useEditEvents, useEvent } from "../hooks/EventHooks";
 import { useAuth } from "../components/AuthProvider";
 import LoginButton from "../components/LoginButton";
+import { useToast } from "../components/Toaster";
 
 const EditEventsPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const { data: events, error, isLoading: loading } = useEvent(slug || "");
   const editEvents = useEditEvents();
@@ -26,7 +28,9 @@ const EditEventsPage: React.FC = () => {
       });
       navigate(`/events/${res.slug}`);
     } catch (error) {
-      console.error("Failed to edit events:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Erreur lors de la modification de l'événement"
+      );
     } finally {
       setIsSubmitting(false);
     }

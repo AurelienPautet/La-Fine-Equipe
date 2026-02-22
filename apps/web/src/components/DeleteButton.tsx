@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "./Toaster";
 
 interface DeleteButtonProps {
   id: number;
@@ -24,6 +25,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -38,8 +40,11 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
         navigate(redirectPath);
       }
     } catch (error) {
-      console.error(`Error deleting ${entityName}:`, error);
-      alert(`Erreur lors de la suppression ${entityName}`);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : `Erreur lors de la suppression de ${entityName}`
+      );
     } finally {
       setIsDeleting(false);
       setShowConfirm(false);

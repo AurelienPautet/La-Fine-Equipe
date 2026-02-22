@@ -10,6 +10,7 @@ import type {
 } from "@lafineequipe/types";
 import { useAuth } from "../components/AuthProvider";
 import LoginButton from "../components/LoginButton";
+import { useToast } from "../components/Toaster";
 
 const EditRegulationPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -17,6 +18,7 @@ const EditRegulationPage: React.FC = () => {
   const navigate = useNavigate();
   const { data: regulation, isLoading, isError } = useRegulation(slug!);
   const editRegulation = useEditRegulation();
+  const { toast } = useToast();
 
   const handleSubmit = async (
     data: CreateRegulationRequest | EditRegulationRequest
@@ -32,7 +34,9 @@ const EditRegulationPage: React.FC = () => {
       });
       navigate(`/regulations/${res.slug}`);
     } catch (error) {
-      console.error("Failed to edit regulation:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Erreur lors de la modification du règlement"
+      );
     }
   };
 

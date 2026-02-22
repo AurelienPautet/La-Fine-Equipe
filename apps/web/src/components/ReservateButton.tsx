@@ -50,13 +50,14 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
     isMember: false,
   });
 
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
   const storeInLocalStorage = (data: typeof reservationData) => {
     localStorage.setItem("reservationData", JSON.stringify(data));
   };
 
   useEffect(() => {
     const data = localStorage.getItem("reservationData");
-    console.log("Loaded reservation data from localStorage:", data);
     if (data) {
       setReservationData(JSON.parse(data));
     }
@@ -69,15 +70,17 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
   ) => {
     const { name, value } = e.target;
     setReservationData((prevData) => ({ ...prevData, [name]: value }));
+    setErrorMessage(null);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!eventId) {
-      alert("Invalid event ID");
+      setErrorMessage("Identifiant d'événement invalide");
       return;
     }
     setStatus("submitting");
+    setErrorMessage(null);
     createReservationMutation.mutate(
       {
         eventId: eventId,
@@ -92,7 +95,9 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
           storeInLocalStorage(reservationData);
         },
         onError: (error) => {
-          console.error("Error creating events:", error);
+          setErrorMessage(
+            error instanceof Error ? error.message : "Erreur lors de la réservation"
+          );
           setStatus("error");
         },
       }
@@ -137,12 +142,12 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
               <p className="text-success">Réservation réussie!</p>
               <AddToCalendarButton
                 eventName={eventTitle || "Événement"}
-                startDate={eventStartDate || new Date()} // Replace with actual event start time
-                endDate={eventEndDate || new Date()} // Replace with actual event end time
+                startDate={eventStartDate || new Date()}
+                endDate={eventEndDate || new Date()}
                 description={`Réservation pour l'événement: ${
                   eventTitle || "Événement"
                 }`}
-                location={eventLocation || "Lieu de l'événement"} // Replace with actual location
+                location={eventLocation || "Lieu de l'événement"}
                 filename="reservation.ics"
               />
               <button
@@ -240,6 +245,12 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
                   </div>
                 )}
 
+                {errorMessage && (
+                  <div className="alert alert-error w-full mb-4">
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
                 <div className="flex flew-row justify-center w-full pr-20 pl-20 mt-2">
                   <button
                     className="btn btn-ghost mr-4"
@@ -257,11 +268,6 @@ const ReservateButton: React.FC<ReservateButtonProps> = ({
                 </div>
               </form>
             </div>
-          )}
-          {status === "error" && (
-            <p className="w-full text-center mt-10  text-error">
-              Erreur lors de la réservation.
-            </p>
           )}
         </div>
       </dialog>

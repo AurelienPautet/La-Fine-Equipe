@@ -9,6 +9,7 @@ import {
   editRegulationRequestSchema,
 } from "@lafineequipe/types";
 import getAuthHeaders from "../utils/getAuthHeadears";
+import { handleApiError, formatZodError } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
@@ -16,7 +17,7 @@ export async function getRegulations(): Promise<Regulation[]> {
   const response = await fetch(`${API_URL}/api/regulations`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch regulations");
+    await handleApiError(response);
   }
 
   const regulations = await response.json();
@@ -27,7 +28,7 @@ export async function getRegulation(slug: string): Promise<Regulation> {
   const response = await fetch(`${API_URL}/api/regulations/${slug}`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch regulation");
+    await handleApiError(response);
   }
 
   const regulation = await response.json();
@@ -38,7 +39,7 @@ export async function getLatestRegulations(): Promise<Regulation[]> {
   const response = await fetch(`${API_URL}/api/regulations/latest`);
 
   if (!response.ok) {
-    throw new Error("Failed to fetch latest regulations");
+    await handleApiError(response);
   }
 
   const regulations = await response.json();
@@ -48,20 +49,20 @@ export async function getLatestRegulations(): Promise<Regulation[]> {
 export async function postRegulationMutation(
   regulationData: CreateRegulationRequest
 ): Promise<Regulation> {
-  const validateData = createRegulationRequestSchema.parse(regulationData);
+  const result = createRegulationRequestSchema.safeParse(regulationData);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/regulations`, {
     method: "POST",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
 
   if (!response.ok) {
-    console.error("Response:", response);
-    throw new Error("Failed to create regulation" + response, {
-      cause: response,
-    });
+    await handleApiError(response);
   }
 
   const regulation = await response.json();
@@ -73,7 +74,10 @@ export async function editRegulationMutation({
 }: {
   regulationData: EditRegulationRequest;
 }): Promise<Regulation> {
-  const validateData = editRegulationRequestSchema.parse(regulationData);
+  const result = editRegulationRequestSchema.safeParse(regulationData);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(
     `${API_URL}/api/regulations/${regulationData.id}`,
     {
@@ -81,12 +85,12 @@ export async function editRegulationMutation({
       headers: {
         ...getAuthHeaders(),
       },
-      body: JSON.stringify(validateData),
+      body: JSON.stringify(result.data),
     }
   );
 
   if (!response.ok) {
-    throw new Error("Failed to edit regulation");
+    await handleApiError(response);
   }
 
   const regulation = await response.json();
@@ -102,6 +106,6 @@ export async function deleteRegulationMutation(id: number): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to delete regulation");
+    await handleApiError(response);
   }
 }

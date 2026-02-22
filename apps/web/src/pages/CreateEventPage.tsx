@@ -7,9 +7,11 @@ import MarkdownGuide from "../components/MarkdownGuide";
 import { usePostEvents } from "../hooks/EventHooks";
 import { useAuth } from "../components/AuthProvider";
 import LoginButton from "../components/LoginButton";
+import { useToast } from "../components/Toaster";
 
 const CreateEventsPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
 
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,7 +33,9 @@ const CreateEventsPage: React.FC = () => {
         navigate("/events");
       },
       onError: (error) => {
-        console.error("Error creating events:", error);
+        toast.error(
+          error instanceof Error ? error.message : "Erreur lors de la création de l'événement"
+        );
         setIsSubmitting(false);
       },
     });

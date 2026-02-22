@@ -11,26 +11,24 @@ import {
 } from "@lafineequipe/types";
 
 import getAuthHeaders from "../utils/getAuthHeadears";
+import { handleApiError, formatZodError } from "../utils/apiError";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
 export async function postFigure(figure: CreateFigureRequest): Promise<Figure> {
-  const validateData = createFigureRequestSchema.parse(figure);
-  if (!validateData) {
-    throw new Error("Invalid figure data");
+  const result = createFigureRequestSchema.safeParse(figure);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
   }
   const response = await fetch(`${API_URL}/api/figures`, {
     method: "POST",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
   if (!response.ok) {
-    console.error("Response:", response);
-    throw new Error("Failed to create figure", {
-      cause: response,
-    });
+    await handleApiError(response);
   }
   const figureCreated = await response.json();
   return figureCreated.data;
@@ -39,19 +37,19 @@ export async function postFigure(figure: CreateFigureRequest): Promise<Figure> {
 export async function editFigure(
   figureData: EditFigureRequest
 ): Promise<Figure> {
-  const validateData = editFigureRequestSchema.parse(figureData);
+  const result = editFigureRequestSchema.safeParse(figureData);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/figures/${figureData.id}`, {
     method: "PUT",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
   if (!response.ok) {
-    console.error("Response:", response);
-    throw new Error("Failed to edit figure", {
-      cause: response,
-    });
+    await handleApiError(response);
   }
   const figureEdited = await response.json();
   return figureEdited.data;
@@ -60,7 +58,7 @@ export async function editFigure(
 export async function getAllFigures(): Promise<Figure[]> {
   const response = await fetch(`${API_URL}/api/figures`);
   if (!response.ok) {
-    throw new Error("Failed to fetch figures");
+    await handleApiError(response);
   }
   const result = await response.json();
   return result.data;
@@ -69,19 +67,19 @@ export async function getAllFigures(): Promise<Figure[]> {
 export async function reorderFigures(
   reorderData: ReorderFiguresRequest
 ): Promise<void> {
-  const validateData = reorderFiguresRequestSchema.parse(reorderData);
+  const result = reorderFiguresRequestSchema.safeParse(reorderData);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/figures/reorder`, {
     method: "PUT",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(validateData),
+    body: JSON.stringify(result.data),
   });
   if (!response.ok) {
-    console.error("Response:", response);
-    throw new Error("Failed to reorder figures", {
-      cause: response,
-    });
+    await handleApiError(response);
   }
 }
 
@@ -93,6 +91,6 @@ export async function deleteFigure(id: number): Promise<void> {
     },
   });
   if (!response.ok) {
-    throw new Error("Failed to delete figure");
+    await handleApiError(response);
   }
 }

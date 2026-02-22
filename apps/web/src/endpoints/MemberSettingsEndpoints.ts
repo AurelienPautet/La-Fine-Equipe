@@ -15,12 +15,16 @@ import type {
   EditSimpleMembersSettingsRequest,
 } from "@lafineequipe/types";
 import getAuthHeaders from "../utils/getAuthHeadears";
+import { handleApiError, formatZodError } from "../utils/apiError";
 
 export const getMembersSettings = async (): Promise<{
   actifSettings: ActifMembersSettings;
   simpleSettings: SimpleMembersSettings;
 }> => {
   const response = await fetch(`${API_URL}/api/members-settings`);
+  if (!response.ok) {
+    await handleApiError(response);
+  }
   const data = await response.json();
 
   return data.data;
@@ -29,16 +33,19 @@ export const getMembersSettings = async (): Promise<{
 export const updateActifMembersSettings = async (
   settings: EditActifMembersSettingsRequest
 ): Promise<void> => {
-  const parsed = editActifMembersSettingsRequestSchema.parse(settings);
+  const result = editActifMembersSettingsRequestSchema.safeParse(settings);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/members-settings/actif`, {
     method: "PUT",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(parsed),
+    body: JSON.stringify(result.data),
   });
   if (!response.ok) {
-    throw new Error("Failed to update Actif members settings");
+    await handleApiError(response);
   }
   const data = await response.json();
   return data;
@@ -47,16 +54,19 @@ export const updateActifMembersSettings = async (
 export const updateSimpleMembersSettings = async (
   settings: EditSimpleMembersSettingsRequest
 ): Promise<void> => {
-  const parsed = editSimpleMembersSettingsRequestSchema.parse(settings);
+  const result = editSimpleMembersSettingsRequestSchema.safeParse(settings);
+  if (!result.success) {
+    throw new Error(formatZodError(result.error));
+  }
   const response = await fetch(`${API_URL}/api/members-settings/simple`, {
     method: "PUT",
     headers: {
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(parsed),
+    body: JSON.stringify(result.data),
   });
   if (!response.ok) {
-    throw new Error("Failed to update Simple members settings");
+    await handleApiError(response);
   }
   const data = await response.json();
   return data;

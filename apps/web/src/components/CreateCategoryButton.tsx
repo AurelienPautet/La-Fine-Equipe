@@ -8,6 +8,7 @@ const CreateCategoryButton: React.FC = () => {
   const [status, setStatus] = useState<
     "idle" | "submitting" | "success" | "error"
   >("idle");
+  const [errorText, setErrorText] = useState<string>("");
   const [categoryData, setCategoryData] = useState<CreateCategoryRequest>({
     name: "",
     abbreviation: "",
@@ -59,7 +60,9 @@ const CreateCategoryButton: React.FC = () => {
         }, 2000);
       },
       onError: (error) => {
-        console.error("Error creating category:", error);
+        setErrorText(
+          error instanceof Error ? error.message : "Erreur lors de la création de la catégorie"
+        );
         setStatus("error");
       },
     });
@@ -79,6 +82,7 @@ const CreateCategoryButton: React.FC = () => {
             status={status}
             onCancel={handleCloseModal}
             isEdit={false}
+            errorText={errorText}
           />
         </div>
         <form method="dialog" className="modal-backdrop">

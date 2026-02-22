@@ -8,6 +8,7 @@ interface CategoryFormProps {
   status: "idle" | "submitting" | "success" | "error";
   onCancel: () => void;
   isEdit?: boolean;
+  errorText?: string;
 }
 
 const CategoryForm: React.FC<CategoryFormProps> = ({
@@ -17,6 +18,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   status,
   onCancel,
   isEdit = false,
+  errorText,
 }) => {
   const title = isEdit ? "Modifier la catégorie" : "Créer une catégorie";
   const submitLabel = isEdit ? "Modifier" : "Créer";
@@ -26,7 +28,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   const successMessage = isEdit
     ? "Catégorie modifiée avec succès!"
     : "Catégorie créée avec succès!";
-  const errorMessage = isEdit
+  const defaultErrorMessage = isEdit
     ? "Erreur lors de la modification de la catégorie."
     : "Erreur lors de la création de la catégorie.";
 
@@ -42,7 +44,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
       {status === "error" && (
         <div className="alert alert-error my-4">
-          <p>{errorMessage}</p>
+          <p>{errorText || defaultErrorMessage}</p>
         </div>
       )}
 

@@ -7,11 +7,13 @@ import { FaFileAlt } from "react-icons/fa";
 import type { CreateRegulationRequest } from "@lafineequipe/types";
 import { useAuth } from "../components/AuthProvider";
 import LoginButton from "../components/LoginButton";
+import { useToast } from "../components/Toaster";
 
 const CreateRegulationPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const postRegulation = usePostRegulation();
+  const { toast } = useToast();
 
   const state = useLocation().state;
   const initialData: CreateRegulationRequest = {
@@ -26,7 +28,9 @@ const CreateRegulationPage: React.FC = () => {
       await postRegulation.mutateAsync(data);
       navigate("/regulations");
     } catch (error) {
-      console.error("Failed to create regulation:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Erreur lors de la création du règlement"
+      );
     }
   };
 

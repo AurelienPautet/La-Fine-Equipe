@@ -94,6 +94,21 @@
   background-color: hsl(var(--b2));
 }
 
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-item {
+  animation: toast-in 0.2s ease-out forwards;
+}
+
 /* Popover positioning fix */
 [popover] {
   position: fixed;

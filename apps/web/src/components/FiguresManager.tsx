@@ -7,6 +7,7 @@ import type {
 } from "@lafineequipe/types";
 import { useAuth } from "../components/AuthProvider";
 import Popover from "./Popover";
+import { useToast } from "./Toaster";
 import {
   FaHandshake,
   FaLightbulb,
@@ -45,6 +46,7 @@ const FiguresManager: React.FC<FiguresManagerProps> = ({ editingFigure }) => {
   const { isAuthenticated } = useAuth();
   const postFigure = usePostFigure();
   const editFigure = useEditFigure();
+  const { toast } = useToast();
 
   const [isModalOpen, setIsModalOpen] = useState(!!editingFigure);
   const [formData, setFormData] = useState<CreateFigureRequest>({
@@ -80,7 +82,9 @@ const FiguresManager: React.FC<FiguresManagerProps> = ({ editingFigure }) => {
       setIsModalOpen(false);
       resetForm();
     } catch (error) {
-      console.error("Error saving figure:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Erreur lors de l'enregistrement du chiffre clé"
+      );
     }
   };
 

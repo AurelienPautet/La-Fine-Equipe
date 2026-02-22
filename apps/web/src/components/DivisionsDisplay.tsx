@@ -30,9 +30,11 @@ import type {
   CreateTeamMemberRequest,
   EditTeamMemberRequest,
 } from "@lafineequipe/types";
+import { useToast } from "./Toaster";
 
 const DivisionsDisplay: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
 
   const [divisionModalOpen, setDivisionModalOpen] = useState(false);
   const [divisionEditingId, setDivisionEditingId] = useState<number | null>(
@@ -107,6 +109,11 @@ const DivisionsDisplay: React.FC = () => {
             message: "Pôle modifié avec succès",
           });
         },
+        onError: (error) => {
+          toast.error(
+            error instanceof Error ? error.message : "Erreur lors de la modification du pôle"
+          );
+        },
       });
     } else {
       postDivision.mutate(data as CreateDivisionRequest, {
@@ -119,12 +126,23 @@ const DivisionsDisplay: React.FC = () => {
             message: "Pôle créé avec succès",
           });
         },
+        onError: (error) => {
+          toast.error(
+            error instanceof Error ? error.message : "Erreur lors de la création du pôle"
+          );
+        },
       });
     }
   };
 
   const handleDeleteDivision = async (divisionId: number) => {
-    await deleteDivision.mutateAsync(divisionId);
+    try {
+      await deleteDivision.mutateAsync(divisionId);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Erreur lors de la suppression du pôle"
+      );
+    }
   };
 
   const handleMoveDivision = (division: Division, dir: -1 | 1) => {
@@ -140,7 +158,13 @@ const DivisionsDisplay: React.FC = () => {
       swapped[divisionIdx].order,
     ];
     const reorderData = swapped.map(({ id, order }) => ({ id, order }));
-    reorderDivisions.mutate(reorderData);
+    reorderDivisions.mutate(reorderData, {
+      onError: (error) => {
+        toast.error(
+          error instanceof Error ? error.message : "Erreur lors du réordonnancement"
+        );
+      },
+    });
   };
 
   const handleAddMember = (division: Division) => {
@@ -170,6 +194,11 @@ const DivisionsDisplay: React.FC = () => {
             message: "Membre modifié avec succès",
           });
         },
+        onError: (error) => {
+          toast.error(
+            error instanceof Error ? error.message : "Erreur lors de la modification du membre"
+          );
+        },
       });
     } else {
       postTeamMember.mutate(data as CreateTeamMemberRequest, {
@@ -183,12 +212,23 @@ const DivisionsDisplay: React.FC = () => {
             message: "Membre créé avec succès",
           });
         },
+        onError: (error) => {
+          toast.error(
+            error instanceof Error ? error.message : "Erreur lors de la création du membre"
+          );
+        },
       });
     }
   };
 
   const handleDeleteMember = async (memberId: number) => {
-    await deleteTeamMember.mutateAsync(memberId);
+    try {
+      await deleteTeamMember.mutateAsync(memberId);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Erreur lors de la suppression du membre"
+      );
+    }
   };
 
   const handleMoveMember = (member: TeamMember, dir: -1 | 1) => {
@@ -204,7 +244,13 @@ const DivisionsDisplay: React.FC = () => {
       arr[memberIdx].order,
     ];
     const reorderData = arr.map(({ id, order }) => ({ id, order }));
-    reorderTeamMembers.mutate(reorderData);
+    reorderTeamMembers.mutate(reorderData, {
+      onError: (error) => {
+        toast.error(
+          error instanceof Error ? error.message : "Erreur lors du réordonnancement"
+        );
+      },
+    });
   };
 
   const editingDivision = divisions?.find((d) => d.id === divisionEditingId);

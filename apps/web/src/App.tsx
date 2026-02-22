@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const queryClient = new QueryClient();
 
 import { AuthProvider } from "./components/AuthProvider";
+import { ToastProvider } from "./components/Toaster";
 
 import HomePage from "./pages/HomePage";
 import EventsPage from "./pages/EventsPage";
@@ -28,6 +29,7 @@ function App() {
       <ScrollToTop />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <ToastProvider>
           <div
             data-theme="lafine"
             className="min-h-screen bg-gradient-to-br from-accent to-base-100"
@@ -67,6 +69,7 @@ function App() {
             {/* Footer */}
             <Footer />
           </div>
+          </ToastProvider>
         </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>

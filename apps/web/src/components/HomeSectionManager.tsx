@@ -10,6 +10,7 @@ import {
 } from "../hooks/HomeSectionHooks";
 import UploadFileButton from "./UploadFileButton";
 import { FaPlus, FaTrash } from "react-icons/fa";
+import { useToast } from "./Toaster";
 
 interface HomeSectionManagerProps {
   editingSection: HomeSectionWithButtons | null;
@@ -22,6 +23,7 @@ const HomeSectionManager: React.FC<HomeSectionManagerProps> = ({
 }) => {
   const postHomeSection = usePostHomeSection();
   const editHomeSection = useEditHomeSection();
+  const { toast } = useToast();
 
   const [formData, setFormData] = useState<
     CreateHomeSectionRequest | EditHomeSectionRequest
@@ -82,7 +84,9 @@ const HomeSectionManager: React.FC<HomeSectionManagerProps> = ({
       });
       onClose?.();
     } catch (error) {
-      console.error("Error saving home section:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Erreur lors de l'enregistrement de la section"
+      );
     }
   };
 
