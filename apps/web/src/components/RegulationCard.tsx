@@ -27,23 +27,19 @@ const RegulationCard: React.FC<RegulationCardProps> = ({
   };
 
   return (
-    <div
+    <Link
       key={regulation.id}
-      className="bg-base-200 rounded-lg p-3 hover:bg-base-300 transition-colors"
+      to={`/regulations/${regulation.slug}`}
+      className="flex items-start justify-between gap-3 group bg-base-200 rounded-lg p-3 hover:bg-base-300 transition-colors"
     >
-      <Link
-        to={`/regulations/${regulation.slug}`}
-        className="flex items-start justify-between gap-3 group"
-      >
-        <div className="flex-1">
-          <h4 className="font-semibold text-base-content group-hover:text-primary transition-colors">
-            {generateRegulationTitle()}
-          </h4>
-          <p>{regulation.description}</p>
-        </div>
-        <FaArrowRight className="w-5 h-5 text-base-content/50 group-hover:text-primary transition-colors mt-1" />
-      </Link>
-    </div>
+      <div className="flex-1">
+        <h4 className="font-semibold text-base-content group-hover:text-primary transition-colors">
+          {generateRegulationTitle()}
+        </h4>
+        <p>{regulation.description}</p>
+      </div>
+      <FaArrowRight className="w-5 h-5 text-base-content/50 group-hover:text-primary transition-colors mt-1" />
+    </Link>
   );
 };
 
