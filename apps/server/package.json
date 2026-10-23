@@ -13,7 +13,7 @@
     "@lafineequipe/types": "workspace:*",
     "@langchain/community": "^1.0.2",
     "@langchain/core": "^1.0.4",
-    "@langchain/google-genai": "^1.0.0",
+    "@langchain/google-genai": "^2.3.3",
     "@langchain/openai": "^1.1.0",
     "@langchain/textsplitters": "^1.0.0",
     "@types/express-fileupload": "^1.5.1",
