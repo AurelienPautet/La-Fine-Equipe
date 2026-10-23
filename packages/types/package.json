@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@lafineequipe/db": "workspace:*",
-    "drizzle-orm": "^0.36.4",
+    "drizzle-orm": "^0.45.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
